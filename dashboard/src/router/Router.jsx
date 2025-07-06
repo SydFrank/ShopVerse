@@ -1,6 +1,6 @@
 /**
  * Router Component
- *
+ * ---------------------------
  * This component takes a list of route configurations (allRoutes)
  * and renders the matched component using React Router's useRoutes() hook.
  */
