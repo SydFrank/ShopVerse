@@ -20,11 +20,11 @@ const Register = lazy(() => import("./../../views/auth/Register"));
 const publicRoutes = [
   {
     path: "/login", // URL path for the login page
-    element: <Login />, // React component render whrn this route is matched
+    element: <Login />, // React component render when this route is matched
   },
   {
     path: "/register", //  URL path for the register page
-    element: <Register />, // React component render whrn this route is matched
+    element: <Register />, // React component render when this route is matched
   },
 ];
 
