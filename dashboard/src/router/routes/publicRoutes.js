@@ -12,7 +12,10 @@
  * Used by the router to define which components render on specific URLs.
  */
 
-import Login from "./../../views/auth/Login";
+import { lazy } from "react";
+// lazy load
+const Login = lazy(() => import("./../../views/auth/Login"));
+const Register = lazy(() => import("./../../views/auth/Register"));
 
 const publicRoutes = [
   {
