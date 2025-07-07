@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 import { FaGoogle } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa";
 import { useState } from "react";
+import { IoMdLock } from "react-icons/io";
 
 const Login = () => {
   /**
@@ -48,7 +49,15 @@ const Login = () => {
     <div className="min-w-screen min-h-screen bg-[#cdcae9] flex justify-center items-center">
       <div className="w-[350px] text-[#ffffff] p-2">
         <div className="bg-[#6f68d1] p-4 rounded-md">
-          <h2 className="text-xl mb-3 font-bold text-center">ShopVerse</h2>
+          <div className="h-[70px] flex justify-center items-center">
+            <div className="w-[180px] h-[50px]">
+              <img
+                className="w-full h-full"
+                src="/images/logo.png"
+                alt="image"
+              />
+            </div>
+          </div>
           <p className="text-sm mb-3 font-medium">Sign in to your account</p>
           <form onSubmit={submit}>
             <div className="flex flex-col w-full gap-1 mb-3">
@@ -78,8 +87,8 @@ const Login = () => {
               />
             </div>
 
-            <button className="bg-slate-800 w-full hover:shadow-blue-300/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3">
-              Sign In
+            <button className="bg-slate-800 w-full hover:shadow-blue-300/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3 flex items-center justify-center gap-2">
+              <IoMdLock size={20} /> Sign in
             </button>
             <div className="flex items-center mb-3 gap-3 justify-center">
               <p>
