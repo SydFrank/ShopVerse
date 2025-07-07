@@ -1,4 +1,14 @@
-import React from "react";
+/**
+ * Register Component
+ * ------------------
+ * Renders the user registration page including:
+ * - Username, Email, Password input fields
+ * - Terms agreement checkbox
+ * - Sign up button
+ * - Social login buttons (Google and Facebook)
+ * - Link to Sign In page
+ */
+
 import { Link } from "react-router-dom";
 import { FaGoogle } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa";
