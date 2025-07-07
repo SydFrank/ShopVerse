@@ -1,4 +1,4 @@
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
@@ -8,6 +8,8 @@ const App = lazy(() => import("./App.jsx"));
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <App />
+    <Suspense>
+      <App />
+    </Suspense>
   </BrowserRouter>
 );
