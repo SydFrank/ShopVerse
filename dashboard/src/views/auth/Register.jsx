@@ -12,8 +12,39 @@
 import { Link } from "react-router-dom";
 import { FaGoogle } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa";
+import { useState } from "react";
 
 const Register = () => {
+  /**
+   * Form state managed using useState hook
+   * Contains: username, email, password
+   */
+  const [state, setState] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+
+  /**
+   * Handle input field changes
+   * Updates the corresponding key in the state
+   */
+  const inputHandle = (e) => {
+    setState({
+      ...state,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  /**
+   * Submit handler for the form
+   * Prevents default form submission and logs user input
+   */
+  const submit = (e) => {
+    e.preventDefault();
+    console.log(state); // Replace with API call in production
+  };
+
   return (
     <div className="min-w-screen min-h-screen bg-[#cdcae9] flex justify-center items-center">
       <div className="w-[350px] text-[#ffffff] p-2">
@@ -22,10 +53,12 @@ const Register = () => {
             Welcome to ShopVerse
           </h2>
           <p className="text-sm mb-3 font-medium">Create an account</p>
-          <form>
+          <form onSubmit={submit}>
             <div className="flex flex-col w-full gap-1 mb-3">
               <label htmlFor="username">Username</label>
               <input
+                onChange={inputHandle}
+                value={state.username}
                 className="px-3 py-2 outline-none border border-slate-700 bg-transparent rounded-md "
                 type="text"
                 name="username"
@@ -37,6 +70,8 @@ const Register = () => {
             <div className="flex flex-col w-full gap-1 mb-3">
               <label htmlFor="email">Email</label>
               <input
+                onChange={inputHandle}
+                value={state.email}
                 className="px-3 py-2 outline-none border border-slate-700 bg-transparent rounded-md "
                 type="text"
                 name="email"
@@ -48,6 +83,8 @@ const Register = () => {
             <div className="flex flex-col w-full gap-1 mb-3">
               <label htmlFor="password">Password</label>
               <input
+                onChange={inputHandle}
+                value={state.password}
                 className="px-3 py-2 outline-none border border-slate-700 bg-transparent rounded-md "
                 type="password"
                 name="password"
