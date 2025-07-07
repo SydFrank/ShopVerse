@@ -12,20 +12,52 @@
 import { Link } from "react-router-dom";
 import { FaGoogle } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa";
+import { useState } from "react";
 
 const Login = () => {
+  /**
+   * Form state managed using useState hook
+   * Contains: email, password
+   */
+  const [state, setState] = useState({
+    email: "",
+    password: "",
+  });
+
+  /**
+   * Handle input field changes
+   * Updates the corresponding key in the state
+   */
+  const inputHandle = (e) => {
+    setState({
+      ...state,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  /**
+   * Submit handler for the form
+   * Prevents default form submission and logs user input
+   */
+  const submit = (e) => {
+    e.preventDefault();
+    console.log(state); // Replace with API call in production
+  };
+
   return (
     <div className="min-w-screen min-h-screen bg-[#cdcae9] flex justify-center items-center">
       <div className="w-[350px] text-[#ffffff] p-2">
         <div className="bg-[#6f68d1] p-4 rounded-md">
           <h2 className="text-xl mb-3 font-bold text-center">ShopVerse</h2>
           <p className="text-sm mb-3 font-medium">Sign in to your account</p>
-          <form>
+          <form onSubmit={submit}>
             <div className="flex flex-col w-full gap-1 mb-3">
               <label htmlFor="email">Email</label>
               <input
+                onChange={inputHandle}
+                value={state.email}
                 className="px-3 py-2 outline-none border border-slate-700 bg-transparent rounded-md "
-                type="text"
+                type="email"
                 name="email"
                 placeholder="Email"
                 id="email"
@@ -35,6 +67,8 @@ const Login = () => {
             <div className="flex flex-col w-full gap-1 mb-3">
               <label htmlFor="password">Password</label>
               <input
+                onChange={inputHandle}
+                value={state.password}
                 className="px-3 py-2 outline-none border border-slate-700 bg-transparent rounded-md "
                 type="password"
                 name="password"
@@ -50,12 +84,6 @@ const Login = () => {
             <div className="flex items-center mb-3 gap-3 justify-center">
               <p>
                 New to ShopVerse ?{" "}
-                {/* <Link
-                  className="font-bold hover:underline hover:text-black hover: shadow-sm"
-                  to="/register"
-                >
-                  Create account
-                </Link> */}
                 <Link
                   className="font-bold underline text-black "
                   to="/register"
