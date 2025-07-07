@@ -21,9 +21,7 @@ const Register = () => {
           <h2 className="text-xl mb-3 font-bold text-center">
             Welcome to ShopVerse
           </h2>
-          <p className="text-sm mb-3 font-medium">
-            Please register your account
-          </p>
+          <p className="text-sm mb-3 font-medium">Create an account</p>
           <form>
             <div className="flex flex-col w-full gap-1 mb-3">
               <label htmlFor="username">Username</label>
@@ -76,10 +74,7 @@ const Register = () => {
             <div className="flex items-center mb-3 gap-3 justify-center">
               <p>
                 Already have an account ?{" "}
-                <Link
-                  className="font-bold hover:underline hover:text-black hover: shadow-sm"
-                  to="/login"
-                >
+                <Link className="font-bold underline text-black m" to="/login">
                   Sign In
                 </Link>
               </p>
