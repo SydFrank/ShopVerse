@@ -1,4 +1,24 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+
+/**
+ * Async Thunk - Admin Login
+ * --------------------------
+ * Sends login credentials to the backend for admin authentication.
+ * Automatically dispatches pending, fulfilled, and rejected actions.
+ */
+
+export const admin_login = createAsyncThunk(
+  "auth/admin_login",
+  async (info) => {
+    console.log(info);
+    try {
+      // const data = await api.post("/admin-login", info, {
+      //   withCredentials: true,
+      // });
+      // console.log(data);
+    } catch (error) {}
+  }
+);
 
 /**
  * The `auth` slice of the global Redux state.

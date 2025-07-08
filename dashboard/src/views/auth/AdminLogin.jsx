@@ -6,9 +6,14 @@
  */
 
 import { useState } from "react";
-import { IoMdLock } from "react-icons/io";
+import { IoMdLock } from "react-icons/io"; // Lock icon for the login button
+import { useDispatch } from "react-redux"; // Redux hook to dispatch actions
+import { admin_login } from "../../store/Reducers/authReducer"; // Login async thunk action
 
 const AdminLogin = () => {
+  // Dispatches login action on form submission via Redux.
+  const dispatch = useDispatch();
+
   /**
    * Form state managed using useState hook
    * Contains: email, password
@@ -32,9 +37,11 @@ const AdminLogin = () => {
   /**
    * Submit handler for the form
    * Prevents default form submission and logs user input
+   * Dispatches the admin_login action with the current form data.
    */
   const submit = (e) => {
     e.preventDefault();
+    dispatch(admin_login(state));
     // console.log(state); // Replace with API call in production
   };
 
