@@ -35,7 +35,7 @@ const AdminLogin = () => {
    */
   const submit = (e) => {
     e.preventDefault();
-    console.log(state); // Replace with API call in production
+    // console.log(state); // Replace with API call in production
   };
 
   return (

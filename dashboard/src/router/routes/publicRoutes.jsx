@@ -16,6 +16,7 @@ import { lazy } from "react";
 
 const Login = lazy(() => import("../../views/auth/Login"));
 const Register = lazy(() => import("../../views/auth/Register"));
+const AdminLogin = lazy(() => import("../../views/auth/adminLogin"));
 
 const publicRoutes = [
   {
@@ -25,6 +26,10 @@ const publicRoutes = [
   {
     path: "/register", //  URL path for the register page
     element: <Register />, // React component render when this route is matched
+  },
+  {
+    path: "/admin/login", //  URL path for the register page
+    element: <AdminLogin />, // React component render when this route is matched
   },
 ];
 
