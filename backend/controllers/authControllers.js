@@ -3,7 +3,9 @@ class authControllers {
   // Asynchronous method to handle admin login requests
   // Logs the request body to the console (for debugging or further processing)
   admin_login = async (req, res) => {
-    console.log(req.body);
+    const { email, password } = req.body;
+    try {
+    } catch (error) {}
   };
 }
 

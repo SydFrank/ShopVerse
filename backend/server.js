@@ -12,6 +12,9 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 
+// Import the database connection utility
+const { dbConnect } = require("./utils/db");
+
 /**
  * Enable Cross-Origin Resource Sharing (CORS) for the specified frontend origin
  * Allow credentials such as cookies and authorization headers to be included in requests
@@ -24,6 +27,7 @@ app.use(
 );
 
 // Parse incoming JSON payloads and populate req.body
+// Must be registered before any route handlers that need to access req.body
 app.use(bodyParser.json());
 
 // Parse cookies from incoming requests and populate req.cookies
@@ -33,11 +37,15 @@ app.use(cookieParser());
 app.use("/api", require("./routes/authRoutes"));
 
 // Define a GET route handler for the root path '/'
-// Sends a simple response message to the client
+// Sends a simple response message to the client to verify that the server is running
 app.get("/", (req, res) => res.send("My backend "));
 
 // Retrieve the port number from environment variables
 const port = process.env.PORT;
+
+// Establish a connection to the MongoDB database
+// This should ideally be done before the server starts listening
+dbConnect();
 
 // Start the server and have it listen on the specified port
 // Log a message to the console once the server is running
