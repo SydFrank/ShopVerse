@@ -1,3 +1,5 @@
+const adminModel = require("../models/adminModel");
+
 // Define the authControllers class to handle authentication-related logic
 class authControllers {
   // Asynchronous method to handle admin login requests
