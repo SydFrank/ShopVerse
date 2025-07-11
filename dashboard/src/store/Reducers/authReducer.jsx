@@ -22,6 +22,8 @@ export const admin_login = createAsyncThunk(
       const { data } = await api.post("/admin-login", info, {
         withCredentials: true, // Include cookies for authentication/session
       });
+      // Store access token in localStorage to persist authentication across sessions
+      localStorage.setItem("accessToken", data.token);
       // console.log(data);
       return fulfillWithValue(data); // Dispatch success
     } catch (error) {
