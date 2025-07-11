@@ -1,18 +1,35 @@
 /**
  * AdminLogin Component
- *------------------
- * Renders a login form for administrators with controlled inputs for email and password.
- * Utilizes React's useState hook for form state management.
+ * ----------------------
+ * Renders a login form for administrators.
+ *
+ * Features:
+ * Controlled inputs for email and password using React's useState
+ * Submits login credentials via Redux async thunk (admin_login)
+ * Displays loading spinner using react-spinners when login is in progress
+ * Clean and responsive UI using Tailwind CSS
+ * Toast notifications for success/error feedback using react-hot-toast
+ * Redirects to home on successful login
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoMdLock } from "react-icons/io"; // Lock icon for the login button
-import { useDispatch } from "react-redux"; // Redux hook to dispatch actions
-import { admin_login } from "../../store/Reducers/authReducer"; // Login async thunk action
+import { useDispatch, useSelector } from "react-redux"; // Redux hook to dispatch actions
+import { admin_login, messageClear } from "../../store/Reducers/authReducer"; // Login async thunk action
+import { PropagateLoader } from "react-spinners";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const AdminLogin = () => {
+  const navigate = useNavigate(); // For redirection post-login
+
   // Dispatches login action on form submission via Redux.
   const dispatch = useDispatch();
+
+  // Access auth state from Redux store
+  const { loader, errorMessage, successMessage } = useSelector(
+    (state) => state.auth
+  ); // Access loading state from auth slice
 
   /**
    * Form state managed using useState hook
@@ -44,6 +61,34 @@ const AdminLogin = () => {
     dispatch(admin_login(state));
     // console.log(state); // Replace with API call in production
   };
+
+  // Styles for loading spinner
+  const overrideStyle = {
+    display: "flex",
+    margin: "0 auto",
+    height: "24px",
+    justifyContent: "center",
+    alignItems: "center",
+  };
+
+  /**
+   * Side Effects:
+   * Display toast notifications on error/success
+   * Clears messages from Redux state
+   * Navigates to home on successful login
+   */
+
+  useEffect(() => {
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(messageClear());
+    }
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(messageClear());
+      navigate("/"); // Redirect to home/dashboard after successful login
+    }
+  }, [errorMessage, successMessage]);
 
   return (
     <div className="min-w-screen min-h-screen bg-[#cdcae9] flex justify-center items-center">
@@ -85,8 +130,17 @@ const AdminLogin = () => {
                 required
               />
             </div>
-            <button className="bg-slate-800 w-full hover:shadow-blue-300/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3 flex items-center justify-center gap-2">
-              <IoMdLock size={20} /> Log in
+            <button
+              disabled={loader ? true : false}
+              className="bg-slate-800 w-full hover:shadow-blue-300/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3 flex items-center justify-center gap-2"
+            >
+              {loader ? (
+                <PropagateLoader color="white" cssOverride={overrideStyle} />
+              ) : (
+                <>
+                  <IoMdLock size={20} /> Log in
+                </>
+              )}
             </button>
           </form>
         </div>
