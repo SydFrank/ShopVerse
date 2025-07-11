@@ -47,11 +47,11 @@ class authControllers {
           responseReturn(res, 200, { token, message: "Login success" });
         } else {
           // Incorrect password
-          responseReturn(res, 400, { error: "Password wrong" });
+          responseReturn(res, 404, { error: "Password wrong" });
         }
       } else {
         // Email not found in database
-        responseReturn(res, 400, { error: "Email not found" });
+        responseReturn(res, 404, { error: "Email not found" });
       }
     } catch (error) {
       // Internal server error
