@@ -62,7 +62,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(admin_login.pending, (state, { payload }) => {
+      .addCase(admin_login.pending, (state) => {
         state.loader = true; // Start loader when login is in progress
       })
       .addCase(admin_login.rejected, (state, { payload }) => {
