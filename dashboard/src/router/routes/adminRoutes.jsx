@@ -1,11 +1,11 @@
 import { lazy } from "react";
 
-const Home = lazy(() => import("../../views/pages/Home"));
+const AdminDashboard = lazy(() => import("../../views/admin/adminDashboard"));
 
 export const adminRoutes = [
   {
     path: "admin/dashboard", // Admin dashboard path
-    element: <Home />, // Home page component
-    ability: ["admin", "seller"], // Accessible by admin and seller roles
+    element: <AdminDashboard />, // Admin dashboard component
+    role: "admin", // Accessible by admin role only
   },
 ];
