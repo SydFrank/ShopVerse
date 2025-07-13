@@ -59,7 +59,8 @@ class authControllers {
     }
   };
 }
-// End Method
 
 // Export an instance of the authControllers class for use in routing
 module.exports = new authControllers();
+
+// End Method
