@@ -60,7 +60,7 @@ class authControllers {
   };
   // End of admin_login method
 
-  getUser = async (req, res) => {
+  get_user = async (req, res) => {
     const { id, role } = req;
     try {
       if (role === "admin") {
