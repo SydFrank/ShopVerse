@@ -1,25 +1,37 @@
 /**
- * Navigation Configuration - Admin Panel
- * --------------------------------------
- * This file defines the navigation structure for the admin interface.
- * Each navigation item is represented as an object containing metadata
- * such as the display title, associated icon, user role, and route path.
+ * Admin Navigation Configuration
+ * -------------------------------
+ * This module defines the structured navigation menu for the admin panel.
+ * Each menu item is represented as an object that includes metadata used
+ * to dynamically render and control navigation visibility based on user roles.
  *
  * Fields:
- * - id:         Unique identifier for the menu item.
- * - title:      Label shown in the navigation UI.
- * - icon:       Icon component imported from react-icons.
- * - role:       User role that can access the menu item (e.g., "admin").
- * - path:       Route path to be used with React Router for navigation.
+ * - id:        A unique numeric identifier for the menu item.
+ * - title:     The display name shown in the sidebar or navigation UI.
+ * - icon:      A JSX element representing the icon (from react-icons).
+ * - role:      Access control identifier (e.g., 'admin') used to filter items by user role.
+ * - path:      Route path that integrates with React Router for navigation.
  *
- * Example Use:
- * This array can be consumed by a sidebar or menu component to dynamically
- * render items based on the authenticated user’s role and permissions.
+ * Usage:
+ * This array can be imported into layout components such as sidebars or header menus
+ * to dynamically render routes based on the authenticated user’s role and permissions.
+ *
+ * Notes:
+ * - All icons are sourced from the 'react-icons' library.
+ * - Update this configuration when adding new admin routes.
+ * - Ensure consistency between route paths and the application's router setup.
  */
 
-import { AiOutlineDashboard } from "react-icons/ai";
+import { AiOutlineDashboard, AiOutlineShoppingCart } from "react-icons/ai";
+import { BiCategory } from "react-icons/bi";
+import { FaUsers } from "react-icons/fa6";
+import { MdPayment } from "react-icons/md";
+import { FaUserTimes } from "react-icons/fa";
+import { FaCodePullRequest } from "react-icons/fa6";
+import { IoIosChatbubbles } from "react-icons/io";
 
 export const allNav = [
+  // Type definition for a single navigation item
   {
     id: 1,
     title: "Dashboard",
@@ -29,9 +41,51 @@ export const allNav = [
   },
   {
     id: 2,
-    title: "Dashboard",
-    icon: <AiOutlineDashboard />,
-    role: "seller",
-    path: "/admin/dashboard",
+    title: "Orders",
+    icon: <AiOutlineShoppingCart />,
+    role: "admin",
+    path: "/admin/dashboard/orders",
+  },
+  {
+    id: 3,
+    title: "Category",
+    icon: <BiCategory />,
+    role: "admin",
+    path: "/admin/dashboard/category",
+  },
+  {
+    id: 4,
+    title: "Sellers",
+    icon: <FaUsers />,
+    role: "admin",
+    path: "/admin/dashboard/sellers",
+  },
+  {
+    id: 5,
+    title: "Payment Request",
+    icon: <MdPayment />,
+    role: "admin",
+    path: "/admin/dashboard/payment-request",
+  },
+  {
+    id: 6,
+    title: "Deactive Sellers",
+    icon: <FaUserTimes />,
+    role: "admin",
+    path: "/admin/dashboard/deactive-sellers",
+  },
+  {
+    id: 7,
+    title: "Seller Request",
+    icon: <FaCodePullRequest />,
+    role: "admin",
+    path: "/admin/dashboard/sellers-request",
+  },
+  {
+    id: 8,
+    title: "Live Chat",
+    icon: <IoIosChatbubbles />,
+    role: "admin",
+    path: "/admin/dashboard/chat-seller",
   },
 ];

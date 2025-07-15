@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { getNav } from "../navigation/index";
-
+import { RiLogoutBoxLine } from "react-icons/ri";
 /**
  * Sidebar Component
  * -----------------
@@ -14,6 +14,8 @@ import { getNav } from "../navigation/index";
  */
 
 const Sidebar = () => {
+  const { pathname } = useLocation();
+
   const [allNav, setAllNav] = useState([]);
 
   // Fetch navigation items for the admin role on initial render
@@ -22,7 +24,7 @@ const Sidebar = () => {
     setAllNav(navs);
   }, []);
 
-  console.log(allNav); // Debug: log the nav items for verification
+  // console.log(allNav); // Debug: log the nav items for verification
   return (
     <div>
       <div></div>
@@ -34,7 +36,36 @@ const Sidebar = () => {
             <img className="w-full h-full" src="/images/logo.png" alt="Logo" />
           </Link>
         </div>
-        <div className="px-[16px]"></div>
+        <div className="px-[16px]">
+          <ul>
+            {allNav.map((currentNav, index) => (
+              <li key={index}>
+                <Link
+                  to={currentNav.path}
+                  className={`${
+                    pathname === currentNav.path
+                      ? "bg-blue-600 shadow-indigo-500/50 text-white duration-500"
+                      : "text-[#030811] font-bold duration-200"
+                  } px-[12px] py-[9px] round-sm flex justify-start items-center gap-[12px] hover:pl-4 transition-all w-full mb-1`}
+                >
+                  <span>{currentNav.icon}</span>
+                  <span>{currentNav.title}</span>
+                </Link>
+              </li>
+            ))}
+            <li>
+              <button
+                className="text-[#030811] font-bold duration-200
+                  px-[12px] py-[9px] round-sm flex justify-start items-center gap-[12px] hover:pl-4 transition-all w-full mb-1"
+              >
+                <span>
+                  <RiLogoutBoxLine />
+                </span>
+                <span>Logout</span>
+              </button>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   );
