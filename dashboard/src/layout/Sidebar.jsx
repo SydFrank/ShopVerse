@@ -1,17 +1,32 @@
+/**
+ * Sidebar Component
+ * ------------------
+ * This component renders the left-hand vertical navigation panel used across
+ * the admin dashboard. It dynamically loads navigation items based on the
+ * authenticated user's role using `getNav("admin")`.
+ *
+ * Features:
+ * - Fixed vertical sidebar with shadow and background styling.
+ * - Responsive navigation highlighting based on current URL (`useLocation`).
+ * - Logo branding at the top.
+ * - Dynamically rendered navigation links based on role-based config.
+ * - Static logout button (functionality to be implemented separately).
+ *
+ * Notes:
+ * - Styling uses Tailwind CSS utility classes.
+ * - Nav items are expected to be defined in `navigation/index.js` or equivalent.
+ * - Consider moving the logout button to auth context or Redux handler.
+ *
+ * Improvements to Consider:
+ * - Add ARIA roles for accessibility.
+ * - Extract `NavLink` rendering into a reusable `<SidebarItem />` component.
+ * - Implement actual logout logic on the logout button.
+ */
+
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { getNav } from "../navigation/index";
 import { RiLogoutBoxLine } from "react-icons/ri";
-/**
- * Sidebar Component
- * -----------------
- * This component renders the application's sidebar menu for the admin panel.
- * It fetches the appropriate navigation items using `getNav("admin")` and stores
- * them in local state (`allNav`). The sidebar includes:
- *  - A fixed-width vertical layout.
- *  - A logo at the top.
- *  - Future support for dynamic navigation links (currently pending).
- */
 
 const Sidebar = () => {
   const { pathname } = useLocation();
