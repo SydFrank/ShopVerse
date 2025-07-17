@@ -1,38 +1,36 @@
 /**
  * Orders Component
  * ----------------
- * This React component renders a styled order list interface with support for:
+ * This React component displays a list of customer orders in a styled, paginated interface.
  *
- * 1. Pagination Size Selection:
- *    - Users can choose how many orders to display per page (5, 10, or 15).
+ * Features:
+ * 1. Pagination Size Selector:
+ *    - Allows the user to select how many orders to show per page (5, 10, or 15).
  *
- * 2. Search Input:
- *    - A placeholder search bar is included for future filtering functionality.
+ * 2. Search Bar:
+ *    - Search input is present but currently non-functional (placeholder for future filtering).
  *
  * 3. Order Table Display:
- *    - Orders are displayed in a table-like layout using Flexbox.
- *    - Each row shows order details: ID, Price, Payment Status, Order Status, Action.
+ *    - Orders are displayed in a responsive table-like layout using Flexbox.
+ *    - Columns include: Order ID, Price, Payment Status, Order Status, Action.
  *
  * 4. Row Expansion:
- *    - Clicking the arrow icon toggles visibility of additional nested order details.
+ *    - Clicking the arrow icon toggles the visibility of additional (nested) order rows.
+ *    - NOTE: The `show` state is shared across all rows; toggling one affects all.
+ *      Consider improving this with per-row expansion state (e.g., using an array of IDs).
  *
- * 5. Styling:
+ * 5. Pagination Component:
+ *    - Includes a reusable Pagination component with dynamic `parPage` and `currentPage`.
+ *
+ * 6. Styling:
  *    - Tailwind CSS is used for styling.
- *    - Responsive design with scrollable table (`overflow-x-auto`).
+ *    - Table supports horizontal scrolling (`overflow-x-auto`) for smaller screens.
  *
- * 6. Icons:
- *    - Uses React Icons (`BsArrowDownSquare`) to enhance UI interactivity.
- *
- * Notes:
- * - The `show` state currently toggles all rows together.
- *   (Consider refactoring to handle individual row expansion using row ID/state array.)
- * - Pagination logic is partially implemented (only `parPage` state, no slicing yet).
- *
- * Future Enhancements:
- * - Implement search filtering using `searchValue`.
- * - Load dynamic order data from an API or backend.
- * - Implement true pagination using `currentPage` and `parPage`.
- *
+ * TODO (Enhancements):
+ * - Connect search functionality to `searchValue`.
+ * - Slice data based on `currentPage` and `parPage`.
+ * - Load order data from API/backend.
+ * - Make row expansion per-item instead of global.
  */
 
 import React from "react";
@@ -49,7 +47,6 @@ const Orders = () => {
 
   // Number of orders to display per page
   const [parPage, setParPage] = React.useState(5);
-  const state = true;
 
   // Controls whether the additional order details are shown or hidden
   const [show, setShow] = React.useState(false);
@@ -74,6 +71,7 @@ const Orders = () => {
         </div>
 
         <div className="relative mt-5 overflow-x-auto">
+          {/* Table Header */}
           <div className="w-full text-sm text-left text-[#d0d2d6]">
             <div className="text-sm text-[#d0d2d6] uppercase border-b border-slate-700">
               <div className="flex justify-between items-center">
@@ -89,6 +87,7 @@ const Orders = () => {
             </div>
           </div>
           <div className="text-[#d0d2d6] ">
+            {/* Example Order Row */}
             <div className="flex justify-between items-start border-b border-slate-700">
               <div className="py-3 w-[25%] font-medium whitespace-nowrap">
                 #6449556
@@ -99,6 +98,7 @@ const Orders = () => {
               <div className="py-3 w-[18%] font-medium">
                 <Link>View</Link>
               </div>
+              {/* Expand/Collapse toggle icon */}
               <div
                 onClick={(e) => setShow(!show)}
                 className="py-3 w-[8%] font-medium text-xl"
@@ -107,11 +107,13 @@ const Orders = () => {
               </div>
             </div>
 
+            {/* Nested/Expanded Order Rows — shown when `show` is true */}
             <div
               className={
                 show ? "block border-b border-slate-700 bg-[#8288ed]" : "hidden"
               }
             >
+              {/* Example nested row */}
               <div className="flex justify-satrt items-start border-b border-slate-700">
                 <div className="py-3 w-[25%] font-medium whitespace-nowrap pl-3">
                   #25000
@@ -262,14 +264,16 @@ const Orders = () => {
             </div>
           </div>
         </div>
-
-        <Pagination
-          pageNumber={currentPage}
-          setPageNumber={setCurrentPage}
-          totalItem={50}
-          parPage={parPage}
-          showItem={3}
-        />
+        {/* Pagination footer */}
+        <div className="w-full flex justify-end mt-4 bottom-4 right-4">
+          <Pagination
+            pageNumber={currentPage}
+            setPageNumber={setCurrentPage}
+            totalItem={50}
+            parPage={parPage}
+            showItem={3}
+          />
+        </div>
       </div>
     </div>
   );
