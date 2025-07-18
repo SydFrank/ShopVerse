@@ -33,7 +33,7 @@
  * - Make row expansion per-item instead of global.
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { BsArrowDownSquare } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import Pagination from "../Pagination";
