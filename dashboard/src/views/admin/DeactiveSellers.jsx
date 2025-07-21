@@ -4,24 +4,18 @@ import Pagination from "../Pagination";
 import { FaEye } from "react-icons/fa";
 
 /**
- * Seller Component
+ * DeactiveSellers component displays a paginated table of inactive sellers.
+ * Features include:
+ * - Pagination controls for navigating large datasets
+ * - Adjustable items per page
+ * - Search bar placeholder (not yet implemented)
+ * - Static demo data for table rows
+ * - Action buttons for each seller (e.g., view details)
  *
- * This component renders the admin view for managing seller accounts.
- * It includes a paginated table of sellers, a per-page selector, a search field,
- * and action buttons for each seller entry.
- *
- * Features:
- * - Pagination with adjustable items per page
- * - Search input for filtering sellers (currently not implemented)
- * - Seller information table (static data for demonstration)
- * - Action button for viewing seller details
- *
- * Dependencies:
- * - React, react-router-dom, react-icons
- * - Pagination component from the parent directory
+ * Styling leverages Tailwind CSS utility classes.
  */
 
-const Seller = () => {
+const DeactiveSellers = () => {
   // State: current page number for pagination
   const [currentPage, setCurrentPage] = React.useState(1);
 
@@ -36,7 +30,7 @@ const Seller = () => {
 
   return (
     <div className="px-2 lg:px-7 pt-5">
-      <h1 className="text-[20px] font-bold mb-3">Sellers</h1>
+      <h1 className="text-[20px] font-bold mb-3">Deactive Sellers</h1>
       {/* Main container for the seller management table */}
       <div className="w-full p-4 bg-[#6a5fdf] rounded-md">
         {/* Header: items per page selector and search input */}
@@ -73,19 +67,13 @@ const Seller = () => {
                   Name
                 </th>
                 <th scope="col" className="py-3 px-4">
-                  Shop Name
+                  Email
                 </th>
                 <th scope="col" className="py-3 px-4">
                   Payment Status
                 </th>
                 <th scope="col" className="py-3 px-4">
-                  Email
-                </th>
-                <th scope="col" className="py-3 px-4">
-                  Division
-                </th>
-                <th scope="col" className="py-3 px-4">
-                  District
+                  Status
                 </th>
                 <th scope="col" className="py-3 px-4">
                   Action
@@ -120,20 +108,6 @@ const Seller = () => {
                   >
                     Frank Xu
                   </td>
-                  {/* Shop name */}
-                  <td
-                    scope="row"
-                    className="py-1 px-4 font-medium whitespace-nowrap"
-                  >
-                    Easy Shop
-                  </td>
-                  {/* Payment status */}
-                  <td
-                    scope="row"
-                    className="py-1 px-4 font-medium whitespace-nowrap"
-                  >
-                    <span>Pending</span>
-                  </td>
                   {/* Seller email */}
                   <td
                     scope="row"
@@ -141,20 +115,21 @@ const Seller = () => {
                   >
                     frankzhsy@gmail.com
                   </td>
-                  {/* Seller division (region) */}
+                  {/* Payment status  */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    Sydney
+                    Active
                   </td>
-                  {/* Seller district (sub-region) */}
+                  {/* Status  */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    Burwood
+                    Deactive
                   </td>
+
                   {/* Action buttons (e.g., view details) */}
                   <td
                     scope="row"
@@ -186,4 +161,4 @@ const Seller = () => {
   );
 };
 
-export default Seller;
+export default DeactiveSellers;
