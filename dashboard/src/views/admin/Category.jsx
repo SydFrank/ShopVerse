@@ -1,25 +1,44 @@
 import React, { useState } from "react";
-import { BsArrowDownSquare } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import Pagination from "../Pagination";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { FaImage } from "react-icons/fa";
 import { IoMdCloseCircle } from "react-icons/io";
 
+/**
+ * Category Component
+ *
+ * This component provides the admin interface for managing product categories.
+ * It features a responsive layout with a paginated table view and a sidebar/modal
+ * for adding new categories. Core functionalities include:
+ *
+ * - Pagination and per-page selector for category table
+ * - Search box for filtering categories (logic to implement)
+ * - Category listing with edit and delete actions
+ * - Responsive sidebar/modal form for adding a new category
+ * - File upload for category images
+ *
+ * Dependencies:
+ * - React, react-router-dom, react-icons
+ * - Pagination component from the parent directory
+ */
+
 const Category = () => {
-  // Pagination state: current page number
+  // State: current page number for pagination
   const [currentPage, setCurrentPage] = React.useState(1);
 
-  // Search keyword entered by the user
+  // State: search keyword entered by the user (search logic not implemented)
   const [searchValue, setSearchValue] = React.useState("");
 
-  // Number of orders to display per page
+  // State: number of categories to display per page
   const [parPage, setParPage] = React.useState(5);
 
+  // State: controls the visibility of the add category sidebar/modal
   const [show, setShow] = useState(false);
 
   return (
     <div className="px-2 lg:px-7 pt-5">
+      {/* Mobile header bar with Category title and Add button */}
       <div className="flex lg:hidden justify-between items-center mb-5 p-4 bg-[#6a5ddf] rounded-md ">
         <h1 className="text-[#d0d2d6] font-semibold text-lg">Category</h1>
         <button
@@ -30,8 +49,10 @@ const Category = () => {
         </button>
       </div>
       <div className="flex flex-wrap w-full">
+        {/* Category table and pagination (left side on desktop) */}
         <div className="w-full lg:w-7/12">
           <div className="w-full p-4 bg-[#6a5fdf] rounded-md">
+            {/* Pagination per-page selector and search box */}
             <div className="flex justify-between items-center">
               <select
                 onChange={(e) => setParPage(parseInt(e.target.value))}
@@ -48,6 +69,7 @@ const Category = () => {
               />
             </div>
 
+            {/* Categories table */}
             <div className="relative overflow-x-auto">
               <table className="w-full text-sm text-left text-[#d0d2d6] ">
                 <thead className="text-sm text-[#d0d2d6] uppercase border-b border-slate-700">
@@ -67,14 +89,17 @@ const Category = () => {
                   </tr>
                 </thead>
                 <tbody>
+                  {/* Static demo data for categories */}
                   {[1, 2, 3, 4, 5].map((curVal, index) => (
                     <tr key={index}>
+                      {/* Serial number */}
                       <td
                         scope="row"
                         className="py-1 px-4 font-medium whitespace-nowrap"
                       >
                         {curVal}
                       </td>
+                      {/* Category image */}
                       <td
                         scope="row"
                         className="py-1 px-4 font-medium whitespace-nowrap"
@@ -84,13 +109,14 @@ const Category = () => {
                           src={`/images/category/${curVal}.jpg`}
                         />
                       </td>
+                      {/* Category name */}
                       <td
                         scope="row"
                         className="py-1 px-4 font-medium whitespace-nowrap"
                       >
                         Tshirt
                       </td>
-
+                      {/* Edit and Delete actions */}
                       <td
                         scope="row"
                         className="py-1 px-4 font-medium whitespace-nowrap"
@@ -122,6 +148,7 @@ const Category = () => {
           </div>
         </div>
 
+        {/* Sidebar/modal for adding a new category (right side on desktop, fixed on mobile) */}
         <div
           className={`w-[320px] lg:w-5/12 lg:relative lg:right-0 fixed ${
             show ? "right-0" : "-right-[340px]"
