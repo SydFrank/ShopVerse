@@ -1,3 +1,8 @@
+import React, { useState } from "react";
+import { BsArrowDownSquare } from "react-icons/bs";
+import { Link } from "react-router-dom";
+import Pagination from "../Pagination";
+
 /**
  * Orders Component
  * ----------------
@@ -32,11 +37,6 @@
  * - Load order data from API/backend.
  * - Make row expansion per-item instead of global.
  */
-
-import React, { useState } from "react";
-import { BsArrowDownSquare } from "react-icons/bs";
-import { Link } from "react-router-dom";
-import Pagination from "../Pagination";
 
 const Orders = () => {
   // Pagination state: current page number

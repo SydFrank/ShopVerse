@@ -1,3 +1,10 @@
+import { MdCurrencyExchange } from "react-icons/md";
+import { MdOutlineProductionQuantityLimits } from "react-icons/md";
+import { FaUsers } from "react-icons/fa";
+import { FaCartArrowDown } from "react-icons/fa";
+import Chart from "react-apexcharts";
+import { Link } from "react-router-dom";
+
 /**
  * AdminDashboard Component
  * -------------------------
@@ -22,13 +29,6 @@
  * - Enhance responsiveness for mobile views.
  * - Add tooltips and loading states for better UX.
  */
-
-import { MdCurrencyExchange } from "react-icons/md";
-import { MdOutlineProductionQuantityLimits } from "react-icons/md";
-import { FaUsers } from "react-icons/fa";
-import { FaCartArrowDown } from "react-icons/fa";
-import Chart from "react-apexcharts";
-import { Link } from "react-router-dom";
 
 const AdminDashboard = () => {
   const state = {
