@@ -1,8 +1,21 @@
-import React from "react";
 import { FaList } from "react-icons/fa6";
 
-// Header component for the admin layout
-// Accepts showSidebar (boolean) and setShowSidebar (function) as props to control sidebar visibility
+/**
+ * Header Component
+ *
+ * Shared header for the admin layout.
+ *
+ * Props:
+ * - showSidebar (boolean): Whether the sidebar is currently open (for mobile).
+ * - setShowSidebar (function): Function to toggle sidebar visibility.
+ *
+ * Features:
+ * - Fixed header with full width and high z-index.
+ * - Responsive sidebar toggle button (visible only on small screens).
+ * - Search input (visible on medium and larger screens).
+ * - User profile section with name, role, and avatar.
+ */
+
 const Header = ({ showSidebar, setShowSidebar }) => {
   return (
     // Outer wrapper: fixed at top, spans full width, with padding and high z-index to stay above other elements

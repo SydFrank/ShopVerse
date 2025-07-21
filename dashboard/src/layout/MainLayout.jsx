@@ -1,3 +1,8 @@
+import { Outlet } from "react-router-dom";
+import Header from "./Header";
+import Sidebar from "./Sidebar";
+import React, { useState } from "react";
+
 /**
  * MainLayout Component
  * --------------------
@@ -22,11 +27,6 @@
  *   ]
  * }
  */
-
-import { Outlet } from "react-router-dom";
-import Header from "./Header";
-import Sidebar from "./Sidebar";
-import React, { useState } from "react";
 
 const MainLayout = () => {
   const [showSidebar, setShowSidebar] = useState(false);
