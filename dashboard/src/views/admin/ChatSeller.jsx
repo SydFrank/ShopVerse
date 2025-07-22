@@ -10,15 +10,66 @@ const ChatSeller = () => {
         <div className="flex w-full h-full relative">
           <div
             className={`w-[280px] h-full absolute z-10 ${
-              show ? "-left-[16px]" : "-[336px]"
+              show ? "-left-[16px]" : "-left-[336px]"
             } md:left-0 md:relative transition-all`}
           >
             <div className="w-full h-[calc(100vh-177px)] bg-[#9e97e9] md:bg-transparent overflow-y-auto">
               <div className="flex text-xl justify-between items-center p-4 md:p-0 md:px-3 md:pb-3 text-white">
                 <h1>Sellers</h1>
-                <span className="block cursor-pointer md:hidden">
+                <span
+                  onClick={() => setShow(true)}
+                  className="block cursor-pointer md:hidden"
+                >
                   <IoMdClose />
                 </span>
+              </div>
+              <div
+                className={`h-[60px] flex justify-start gap-2 items-center text-white px-2 py-2 rounded-sm cursor-pointer`}
+              >
+                <div className="relative">
+                  <img
+                    className="w-[38px] h-[38px] border-white border-2 max-w-[38px] p-[2px] rounded-full"
+                    src="/images/admin.jpg"
+                  />
+                  <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
+                </div>
+                <div className="flex justify-center items-start flex-col w-full">
+                  <div className="flex justify-between items-center w-full">
+                    <h2 className="text-base font-semibold">Allen Li</h2>
+                  </div>
+                </div>
+              </div>
+              <div
+                className={`h-[60px] flex justify-start gap-2 items-center text-white px-2 py-2 rounded-sm cursor-pointer`}
+              >
+                <div className="relative">
+                  <img
+                    className="w-[38px] h-[38px] border-white border-2 max-w-[38px] p-[2px] rounded-full"
+                    src="/images/admin.jpg"
+                  />
+                  <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
+                </div>
+                <div className="flex justify-center items-start flex-col w-full">
+                  <div className="flex justify-between items-center w-full">
+                    <h2 className="text-base font-semibold">John Doe</h2>
+                  </div>
+                </div>
+              </div>
+              <div
+                className={`h-[60px] flex justify-start gap-2 items-center text-white px-2 py-2 rounded-sm cursor-pointer`}
+              >
+                <div className="relative">
+                  <img
+                    className="w-[38px] h-[38px] border-white border-2 max-w-[38px] p-[2px] rounded-full"
+                    src="/images/admin.jpg"
+                  />
+                  <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
+                </div>
+                <div className="flex justify-center items-start flex-col w-full">
+                  <div className="flex justify-between items-center w-full">
+                    <h2 className="text-base font-semibold">Amy Wu</h2>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
