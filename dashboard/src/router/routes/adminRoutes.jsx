@@ -9,6 +9,7 @@ const PaymentRequest = lazy(() => import("../../views/admin/PaymentRequest"));
 const DeactiveSellers = lazy(() => import("../../views/admin/DeactiveSellers"));
 const SellerRequest = lazy(() => import("../../views/admin/SellerRequest"));
 const SellerDetails = lazy(() => import("../../views/admin/SellerDetails"));
+const ChatSeller = lazy(() => import("../../views/admin/ChatSeller"));
 
 /**
  * adminRoutes
@@ -60,6 +61,11 @@ export const adminRoutes = [
   {
     path: "admin/dashboard/seller/details/:sellerId", // Admin seller details management path
     element: <SellerDetails />, // Admin seller details component
+    role: "admin", // Accessible by admin role only
+  },
+  {
+    path: "admin/dashboard/chat-sellers", // Admin chat seller management path
+    element: <ChatSeller />, // Admin chat seller component
     role: "admin", // Accessible by admin role only
   },
 ];
