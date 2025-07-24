@@ -35,7 +35,7 @@ const Sidebar = ({ showSidebar, setShowSidebar }) => {
 
   // Fetch navigation items for the admin role on initial render
   useEffect(() => {
-    const navs = getNav("admin");
+    const navs = getNav("seller");
     setAllNav(navs);
   }, []);
 
