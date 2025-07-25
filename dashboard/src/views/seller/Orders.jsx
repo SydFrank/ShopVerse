@@ -4,14 +4,29 @@ import { Link } from "react-router-dom";
 import Pagination from "../Pagination";
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 
+/**
+ * Orders component displays a paginated table of order entries (using static demo data).
+ * Includes search and page size controls, and allows viewing details for each order.
+ *
+ * State:
+ * - currentPage: Tracks the current page for pagination.
+ * - searchValue: Stores the search keyword entered by the user.
+ * - parPage: Number of orders to display per page.
+ *
+ * Renders:
+ * - Search controls for filtering and page size.
+ * - Table listing order details (demo data).
+ * - Action for viewing each order.
+ * - Pagination control.
+ */
 const Orders = () => {
   // State: current page number for pagination
   const [currentPage, setCurrentPage] = useState(1);
 
-  // State: search keyword entered by the user (search logic not implemented)
+  // State: search keyword entered by the user
   const [searchValue, setSearchValue] = useState("");
 
-  // State: number of categories to display per page
+  // State: number of orders to display per page
   const [parPage, setParPage] = useState(5);
 
   return (
@@ -46,10 +61,10 @@ const Orders = () => {
               </tr>
             </thead>
             <tbody>
-              {/* Static demo data for categories */}
+              {/* Static demo data for orders */}
               {[1, 2, 3, 4, 5].map((curVal, index) => (
                 <tr key={index}>
-                  {/* Serial number */}
+                  {/* Order Id */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
@@ -77,7 +92,7 @@ const Orders = () => {
                   >
                     Pending
                   </td>
-                  {/* Edit and Delete actions */}
+                  {/* View action */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"

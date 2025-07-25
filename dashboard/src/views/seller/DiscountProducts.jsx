@@ -4,11 +4,27 @@ import { Link } from "react-router-dom";
 import Pagination from "../Pagination";
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 
+/**
+ * DiscountProducts component displays a paginated table of products with static demo data.
+ * Includes search and page size controls, and action icons for each product row.
+ *
+ * State:
+ * - currentPage: Tracks the current page number for pagination.
+ * - searchValue: Stores the search keyword entered by the user.
+ * - parPage: Number of items to display per page.
+ *
+ * Renders:
+ * - Search controls for filtering and page size.
+ * - Table listing product details (demo data).
+ * - Actions for editing, viewing, and deleting each product.
+ * - Pagination control.
+ */
+
 const DiscountProducts = () => {
   // State: current page number for pagination
   const [currentPage, setCurrentPage] = useState(1);
 
-  // State: search keyword entered by the user (search logic not implemented)
+  // State: search keyword entered by the user
   const [searchValue, setSearchValue] = useState("");
 
   // State: number of categories to display per page
@@ -76,6 +92,7 @@ const DiscountProducts = () => {
                     <img
                       className="w-[45px] h-[45px]"
                       src={`/images/category/${curVal}.jpg`}
+                      alt={`Category ${curVal}`}
                     />
                   </td>
                   {/* Name */}

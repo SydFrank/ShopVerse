@@ -4,14 +4,30 @@ import { Link } from "react-router-dom";
 import Pagination from "../Pagination";
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 
+/**
+ * Products component displays a paginated table of products with static demo data.
+ * Includes search and page size controls, and action icons for each product row.
+ *
+ * State:
+ * - currentPage: Tracks the current page number for pagination.
+ * - searchValue: Stores the search keyword entered by the user.
+ * - parPage: Number of items to display per page.
+ *
+ * Renders:
+ * - Search controls for filtering and page size.
+ * - Table listing product details (demo data).
+ * - Actions for editing, viewing, and deleting each product.
+ * - Pagination control.
+ */
+
 const Products = () => {
   // State: current page number for pagination
   const [currentPage, setCurrentPage] = useState(1);
 
-  // State: search keyword entered by the user (search logic not implemented)
+  // State: search keyword entered by the user
   const [searchValue, setSearchValue] = useState("");
 
-  // State: number of categories to display per page
+  // State: number of products to display per page
   const [parPage, setParPage] = useState(5);
 
   return (
@@ -58,7 +74,7 @@ const Products = () => {
               </tr>
             </thead>
             <tbody>
-              {/* Static demo data for categories */}
+              {/* Static demo data for products */}
               {[1, 2, 3, 4, 5].map((curVal, index) => (
                 <tr key={index}>
                   {/* Serial number */}
@@ -68,7 +84,7 @@ const Products = () => {
                   >
                     {curVal}
                   </td>
-                  {/* Category image */}
+                  {/* Product image */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
@@ -76,6 +92,7 @@ const Products = () => {
                     <img
                       className="w-[45px] h-[45px]"
                       src={`/images/category/${curVal}.jpg`}
+                      alt={`Product ${curVal}`}
                     />
                   </td>
                   {/* Name */}
@@ -120,7 +137,7 @@ const Products = () => {
                   >
                     50
                   </td>
-                  {/* Edit and Delete actions */}
+                  {/* Edit, View, and Delete actions */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"

@@ -1,5 +1,17 @@
 import React from "react";
 
+/**
+ * Search component for controlling pagination and filtering data.
+ *
+ * Props:
+ * - setParPage (function): Updates the number of items displayed per page.
+ * - setSearchValue (function): Updates the current search query value.
+ * - searchValue (string): Current search query value.
+ *
+ * Renders a select input for page size and a text input for search term.
+ * Provides controlled inputs to update parent state.
+ */
+
 const Search = ({ setParPage, setSearchValue, searchValue }) => {
   return (
     <div className="flex justify-between items-center">
