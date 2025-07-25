@@ -6,6 +6,7 @@ const SellerDashboard = lazy(() =>
   import("../../views/seller/SellerDashboard")
 );
 const AddProduct = lazy(() => import("../../views/seller/AddProduct"));
+const Products = lazy(() => import("../../views/seller/Products"));
 
 /**
  * sellerRoutes
@@ -30,8 +31,13 @@ export const sellerRoutes = [
     ability: ["seller"], // Accessible by seller roles
   },
   {
-    path: "/seller/dashboard/add-product", // Seller dashboard path
+    path: "/seller/dashboard/add-product", // Seller add product path
     element: <AddProduct />, // Add product component
+    ability: ["seller"], // Accessible by seller roles
+  },
+  {
+    path: "/seller/dashboard/all-product", // Seller products path
+    element: <Products />, // Products component
     ability: ["seller"], // Accessible by seller roles
   },
 ];
