@@ -122,7 +122,10 @@ const AddProduct = () => {
         {/* Header with navigation */}
         <div className="flex justify-between items-center pb-4">
           <h1 className="text-[#d0d2d6] text-xl font-semibold">Add Product</h1>
-          <Link className="bg-blue-500 hover:shadow-blue-500  hover:shadow-lg text-white rounded-sm px-7 py-2">
+          <Link
+            to="/seller/dashboard/all-product"
+            className="bg-blue-500 hover:shadow-blue-500  hover:shadow-lg text-white rounded-sm px-7 py-2"
+          >
             All Product
           </Link>
         </div>
