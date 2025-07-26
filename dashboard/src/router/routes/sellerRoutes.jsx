@@ -11,6 +11,7 @@ const DiscountProducts = lazy(() =>
   import("../../views/seller/DiscountProducts")
 );
 const Orders = lazy(() => import("../../views/seller/Orders"));
+const Payments = lazy(() => import("../../views/seller/Payments"));
 
 /**
  * sellerRoutes
@@ -52,6 +53,11 @@ export const sellerRoutes = [
   {
     path: "/seller/dashboard/orders", // Seller orders path
     element: <Orders />, // Orders component
+    ability: ["seller"], // Accessible by seller roles
+  },
+  {
+    path: "/seller/dashboard/payments", // Seller payments path
+    element: <Payments />, // Payments component
     ability: ["seller"], // Accessible by seller roles
   },
 ];
