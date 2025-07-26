@@ -118,6 +118,7 @@ const SellerToCustomer = () => {
                     {/* Online Indicator */}
                     <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
                   </div>
+                  <h2 className="text-base text-white font-semibold">Allen</h2>
                 </div>
               )}
 
