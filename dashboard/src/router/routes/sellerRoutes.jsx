@@ -33,31 +33,36 @@ export const sellerRoutes = [
   {
     path: "/seller/dashboard", // Seller dashboard path
     element: <SellerDashboard />, // Seller dashboard component
-    ability: ["seller"], // Accessible by seller roles
+    role: "seller", // Accessible by seller roles
+    status: "active", // Only active sellers can access
   },
   {
     path: "/seller/dashboard/add-product", // Seller add product path
     element: <AddProduct />, // Add product component
-    ability: ["seller"], // Accessible by seller roles
+    role: "seller", // Accessible by seller roles
+    status: "active", // Only active sellers can access
   },
   {
     path: "/seller/dashboard/all-product", // Seller products path
     element: <Products />, // Products component
-    ability: ["seller"], // Accessible by seller roles
+    role: "seller", // Accessible by seller roles
+    status: "active", // Only active sellers can access
   },
   {
     path: "/seller/dashboard/discount-product", // Seller discount products path
     element: <DiscountProducts />, // Discount products component
-    ability: ["seller"], // Accessible by seller roles
+    role: "seller", // Accessible by seller roles
+    status: "active", // Only active sellers can access
   },
   {
     path: "/seller/dashboard/orders", // Seller orders path
     element: <Orders />, // Orders component
-    ability: ["seller"], // Accessible by seller roles
+    ability: ["active", "deactive"], // Active and deactive sellers
   },
   {
     path: "/seller/dashboard/payments", // Seller payments path
     element: <Payments />, // Payments component
-    ability: ["seller"], // Accessible by seller roles
+    role: "seller", // Accessible by seller roles
+    status: "active", // Only active sellers can access
   },
 ];
