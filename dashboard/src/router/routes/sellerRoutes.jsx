@@ -12,6 +12,10 @@ const DiscountProducts = lazy(() =>
 );
 const Orders = lazy(() => import("../../views/seller/Orders"));
 const Payments = lazy(() => import("../../views/seller/Payments"));
+const SellerToCustomer = lazy(() =>
+  import("../../views/seller/SellerToCustomer")
+);
+const SellerToAdmin = lazy(() => import("../../views/seller/SellerToAdmin"));
 
 /**
  * sellerRoutes
@@ -62,6 +66,23 @@ export const sellerRoutes = [
   {
     path: "/seller/dashboard/payments", // Seller payments path
     element: <Payments />, // Payments component
+    role: "seller", // Accessible by seller roles
+    status: "active", // Only active sellers can access
+  },
+  {
+    path: "/seller/dashboard/chat-support", // Seller chat to support path
+    element: <SellerToAdmin />, // Chat to support component
+    ability: ["active", "deactive", "pending"], // Active, deactive, and pending sellers
+  },
+  {
+    path: "/seller/dashboard/chat-customer/:customerId", // Seller chat to customer path
+    element: <SellerToCustomer />, // Chat to customer component
+    role: "seller", // Accessible by seller roles
+    status: "active", // Only active sellers can access
+  },
+  {
+    path: "/seller/dashboard/chat-customer", // Seller chat to customer path
+    element: <SellerToCustomer />, // Chat to customer component
     role: "seller", // Accessible by seller roles
     status: "active", // Only active sellers can access
   },
