@@ -1,6 +1,24 @@
 import React, { forwardRef } from "react";
 import { FixedSizeList as List } from "react-window";
 import { MdCurrencyExchange } from "react-icons/md";
+
+/**
+ * This component displays a paginated, searchable table of products.
+ * Each product row shows key details such as image, name, category, brand, price, discount, stock, and action buttons.
+ * Includes custom pagination and search controls for enhanced user experience.
+ *
+ * Features:
+ * - Search input for live filtering (logic to be implemented)
+ * - Select dropdown for changing items-per-page
+ * - Responsive table layout using Tailwind CSS
+ * - Action buttons for edit, view, and delete (icons only, handlers to be implemented)
+ * - Pagination controls at the bottom
+ *
+ * Usage:
+ * Import and render this component within a parent route or dashboard.
+
+ */
+
 /**
  * Handles the wheel event on the list's outer container.
  * Logs the vertical scroll delta for debugging or analytics purposes.
