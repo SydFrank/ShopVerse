@@ -2,6 +2,22 @@ import React from "react";
 import { FaEdit, FaImages } from "react-icons/fa";
 import { FadeLoader } from "react-spinners";
 
+/**
+ * Profile component renders the user's profile information and allows editing of personal details,
+ * shop information, and password. It supports image upload with loading states, conditional rendering
+ * of user/shop info or editable forms, and provides a responsive layout.
+ *
+ * Features:
+ * - Displays user profile image with loading spinner feedback.
+ * - Allows editing of user information and shop details.
+ * - Provides form for changing password with validation-ready inputs.
+ * - Responsive design using Tailwind CSS utility classes.
+ * - Utilizes react-icons for visual cues and react-spinners for loading states.
+ *
+ * Usage:
+ * <Profile />
+ */
+
 const Profile = () => {
   const image = true;
   const loader = true;
@@ -11,8 +27,10 @@ const Profile = () => {
   return (
     <div className="px-2 lg:px-7 py-5 ">
       <div className="w-full flex flex-wrap">
+        {/* Profile and Shop Information Section */}
         <div className="w-full md:w-6/12">
           <div className="w-full p-4 bg-[#6a5fdf] rounded-md text-[#d0d2d6]">
+            {/* Profile Image Upload */}
             <div className="flex justify-center items-center py-3">
               {image ? (
                 <label
@@ -36,7 +54,7 @@ const Profile = () => {
                   <span>
                     <FaImages />
                   </span>
-                  <span>Slect Image</span>
+                  <span>Select Image</span>
                   {loader && (
                     <div className="bg-slate-600 absolute left-0 top-0 w-full h-full opacity-17 flex justify-center items-center z-20">
                       <span>
@@ -49,6 +67,7 @@ const Profile = () => {
               <input type="file" id="img" className="hidden" />
             </div>
 
+            {/* User Information */}
             <div className="px-0 md:px-5 py-2">
               <div className="flex justify-between text-sm flex-col gap-2 p-4 bg-slate-800 rounded-md relative">
                 <span className="p-[6px] bg-yellow-500 rounded hover:shadow-lg hover:shadow-yellow-500/50 absolute right-2 top-2 cursor-pointer">
@@ -92,9 +111,11 @@ const Profile = () => {
               </div>
             </div>
 
+            {/* Shop Info or Edit Form */}
             <div className="px-0 md:px-5 py-2">
               {!userInfo ? (
                 <form>
+                  {/* Editable Shop Information */}
                   <div className="flex flex-col w-full gap-2 mb-2">
                     <label htmlFor="shop">Shop Name</label>
                     <input
@@ -169,6 +190,7 @@ const Profile = () => {
             </div>
           </div>
         </div>
+        {/* Password Change Section */}
         <div className="w-full md:w-6/12">
           <div className="w-full pl-0 md:pl-7 mt-6 md:mt-0 ">
             <div className="bg-[#6a5fdf] rounded-md text-[#d0d2d6] p-4">
