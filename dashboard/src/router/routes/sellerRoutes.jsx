@@ -17,6 +17,7 @@ const SellerToCustomer = lazy(() =>
 );
 const SellerToAdmin = lazy(() => import("../../views/seller/SellerToAdmin"));
 const Profile = lazy(() => import("../../views/seller/Profile"));
+const EditProduct = lazy(() => import("../../views/seller/EditProduct"));
 
 /**
  * sellerRoutes
@@ -44,6 +45,12 @@ export const sellerRoutes = [
   {
     path: "/seller/dashboard/add-product", // Seller add product path
     element: <AddProduct />, // Add product component
+    role: "seller", // Accessible by seller roles
+    status: "active", // Only active sellers can access
+  },
+  {
+    path: "/seller/dashboard/edit-product/:productId", // Seller edit product path
+    element: <EditProduct />, // Edit product component
     role: "seller", // Accessible by seller roles
     status: "active", // Only active sellers can access
   },
