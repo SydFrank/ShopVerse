@@ -16,6 +16,7 @@ const SellerToCustomer = lazy(() =>
   import("../../views/seller/SellerToCustomer")
 );
 const SellerToAdmin = lazy(() => import("../../views/seller/SellerToAdmin"));
+const Profile = lazy(() => import("../../views/seller/Profile"));
 
 /**
  * sellerRoutes
@@ -83,6 +84,12 @@ export const sellerRoutes = [
   {
     path: "/seller/dashboard/chat-customer", // Seller chat to customer path
     element: <SellerToCustomer />, // Chat to customer component
+    role: "seller", // Accessible by seller roles
+    status: "active", // Only active sellers can access
+  },
+  {
+    path: "/seller/dashboard/profile", // Seller profile path
+    element: <Profile />, // Profile component
     role: "seller", // Accessible by seller roles
     status: "active", // Only active sellers can access
   },
