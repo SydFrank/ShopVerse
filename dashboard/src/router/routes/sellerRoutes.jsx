@@ -18,6 +18,7 @@ const SellerToCustomer = lazy(() =>
 const SellerToAdmin = lazy(() => import("../../views/seller/SellerToAdmin"));
 const Profile = lazy(() => import("../../views/seller/Profile"));
 const EditProduct = lazy(() => import("../../views/seller/EditProduct"));
+const OrderDetails = lazy(() => import("../../views/seller/OrderDetails"));
 
 /**
  * sellerRoutes
@@ -69,6 +70,11 @@ export const sellerRoutes = [
   {
     path: "/seller/dashboard/orders", // Seller orders path
     element: <Orders />, // Orders component
+    ability: ["active", "deactive"], // Active and deactive sellers
+  },
+  {
+    path: "/seller/dashboard/orders/details/:orderId", // Seller orders details path
+    element: <OrderDetails />, // Order details component
     ability: ["active", "deactive"], // Active and deactive sellers
   },
   {
