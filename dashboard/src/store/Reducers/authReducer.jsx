@@ -34,6 +34,38 @@ export const admin_login = createAsyncThunk(
 );
 
 /**
+ * Async Thunk: Seller Register
+ * ------------------------
+ * Sends registration credentials to the backend and handles the registration flow.
+ * Uses axios (via `api`) to post credentials.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ *
+ * @param {Object} info - Registration payload (e.g. { email, password }).
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error.
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload.
+ * @returns {Object} Response data or error.
+ */
+
+export const seller_register = createAsyncThunk(
+  "auth/seller_register",
+  async (info, { rejectWithValue, fulfillWithValue }) => {
+    console.log(info);
+    try {
+      const { data } = await api.post("/seller-register", info, {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      // Store access token in localStorage to persist authentication across sessions
+      // localStorage.setItem("accessToken", data.token);
+      console.log(data);
+      return fulfillWithValue(data); // Dispatch success
+    } catch (error) {
+      // console.log(error.response.data);
+      return rejectWithValue(error.response.data); // Return backend error message
+    }
+  }
+);
+
+/**
  * The `auth` slice of the global Redux state.
  *
  * - `name`: Unique name for the slice.

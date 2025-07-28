@@ -1,3 +1,13 @@
+import { Link } from "react-router-dom";
+import { FaGoogle } from "react-icons/fa";
+import { FaFacebook } from "react-icons/fa";
+import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { PropagateLoader } from "react-spinners";
+import { overrideStyle } from "../../utils/utils"; // Importing styles for the loading spinner
+import { IoMdLock } from "react-icons/io"; // Lock icon for the login button
+import { seller_register } from "../../store/Reducers/authReducer"; // Importing the registration action
+
 /**
  * Register Component
  * ------------------
@@ -9,12 +19,12 @@
  * - Link to Sign In page
  */
 
-import { Link } from "react-router-dom";
-import { FaGoogle } from "react-icons/fa";
-import { FaFacebook } from "react-icons/fa";
-import { useState } from "react";
-
 const Register = () => {
+  // Dispatches login action on form submission via Redux.
+  const dispatch = useDispatch();
+
+  const { loader } = useSelector((state) => state.auth); // Access loading state from auth slice
+
   /**
    * Form state managed using useState hook
    * Contains: username, email, password
@@ -42,7 +52,8 @@ const Register = () => {
    */
   const submit = (e) => {
     e.preventDefault();
-    console.log(state); // Replace with API call in production
+    // console.log(state); // Replace with API call in production
+    dispatch(seller_register(state));
   };
 
   return (
@@ -111,8 +122,17 @@ const Register = () => {
               </label>
             </div>
 
-            <button className="bg-slate-800 w-full hover:shadow-blue-300/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3">
-              Sign Up
+            <button
+              disabled={loader ? true : false}
+              className="bg-slate-800 w-full hover:shadow-blue-300/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3 flex items-center justify-center gap-2"
+            >
+              {loader ? (
+                <PropagateLoader color="white" cssOverride={overrideStyle} />
+              ) : (
+                <>
+                  <IoMdLock size={20} /> Sign Up
+                </>
+              )}
             </button>
             <div className="flex items-center mb-3 gap-3 justify-center">
               <p>

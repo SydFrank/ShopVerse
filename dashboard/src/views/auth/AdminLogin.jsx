@@ -29,7 +29,7 @@ const AdminLogin = () => {
   // Access auth state from Redux store
   const { loader, errorMessage, successMessage } = useSelector(
     (state) => state.auth
-  ); // Access loading state from auth slice
+  );
 
   /**
    * Form state managed using useState hook
