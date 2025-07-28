@@ -55,8 +55,8 @@ export const seller_register = createAsyncThunk(
         withCredentials: true, // Include cookies for authentication/session
       });
       // Store access token in localStorage to persist authentication across sessions
-      // localStorage.setItem("accessToken", data.token);
-      console.log(data);
+      localStorage.setItem("accessToken", data.token);
+      // console.log(data);
       return fulfillWithValue(data); // Dispatch success
     } catch (error) {
       // console.log(error.response.data);
@@ -102,6 +102,17 @@ const authSlice = createSlice({
         state.errorMessage = payload.error; // Store backend error
       })
       .addCase(admin_login.fulfilled, (state, { payload }) => {
+        state.loader = false;
+        state.successMessage = payload.message;
+      })
+      .addCase(seller_register.pending, (state) => {
+        state.loader = true; // Start loader when login is in progress
+      })
+      .addCase(seller_register.rejected, (state, { payload }) => {
+        state.loader = false;
+        state.errorMessage = payload.error; // Store backend error
+      })
+      .addCase(seller_register.fulfilled, (state, { payload }) => {
         state.loader = false;
         state.successMessage = payload.message;
       });
