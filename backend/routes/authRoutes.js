@@ -12,3 +12,6 @@ router.post("/admin-login", authControllers.admin_login);
 router.get("/get-user", authMiddleware, authControllers.get_user);
 // Export the router to be used in the main server application
 module.exports = router;
+
+// Define a POST route at '/seller-register' that uses the seller_register method from authControllers
+router.post("/seller-register", authControllers.seller_register);
