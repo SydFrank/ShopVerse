@@ -126,6 +126,59 @@ class authControllers {
   // End of seller_register method
 
   /**
+   * Seller login controller
+   *
+   * Steps:
+   * 1. Extract email and password from the request body.
+   * 2. Find the seller using the email.
+   * 3. Compare input password with hashed password in DB.
+   * 4. If matched, create a JWT token and set it in an HTTP-only cookie.
+   * 5. Return success response; otherwise, handle invalid credentials.
+   *
+   * @param {import('express').Request} req
+   * @param {import('express').Response} res
+   * @returns {Promise<void>}
+   */
+  seller_login = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+      // Find seller and include password field for comparison
+      const seller = await sellerModel.findOne({ email }).select("+password");
+
+      if (seller) {
+        // Compare provided password with hashed password
+        const match = await bcrpty.compare(password, seller.password);
+
+        if (match) {
+          // Generate JWT with seller ID and role
+          const token = await createToken({
+            id: seller.id,
+            role: seller.role,
+          });
+
+          // Set token in cookie, valid for 7 days
+          res.cookie("accessToken", token, {
+            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          });
+
+          // Send success response
+          responseReturn(res, 200, { token, message: "Login success" });
+        } else {
+          // Password mismatch
+          responseReturn(res, 404, { error: "Password wrong" });
+        }
+      } else {
+        // Admin not found
+        responseReturn(res, 404, { error: "Email not found" });
+      }
+    } catch (error) {
+      // Log and return server error
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+  // End of seller_login method
+
+  /**
    * Get current user info (based on token)
    *
    * This function checks the role from the request (decoded JWT),

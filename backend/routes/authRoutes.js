@@ -10,8 +10,12 @@ router.post("/admin-login", authControllers.admin_login);
 
 // Define a GET route at '/get-user' that uses the authMiddleware for authentication
 router.get("/get-user", authMiddleware, authControllers.get_user);
-// Export the router to be used in the main server application
-module.exports = router;
 
 // Define a POST route at '/seller-register' that uses the seller_register method from authControllers
 router.post("/seller-register", authControllers.seller_register);
+
+// Define a POST route at '/seller-login' that uses the seller_login method from authControllers
+router.post("/seller-login", authControllers.seller_login);
+
+// Export the router to be used in the main server application
+module.exports = router;
