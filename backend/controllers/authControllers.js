@@ -196,16 +196,13 @@ class authControllers {
         const user = await adminModel.findById(id);
         responseReturn(res, 200, { userInfo: user });
       } else {
-        // TODO: Add seller user info retrieval here
-        console.log("Seller Info");
-        responseReturn(res, 200, {
-          message: "Seller info not yet implemented",
-        });
+        // Find seller user by ID
+        const seller = await sellerModel.findById(id);
+        responseReturn(res, 200, { userInfo: seller });
       }
     } catch (error) {
       // Handle error
-      console.log(error.message);
-      responseReturn(res, 500, { error: "Error fetching user" });
+      return responseReturn(res, 500, { error: "Internal Server Error" });
     }
   };
   // End of get_user method
