@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "./../../api/api";
-
+import { jwtDecode } from "jwt-decode";
 /**
  * Async Thunk: Admin Login
  * ------------------------
@@ -98,6 +98,65 @@ export const seller_register = createAsyncThunk(
 );
 
 /**
+ * Async Thunk: Get User Info
+ * ------------------------
+ * Fetches user information from the backend.
+ * Uses axios (via `api`) to get user data.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ *
+ * @param {Object} info - Login payload (e.g. { email, password }).
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error.
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload.
+ * @returns {Object} Response data or error.
+ */
+
+export const get_user_info = createAsyncThunk(
+  "auth/get_user_info",
+  async (_, { rejectWithValue, fulfillWithValue }) => {
+    // console.log(info);
+    try {
+      const { data } = await api.get("/get-user", {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      // Store access token in localStorage to persist authentication across sessions
+      // localStorage.setItem("accessToken", data.token);
+      // console.log(data);
+      return fulfillWithValue(data); // Dispatch success
+    } catch (error) {
+      // console.log(error.response.data);
+      return rejectWithValue(error.response.data); // Return backend error message
+    }
+  }
+);
+
+/**
+ * Helper function: returnRole
+ * ---------------------------
+ * Decodes a JWT token to determine the user's role and checks if the token is expired.
+ * If expired, removes token from localStorage and returns an empty string.
+ * Otherwise, returns the user's role (e.g. "admin", "seller").
+ *
+ * @param {string} token - JWT token string.
+ * @returns {string} User role or empty string if invalid/expired.
+ */
+
+const returnRole = (token) => {
+  if (token) {
+    const decodeToken = jwtDecode(token);
+    const expireTime = new Date(decodeToken.exp * 1000);
+    // Check if token is expired
+    if (new Date() > expireTime) {
+      localStorage.removeItem("accessToken");
+      return ""; // Return empty if token is expired
+    } else {
+      return decodeToken.role; // Return role if token is valid
+    }
+  } else {
+    return ""; // Return empty if no token is present
+  }
+};
+
+/**
  * The `auth` slice of the global Redux state.
  *
  * - `name`: Unique name for the slice.
@@ -113,6 +172,8 @@ const authSlice = createSlice({
     errorMessage: "", // Stores backend errors or rejection reasons
     loader: false, // Indicates if login request is in progress
     userInfo: "", // Can later be used to store admin data (e.g. token, name)
+    role: returnRole(localStorage.getItem("accessToken")), // User role (e.g. admin, seller)
+    token: localStorage.getItem("accessToken"), // Stores JWT token for authenticated requests
   },
 
   reducers: {
@@ -126,6 +187,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Handles admin login async flow
       .addCase(admin_login.pending, (state) => {
         state.loader = true; // Start loader when login is in progress
       })
@@ -136,7 +198,10 @@ const authSlice = createSlice({
       .addCase(admin_login.fulfilled, (state, { payload }) => {
         state.loader = false;
         state.successMessage = payload.message;
+        state.token = payload.token; // Store JWT token
+        state.role = returnRole(payload.token); // Update role based on token
       })
+      // Handles seller registration async flow
       .addCase(seller_register.pending, (state) => {
         state.loader = true; // Start loader when login is in progress
       })
@@ -147,7 +212,10 @@ const authSlice = createSlice({
       .addCase(seller_register.fulfilled, (state, { payload }) => {
         state.loader = false;
         state.successMessage = payload.message;
+        state.token = payload.token; // Store JWT token
+        state.role = returnRole(payload.token); // Update role based on token
       })
+      // Handles seller login async flow
       .addCase(seller_login.pending, (state) => {
         state.loader = true; // Start loader when login is in progress
       })
@@ -158,6 +226,13 @@ const authSlice = createSlice({
       .addCase(seller_login.fulfilled, (state, { payload }) => {
         state.loader = false;
         state.successMessage = payload.message;
+        state.token = payload.token; // Store JWT token
+        state.role = returnRole(payload.token); // Update role based on token
+      })
+      // Handles user info fetch async flow
+      .addCase(get_user_info.fulfilled, (state, { payload }) => {
+        state.loader = false;
+        state.userInfo = payload.userInfo; // Store user info from backend
       });
   },
 });
