@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"; // Used for navigating to the register page
+import { Link, useNavigate } from "react-router-dom"; // Used for navigating to the register page
 import { FaGoogle, FaFacebook } from "react-icons/fa"; // Social login icons
 import { useState, useEffect } from "react"; // React hooks
 import { IoMdLock } from "react-icons/io"; // Lock icon for the login button
@@ -23,6 +23,8 @@ import { seller_login, messageClear } from "../../store/Reducers/authReducer"; /
  */
 
 const Login = () => {
+  const navigate = useNavigate(); // For programmatic navigation
+
   const dispatch = useDispatch(); // For dispatching actions to the Redux store
 
   // Destructure authentication-related state from Redux
@@ -67,6 +69,7 @@ const Login = () => {
     if (successMessage) {
       toast.success(successMessage);
       dispatch(messageClear());
+      navigate("/");
     }
     if (errorMessage) {
       toast.error(errorMessage);

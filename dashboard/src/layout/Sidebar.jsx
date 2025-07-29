@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { getNav } from "../navigation/index";
 import { RiLogoutBoxLine } from "react-icons/ri";
-
+import { useDispatch, useSelector } from "react-redux"; // Redux hooks for state access and dispatch
 /**
  * Sidebar Component
  * ------------------
@@ -29,15 +29,20 @@ import { RiLogoutBoxLine } from "react-icons/ri";
  */
 
 const Sidebar = ({ showSidebar, setShowSidebar }) => {
+  const dispatch = useDispatch(); // For dispatching actions to the Redux store
+
+  // Destructure authentication-related state from Redux
+  const { role } = useSelector((state) => state.auth);
+
   const { pathname } = useLocation();
 
   const [allNav, setAllNav] = useState([]);
 
   // Fetch navigation items for the admin role on initial render
   useEffect(() => {
-    const navs = getNav("seller");
+    const navs = getNav(role);
     setAllNav(navs);
-  }, []);
+  }, [role]);
 
   // console.log(allNav); // Debug: log the nav items for verification
   return (

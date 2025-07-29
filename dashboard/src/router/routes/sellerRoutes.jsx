@@ -33,11 +33,6 @@ const OrderDetails = lazy(() => import("../../views/seller/OrderDetails"));
 
 export const sellerRoutes = [
   {
-    path: "/", // Home page path
-    element: <Home />, // Home page component
-    ability: ["admin", "seller"], // Accessible by admin or seller roles
-  },
-  {
     path: "/seller/dashboard", // Seller dashboard path
     element: <SellerDashboard />, // Seller dashboard component
     role: "seller", // Accessible by seller roles
