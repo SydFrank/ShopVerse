@@ -24,11 +24,15 @@
 
 import { AiOutlineDashboard, AiOutlineShoppingCart } from "react-icons/ai";
 import { BiCategory } from "react-icons/bi";
-import { FaUsers } from "react-icons/fa6";
-import { MdPayment } from "react-icons/md";
+import { FaUsers, FaCodePullRequest } from "react-icons/fa6";
 import { FaUserTimes } from "react-icons/fa";
-import { FaCodePullRequest } from "react-icons/fa6";
-import { IoIosChatbubbles } from "react-icons/io";
+import { IoIosChatbubbles, IoMdAdd } from "react-icons/io";
+import { FaThList } from "react-icons/fa";
+import { TbBasketDiscount } from "react-icons/tb";
+import { BsCartCheck } from "react-icons/bs";
+import { MdPayment } from "react-icons/md";
+import { AiFillWechat } from "react-icons/ai";
+import { CgProfile } from "react-icons/cg";
 
 export const allNav = [
   // Type definition for a single navigation item
@@ -98,56 +102,56 @@ export const allNav = [
   {
     id: 10,
     title: "Add Product",
-    icon: <AiOutlineDashboard />,
+    icon: <IoMdAdd />,
     role: "seller",
     path: "/seller/dashboard/add-product",
   },
   {
     id: 11,
     title: "All Product",
-    icon: <AiOutlineDashboard />,
+    icon: <FaThList />,
     role: "seller",
     path: "/seller/dashboard/all-product",
   },
   {
     id: 12,
     title: "Discount Product",
-    icon: <AiOutlineDashboard />,
+    icon: <TbBasketDiscount />,
     role: "seller",
     path: "/seller/dashboard/discount-product",
   },
   {
     id: 13,
     title: "Orders",
-    icon: <AiOutlineDashboard />,
+    icon: <BsCartCheck />,
     role: "seller",
     path: "/seller/dashboard/orders",
   },
   {
     id: 14,
     title: "Payments",
-    icon: <AiOutlineDashboard />,
+    icon: <MdPayment />,
     role: "seller",
     path: "/seller/dashboard/payments",
   },
   {
     id: 15,
     title: "Chat Customer",
-    icon: <AiOutlineDashboard />,
+    icon: <IoIosChatbubbles />,
     role: "seller",
     path: "/seller/dashboard/chat-customer",
   },
   {
     id: 16,
     title: "Chat Support",
-    icon: <AiOutlineDashboard />,
+    icon: <AiFillWechat />,
     role: "seller",
     path: "/seller/dashboard/chat-support",
   },
   {
     id: 17,
     title: "Profile",
-    icon: <AiOutlineDashboard />,
+    icon: <CgProfile />,
     role: "seller",
     path: "/seller/dashboard/profile",
   },
