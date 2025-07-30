@@ -19,7 +19,8 @@ const SellerToAdmin = lazy(() => import("../../views/seller/SellerToAdmin"));
 const Profile = lazy(() => import("../../views/seller/Profile"));
 const EditProduct = lazy(() => import("../../views/seller/EditProduct"));
 const OrderDetails = lazy(() => import("../../views/seller/OrderDetails"));
-
+const Pending = lazy(() => import("../../views/Pending"));
+const Deactive = lazy(() => import("../../views/Deactive"));
 /**
  * sellerRoutes
  *
@@ -32,6 +33,17 @@ const OrderDetails = lazy(() => import("../../views/seller/OrderDetails"));
  */
 
 export const sellerRoutes = [
+  {
+    path: "/seller/account-pending", // Seller account pending path
+    element: <Pending />, // Pending component
+    ability: "seller", // Accessible by seller roles
+  },
+  {
+    path: "/seller/account-deactive", // Seller account deactive path
+    element: <Deactive />, // Deactive component
+    ability: "seller", // Accessible by seller roles
+  },
+
   {
     path: "/seller/dashboard", // Seller dashboard path
     element: <SellerDashboard />, // Seller dashboard component
