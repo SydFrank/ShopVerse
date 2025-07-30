@@ -65,12 +65,14 @@ export const sellerRoutes = [
   {
     path: "/seller/dashboard/orders", // Seller orders path
     element: <Orders />, // Orders component
-    ability: ["active", "deactive"], // Active and deactive sellers
+    role: "seller", // Accessible by seller roles
+    visibility: ["active", "deactive"], // Active and deactive sellers
   },
   {
     path: "/seller/dashboard/orders/details/:orderId", // Seller orders details path
     element: <OrderDetails />, // Order details component
-    ability: ["active", "deactive"], // Active and deactive sellers
+    role: "seller", // Accessible by seller roles
+    visibility: ["active", "deactive"], // Active and deactive sellers
   },
   {
     path: "/seller/dashboard/payments", // Seller payments path
@@ -81,7 +83,8 @@ export const sellerRoutes = [
   {
     path: "/seller/dashboard/chat-support", // Seller chat to support path
     element: <SellerToAdmin />, // Chat to support component
-    ability: ["active", "deactive", "pending"], // Active, deactive, and pending sellers
+    role: "seller", // Accessible by seller roles
+    visibility: ["active", "deactive", "pending"], // Active, deactive, and pending sellers
   },
   {
     path: "/seller/dashboard/chat-customer/:customerId", // Seller chat to customer path
