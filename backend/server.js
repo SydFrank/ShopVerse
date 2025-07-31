@@ -35,6 +35,7 @@ app.use(cookieParser());
 
 // Mount the authentication routes at the '/api' path
 app.use("/api", require("./routes/authRoutes"));
+app.use("/api", require("./routes/dashboard/CategoryRoutes"));
 
 // Define a GET route handler for the root path '/'
 // Sends a simple response message to the client to verify that the server is running
