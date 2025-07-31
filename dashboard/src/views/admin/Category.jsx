@@ -4,7 +4,8 @@ import Pagination from "../Pagination";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { FaImage } from "react-icons/fa";
 import { IoMdCloseCircle } from "react-icons/io";
-
+import { PropagateLoader } from "react-spinners"; // Spinner component for indicating loading state
+import { overrideStyle } from "../../utils/utils"; // Custom spinner style override
 /**
  * Category Component
  *
@@ -65,6 +66,13 @@ const Category = () => {
       setState({ ...state, image: files[0] });
     }
   };
+
+  const add_category = (e) => {
+    e.preventDefault(); // Prevent the default form submission behavior
+    console.log(state);
+  };
+
+  const loader = false;
 
   return (
     <div className="px-2 lg:px-7 pt-5">
@@ -194,7 +202,7 @@ const Category = () => {
                   <IoMdCloseCircle />
                 </div>
               </div>
-              <form>
+              <form onSubmit={add_category}>
                 <div className="flex flex-col w-full gap-1 mb-3">
                   <label htmlFor="name">Category Name</label>
                   <input
@@ -232,9 +240,22 @@ const Category = () => {
                     name="image"
                     id="image"
                   />
-                  <div>
-                    <button className="bg-red-500 w-full hover:shadow-red-500/40 hover:shadow-md text-white rounded-md px-7 py-2 my-2">
-                      Add Category
+                  <div className="mt-4">
+                    {/* Submit Button */}
+                    <button
+                      disabled={loader}
+                      className="bg-red-800 w-full hover:shadow-red-300/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3 flex items-center justify-center gap-2"
+                    >
+                      {loader ? (
+                        // Show loading spinner during API request
+                        <PropagateLoader
+                          color="white"
+                          cssOverride={overrideStyle}
+                        />
+                      ) : (
+                        // Display lock icon and text if not loading
+                        <>Add Category</>
+                      )}
                     </button>
                   </div>
                 </div>
