@@ -36,6 +36,36 @@ const Category = () => {
   // State: controls the visibility of the add category sidebar/modal
   const [show, setShow] = useState(false);
 
+  // State: holds the selected image for the category
+  const [imageShow, setImageShow] = useState("");
+
+  /**
+   * State holds the form data for adding a new category
+   * This state can be expanded to include image upload handling
+   * and form submission logic as needed.
+   */
+  const [state, setState] = useState({
+    name: "",
+    image: "",
+  });
+
+  /// Function to handle image selection from an <input type="file" />
+  const imageHandle = (e) => {
+    // Get the list of files selected by the user
+    let files = e.target.files;
+    // Check if at least one file has been selected
+    if (files.length > 0) {
+      // Create a temporary URL representing the selected file object
+      // This URL can be used as the src for an <img> tag to preview the image in the browser without uploading it to a server
+      setImageShow(URL.createObjectURL(files[0]));
+
+      // Update the component state with the selected file object
+      // files[0] refers to the first (and usually only) file selected by the user
+      // Storing the file object in state allows you to use it later, for example, for uploading to a server
+      setState({ ...state, image: files[0] });
+    }
+  };
+
   return (
     <div className="px-2 lg:px-7 pt-5">
       {/* Mobile header bar with Category title and Add button */}
@@ -166,12 +196,16 @@ const Category = () => {
               </div>
               <form>
                 <div className="flex flex-col w-full gap-1 mb-3">
-                  <label htmlFor="name">Categoty Name</label>
+                  <label htmlFor="name">Category Name</label>
                   <input
+                    onChange={(e) =>
+                      setState({ ...state, name: e.target.value })
+                    }
+                    value={state.name}
                     className="px-4 py-2 focus:border-indigo-500 outline-none bg-[#ffffff] border border-slate-700 rounded-md text-[#000000]"
                     type="text"
                     id="name"
-                    name="categoty_name"
+                    name="category_name"
                     placeholder="Category Name"
                   />
                 </div>
@@ -180,12 +214,19 @@ const Category = () => {
                     className="flex justify-center items-center flex-col h-[238px] cursor-pointer border border-dashed hover:border-black w-full border-[#d0d2d6]"
                     htmlFor="image"
                   >
-                    <span>
-                      <FaImage />
-                    </span>
-                    <span>Slect Image</span>
+                    {imageShow ? (
+                      <img className="w-full h-full" src={imageShow} />
+                    ) : (
+                      <>
+                        <span>
+                          <FaImage />
+                        </span>
+                        <span>Select Image</span>
+                      </>
+                    )}
                   </label>
                   <input
+                    onChange={imageHandle}
                     className="hidden"
                     type="file"
                     name="image"
