@@ -13,6 +13,7 @@
  */
 
 import { authReducer } from "./Reducers/authReducer";
+import categoryReducer from "./Reducers/categoryReducer";
 
 /**
  * Combines all feature slice reducers into a single root reducer object.
@@ -24,6 +25,7 @@ import { authReducer } from "./Reducers/authReducer";
 
 const rootReducer = {
   auth: authReducer,
+  category: categoryReducer,
 };
 
 export default rootReducer;

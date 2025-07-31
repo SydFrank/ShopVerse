@@ -5,7 +5,10 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import { FaImage } from "react-icons/fa";
 import { IoMdCloseCircle } from "react-icons/io";
 import { PropagateLoader } from "react-spinners"; // Spinner component for indicating loading state
-import { overrideStyle } from "../../utils/utils"; // Custom spinner style override
+import { overrideStyle } from "../../utils/utils"; // Custom spinner
+// style override
+import { categoryAdd } from "../../store/Reducers/categoryReducer";
+import { useDispatch, useSelector } from "react-redux";
 /**
  * Category Component
  *
@@ -25,6 +28,13 @@ import { overrideStyle } from "../../utils/utils"; // Custom spinner style overr
  */
 
 const Category = () => {
+  // Redux dispatch function to trigger actions
+  // This is used to dispatch the categoryAdd action when adding a new category.
+  const dispatch = useDispatch();
+
+  // Destructure authentication-related state from Redux
+  const { loader } = useSelector((state) => state.category);
+
   // State: current page number for pagination
   const [currentPage, setCurrentPage] = React.useState(1);
 
@@ -69,10 +79,9 @@ const Category = () => {
 
   const add_category = (e) => {
     e.preventDefault(); // Prevent the default form submission behavior
-    console.log(state);
+    // console.log(state);
+    dispatch(categoryAdd(state)); // Dispatch the categoryAdd action with the current state
   };
-
-  const loader = false;
 
   return (
     <div className="px-2 lg:px-7 pt-5">

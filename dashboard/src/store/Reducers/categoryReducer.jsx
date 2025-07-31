@@ -69,19 +69,19 @@ const categorySlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder;
-    // // Handles admin login async flow
-    // .addCase(admin_login.pending, (state) => {
-    //   state.loader = true; // Start loader when login is in progress
-    // })
-    // .addCase(admin_login.rejected, (state, { payload }) => {
-    //   state.loader = false;
-    //   state.errorMessage = payload.error; // Store backend error
-    // })
-    // .addCase(admin_login.fulfilled, (state, { payload }) => {
-    //   state.loader = false;
-    //   state.successMessage = payload.message;
-    // });
+    builder
+      // Handles category add async flow
+      .addCase(categoryAdd.pending, (state) => {
+        state.loader = true; // Start loader when add category is in progress
+      })
+      .addCase(categoryAdd.rejected, (state, { payload }) => {
+        state.loader = false;
+        state.errorMessage = payload.error; // Store backend error
+      })
+      .addCase(categoryAdd.fulfilled, (state, { payload }) => {
+        state.loader = false;
+        state.successMessage = payload.message;
+      });
   },
 });
 
