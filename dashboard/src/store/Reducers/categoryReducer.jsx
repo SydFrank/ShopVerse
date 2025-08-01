@@ -2,9 +2,9 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "./../../api/api";
 
 /**
- * Async Thunk: Category Add
+ * Async Thunk:  Category Add
  * ------------------------
- * Sends category data to the backend and handles the add category flow.
+ * Sends a request to the backend to add a new category.
  * Uses axios (via `api`) to post category data.
  * Automatically generates pending, fulfilled, and rejected action types.
  *
@@ -40,6 +40,48 @@ export const categoryAdd = createAsyncThunk(
     }
   }
 );
+// End of categoryAdd async thunk
+
+/**
+ * Async Thunk: Get Category
+ * ------------------------
+ * Sends a request to the backend to fetch category data.
+ * Uses axios (via `api`) to get category data.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ *
+ * @param {Object} info - Category payload (e.g. { name, image }).
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error.
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload.
+ * @returns {Object} Response data or error.
+ */
+
+export const get_category = createAsyncThunk(
+  "category/get_category",
+  // This thunk asynchronously fetches category data from the backend.
+  async (
+    { parPage, page, searchValue }, // Destructure pagination and search parameters from the payload
+    { rejectWithValue, fulfillWithValue } // Helper functions for custom fulfilled/rejected payloads
+  ) => {
+    try {
+      // Make a GET request to the backend API with pagination and search parameters
+      const { data } = await api.get(
+        `/category-get?page=${page}&&searchValue=${searchValue}&&parPage=${parPage}`,
+        {
+          withCredentials: true, // Include cookies for authentication/session
+        }
+      );
+      console.log(data); // Log the response data for debugging
+      // On success, dispatch the fulfilled action with the server's response data
+      return fulfillWithValue(data);
+    } catch (error) {
+      // On error, dispatch the rejected action with the backend error message
+      // error.response.data contains the error details sent from the server
+      // console.log(error.response.data); // Uncomment for error debugging
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+//End of get_category async thunk
 
 /**
  * The `auth` slice of the global Redux state.

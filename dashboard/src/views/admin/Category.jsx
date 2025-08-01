@@ -10,10 +10,11 @@ import { overrideStyle } from "../../utils/utils"; // Custom spinner
 import {
   categoryAdd,
   messageClear,
+  get_category,
 } from "../../store/Reducers/categoryReducer";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast"; // For displaying toast messages
-
+import Search from "../components/Search"; // Search component for filtering categories
 /**
  * Category Component
  *
@@ -90,26 +91,44 @@ const Category = () => {
     dispatch(categoryAdd(state)); // Dispatch the categoryAdd action with the current state
   };
 
-  /**
-   * useEffect to handle login response messages
-   * - Displays toast for success or error
-   * - Clears messages from Redux after display
-   */
+  // useEffect to handle category add response messages
+  // - Shows a success toast if a category is added successfully
+  // - Shows an error toast if there is an error
+  // - Clears messages from Redux after displaying
+  // - Resets form state and image preview after successful addition
   useEffect(() => {
     if (successMessage) {
+      // Show success toast notification
       toast.success(successMessage);
+      // Clear success/error messages from Redux state
       dispatch(messageClear());
+      // Reset form fields
       setState({
         name: "",
         image: "",
       });
-      setImageShow(""); // Reset image preview after successful addition
+      // Reset image preview
+      setImageShow("");
     }
     if (errorMessage) {
+      // Show error toast notification
       toast.error(errorMessage);
+      // Clear success/error messages from Redux state
       dispatch(messageClear());
     }
   }, [successMessage, errorMessage]);
+
+  // useEffect to fetch categories whenever search value, items per page, or current page changes
+  useEffect(() => {
+    // Build the request object with pagination and search parameters
+    const obj = {
+      parPage: parseInt(parPage), // Number of categories per page
+      page: parseInt(currentPage), // Current page number
+      searchValue, // Search keyword for filtering categories
+    };
+    // Dispatch Redux action to fetch categories based on current filters
+    dispatch(get_category(obj));
+  }, [searchValue, parPage, currentPage]);
 
   return (
     <div className="px-2 lg:px-7 pt-5">
@@ -128,21 +147,11 @@ const Category = () => {
         <div className="w-full lg:w-7/12">
           <div className="w-full p-4 bg-[#6a5fdf] rounded-md">
             {/* Pagination per-page selector and search box */}
-            <div className="flex justify-between items-center">
-              <select
-                onChange={(e) => setParPage(parseInt(e.target.value))}
-                className="px-4 py-2 focus:border-indigo-500 outline-none bg-[#6a5fdf] border border-slate-700 rounded-md text-[#d0d2d6]"
-              >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="15">15</option>
-              </select>
-              <input
-                type="text"
-                placeholder="Search"
-                className="px-4 py-2 focus:border-indigo-500 outline-none bg-[#6a5fdf] border border-slate-700 rounded-md text-[#d0d2d6]"
-              />
-            </div>
+            <Search
+              setParPage={setParPage}
+              searchValue={searchValue}
+              setSearchValue={setSearchValue}
+            />
 
             {/* Categories table */}
             <div className="relative overflow-x-auto">
