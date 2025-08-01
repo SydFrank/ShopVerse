@@ -23,7 +23,7 @@ export const categoryAdd = createAsyncThunk(
       const formData = new FormData();
       formData.append("name", name); // Append the category name to the form data.
       formData.append("image", image); // Append the image file to the form data.
-      console.log("FormData debug:", name, image);
+      // console.log("FormData debug:", name, image);
       // Make a POST request to the /category-add endpoint, sending the FormData.
       // withCredentials: true ensures that cookies (for authentication/session) are included in the request.
       const { data } = await api.post("/category-add", formData, {
@@ -56,7 +56,7 @@ const categorySlice = createSlice({
     successMessage: "", // Stores success status (e.g. "Login successful")
     errorMessage: "", // Stores backend errors or rejection reasons
     loader: false, // Indicates if login request is in progress
-    category: [], // Stores categories fetched from the backend
+    categorys: [], // Stores categories fetched from the backend
   },
 
   reducers: {
@@ -81,6 +81,7 @@ const categorySlice = createSlice({
       .addCase(categoryAdd.fulfilled, (state, { payload }) => {
         state.loader = false;
         state.successMessage = payload.message;
+        state.categorys = [...state.categorys, payload.category]; // Append new category to existing list
       });
   },
 });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Pagination from "../Pagination";
 import { FaEdit, FaTrash } from "react-icons/fa";
@@ -7,8 +7,13 @@ import { IoMdCloseCircle } from "react-icons/io";
 import { PropagateLoader } from "react-spinners"; // Spinner component for indicating loading state
 import { overrideStyle } from "../../utils/utils"; // Custom spinner
 // style override
-import { categoryAdd } from "../../store/Reducers/categoryReducer";
+import {
+  categoryAdd,
+  messageClear,
+} from "../../store/Reducers/categoryReducer";
 import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast"; // For displaying toast messages
+
 /**
  * Category Component
  *
@@ -33,7 +38,9 @@ const Category = () => {
   const dispatch = useDispatch();
 
   // Destructure authentication-related state from Redux
-  const { loader } = useSelector((state) => state.category);
+  const { loader, successMessage, errorMessage } = useSelector(
+    (state) => state.category
+  );
 
   // State: current page number for pagination
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -82,6 +89,27 @@ const Category = () => {
     // console.log(state);
     dispatch(categoryAdd(state)); // Dispatch the categoryAdd action with the current state
   };
+
+  /**
+   * useEffect to handle login response messages
+   * - Displays toast for success or error
+   * - Clears messages from Redux after display
+   */
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(messageClear());
+      setState({
+        name: "",
+        image: "",
+      });
+      setImageShow(""); // Reset image preview after successful addition
+    }
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(messageClear());
+    }
+  }, [successMessage, errorMessage]);
 
   return (
     <div className="px-2 lg:px-7 pt-5">
