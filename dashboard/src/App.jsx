@@ -34,6 +34,7 @@ function App() {
    */
   useEffect(() => {
     const routes = getRoutes();
+    // setAllRoutes((prev) => [...prev, routes]);
     setAllRoutes((prev) => [...prev, routes]);
   }, []);
 

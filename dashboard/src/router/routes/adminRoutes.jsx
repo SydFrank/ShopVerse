@@ -25,52 +25,52 @@ const OrderDetails = lazy(() => import("../../views/admin/OrderDetails"));
 
 export const adminRoutes = [
   {
-    path: "admin/dashboard", // Admin dashboard path
+    path: "/admin/dashboard", // Admin dashboard path
     element: <AdminDashboard />, // Admin dashboard component
     role: "admin", // Accessible by admin role only
   },
   {
-    path: "admin/dashboard/orders", // Admin orders management path
+    path: "/admin/dashboard/orders", // Admin orders management path
     element: <Orders />, // Admin orders component
     role: "admin", // Accessible by admin role only
   },
   {
-    path: "admin/dashboard/category", // Admin category management path
+    path: "/admin/dashboard/category", // Admin category management path
     element: <Category />, // Admin category component
     role: "admin", // Accessible by admin role only
   },
   {
-    path: "admin/dashboard/sellers", // Admin seller management path
+    path: "/admin/dashboard/sellers", // Admin seller management path
     element: <Seller />, // Admin seller component
     role: "admin", // Accessible by admin role only
   },
   {
-    path: "admin/dashboard/payment-request", // Admin payment request management path
+    path: "/admin/dashboard/payment-request", // Admin payment request management path
     element: <PaymentRequest />, // Admin payment request component
     role: "admin", // Accessible by admin role only
   },
   {
-    path: "admin/dashboard/deactive-sellers", // Admin deactive sellers management path
+    path: "/admin/dashboard/deactive-sellers", // Admin deactive sellers management path
     element: <DeactiveSellers />, // Admin deactive sellers component
     role: "admin", // Accessible by admin role only
   },
   {
-    path: "admin/dashboard/sellers-request", // Admin seller request management path
+    path: "/admin/dashboard/sellers-request", // Admin seller request management path
     element: <SellerRequest />, // Admin seller request component
     role: "admin", // Accessible by admin role only
   },
   {
-    path: "admin/dashboard/seller/details/:sellerId", // Admin seller details management path
+    path: "/admin/dashboard/seller/details/:sellerId", // Admin seller details management path
     element: <SellerDetails />, // Admin seller details component
     role: "admin", // Accessible by admin role only
   },
   {
-    path: "admin/dashboard/chat-sellers", // Admin chat seller management path
+    path: "/admin/dashboard/chat-sellers", // Admin chat seller management path
     element: <ChatSeller />, // Admin chat seller component
     role: "admin", // Accessible by admin role only
   },
   {
-    path: "admin/dashboard/order/details/:orderId", // Admin order details management path
+    path: "/admin/dashboard/order/details/:orderId", // Admin order details management path
     element: <OrderDetails />, // Admin order details component
     role: "admin", // Accessible by admin role only
   },

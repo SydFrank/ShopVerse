@@ -23,7 +23,7 @@ export const categoryAdd = createAsyncThunk(
       const formData = new FormData();
       formData.append("name", name); // Append the category name to the form data.
       formData.append("image", image); // Append the image file to the form data.
-
+      console.log("FormData debug:", name, image);
       // Make a POST request to the /category-add endpoint, sending the FormData.
       // withCredentials: true ensures that cookies (for authentication/session) are included in the request.
       const { data } = await api.post("/category-add", formData, {
