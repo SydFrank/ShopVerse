@@ -23,5 +23,5 @@ const categorySchema = new Schema(
 categorySchema.index({ name: "text" }); // Create a text index on the name field for search functionality
 
 // Export the model based on the defined schema
-// This will create or use the "categories" collection in MongoDB
-module.exports = model("categories", categorySchema);
+// This will create or use the "categorys" collection in MongoDB
+module.exports = model("categorys", categorySchema);

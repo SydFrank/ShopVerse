@@ -1,5 +1,5 @@
 // Import the authentication controller module
-const categoryController = require("../../controllers/dashaboard/categoryController");
+const categoryController = require("../../controllers/dashboard/categoryController");
 const { authMiddleware } = require("../../middlewares/authMiddleware");
 
 // Create a new Express Router instance to define route handlers
