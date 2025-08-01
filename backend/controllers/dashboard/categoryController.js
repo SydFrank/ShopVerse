@@ -94,7 +94,7 @@ class categoryController {
 
     try {
       // If a search value is provided, perform a text search on categories
-      if (searchValue) {
+      if (searchValue && parPage && page) {
         // Find categories matching the search value, apply pagination and sort by creation date (descending)
         const categorys = await categoryModel
           .find({
@@ -113,13 +113,21 @@ class categoryController {
 
         // Return the paginated categories and total count in the response
         responseReturn(res, 200, { categorys, totalCategory });
-      } else {
-        // If no search value, fetch all categories with pagination and sorting
+      } else if (searchValue === "" && parPage && page) {
+        // If search value is empty but pagination parameters are provided,
         const categorys = await categoryModel
           .find({})
-          .skip(skipPage)
-          .limit(parseInt(parPage))
-          .sort({ createdAt: -1 });
+          .skip(skipPage) // Skip documents for pagination
+          .limit(parseInt(parPage)) // Limit the number of documents returned
+          .sort({ createdAt: -1 }); // Sort by newest first
+
+        // Count total number of categories matching the search for pagination info
+        const totalCategory = await categoryModel.find({}).countDocuments();
+        // Return the paginated categories and total count in the response
+        responseReturn(res, 200, { categorys, totalCategory });
+      } else {
+        // If no search value, fetch all categories with pagination and sorting
+        const categorys = await categoryModel.find({}).sort({ createdAt: -1 });
 
         // Count total number of categories for pagination info
         const totalCategory = await categoryModel.find({}).countDocuments();
@@ -129,6 +137,7 @@ class categoryController {
       }
     } catch (error) {
       // Handle any errors during category retrieval
+      console.log(error.message);
       responseReturn(res, 500, { error: "Internal Server Error" });
     }
   };
