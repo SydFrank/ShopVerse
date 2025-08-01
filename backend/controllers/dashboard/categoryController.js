@@ -76,7 +76,8 @@ class categoryController {
    * Currently only logs a message to the console (to be implemented).
    */
   get_Category = async (req, res) => {
-    console.log("this is getting");
+    // console.log(req.query);
+    const { page, searchValue, perPage } = req.query;
   };
   // End of get_Category method
 }
