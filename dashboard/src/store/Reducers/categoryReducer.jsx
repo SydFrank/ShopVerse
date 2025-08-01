@@ -99,6 +99,7 @@ const categorySlice = createSlice({
     errorMessage: "", // Stores backend errors or rejection reasons
     loader: false, // Indicates if login request is in progress
     categorys: [], // Stores categories fetched from the backend
+    totalCategory: 0,
   },
 
   reducers: {
@@ -124,6 +125,11 @@ const categorySlice = createSlice({
         state.loader = false;
         state.successMessage = payload.message;
         state.categorys = [...state.categorys, payload.category]; // Append new category to existing list
+      })
+      .addCase(get_category.fulfilled, (state, { payload }) => {
+        state.totalCategory = payload.totalCategory;
+        state.successMessage = payload.message;
+        state.categorys = payload.categorys; // Update categories with fetched data
       });
   },
 });

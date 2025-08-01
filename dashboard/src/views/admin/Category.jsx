@@ -39,7 +39,7 @@ const Category = () => {
   const dispatch = useDispatch();
 
   // Destructure authentication-related state from Redux
-  const { loader, successMessage, errorMessage } = useSelector(
+  const { loader, successMessage, errorMessage, categorys } = useSelector(
     (state) => state.category
   );
 
@@ -174,31 +174,28 @@ const Category = () => {
                 </thead>
                 <tbody>
                   {/* Static demo data for categories */}
-                  {[1, 2, 3, 4, 5].map((curVal, index) => (
+                  {categorys.map((curVal, index) => (
                     <tr key={index}>
                       {/* Serial number */}
                       <td
                         scope="row"
                         className="py-1 px-4 font-medium whitespace-nowrap"
                       >
-                        {curVal}
+                        {index + 1}
                       </td>
                       {/* Category image */}
                       <td
                         scope="row"
                         className="py-1 px-4 font-medium whitespace-nowrap"
                       >
-                        <img
-                          className="w-[45px] h-[45px]"
-                          src={`/images/category/${curVal}.jpg`}
-                        />
+                        <img className="w-[45px] h-[45px]" src={curVal.image} />
                       </td>
                       {/* Category name */}
                       <td
                         scope="row"
                         className="py-1 px-4 font-medium whitespace-nowrap"
                       >
-                        Tshirt
+                        {curVal.name}
                       </td>
                       {/* Edit and Delete actions */}
                       <td
