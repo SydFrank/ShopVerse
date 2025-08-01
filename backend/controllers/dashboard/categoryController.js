@@ -64,7 +64,7 @@ class categoryController {
           }
         } catch (error) {
           // Handle any errors during image upload or database operation
-          responseReturn(res, 500, { error: "Internal Server Error 55555 " });
+          responseReturn(res, 500, { error: "Internal Server Error" });
         }
       }
     });
@@ -72,12 +72,65 @@ class categoryController {
   // End of add_Category method
 
   /**
-   * Handles fetching categories.
-   * Currently only logs a message to the console (to be implemented).
+   * Handles fetching categories from the database.
+   * Supports pagination and search functionality.
+   * - If 'searchValue' is provided in the query, performs a text search on categories.
+   * - Otherwise, fetches all categories.
+   * - Results are paginated based on 'page' and 'parPage' query parameters.
+   * - Returns both the list of categories and the total count for pagination.
+   *
+   * @param {Object} req - Express request object, expects query params:
+   *   - page: current page number (string or number)
+   *   - parPage: number of items per page (string or number)
+   *   - searchValue: optional search string for filtering categories
+   * @param {Object} res - Express response object
    */
   get_Category = async (req, res) => {
-    // console.log(req.query);
-    const { page, searchValue, perPage } = req.query;
+    // Extract pagination and search parameters from the request query
+    const { page, searchValue, parPage } = req.query;
+    // Calculate the number of documents to skip for pagination
+    // Example: page=2, parPage=10 => skipPage = 10 * (2 - 1) = 10
+    const skipPage = parseInt(parPage) * (parseInt(page) - 1);
+
+    try {
+      // If a search value is provided, perform a text search on categories
+      if (searchValue) {
+        // Find categories matching the search value, apply pagination and sort by creation date (descending)
+        const categorys = await categoryModel
+          .find({
+            $text: { $search: searchValue }, // MongoDB text search
+          })
+          .skip(skipPage) // Skip documents for pagination
+          .limit(parseInt(parPage)) // Limit the number of documents returned
+          .sort({ createdAt: -1 }); // Sort by newest first
+
+        // Count total number of categories matching the search for pagination info
+        const totalCategory = await categoryModel
+          .find({
+            $text: { $search: searchValue },
+          })
+          .countDocuments();
+
+        // Return the paginated categories and total count in the response
+        responseReturn(res, 200, { categorys, totalCategory });
+      } else {
+        // If no search value, fetch all categories with pagination and sorting
+        const categorys = await categoryModel
+          .find({})
+          .skip(skipPage)
+          .limit(parseInt(parPage))
+          .sort({ createdAt: -1 });
+
+        // Count total number of categories for pagination info
+        const totalCategory = await categoryModel.find({}).countDocuments();
+
+        // Return the paginated categories and total count in the response
+        responseReturn(res, 200, { categorys, totalCategory });
+      }
+    } catch (error) {
+      // Handle any errors during category retrieval
+      responseReturn(res, 500, { error: "Internal Server Error" });
+    }
   };
   // End of get_Category method
 }
