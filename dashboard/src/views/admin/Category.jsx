@@ -15,6 +15,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast"; // For displaying toast messages
 import Search from "../components/Search"; // Search component for filtering categories
+
 /**
  * Category Component
  *

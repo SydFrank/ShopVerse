@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaRegImages } from "react-icons/fa";
 import { IoMdCloseCircle } from "react-icons/io";
-
+import { useDispatch, useSelector } from "react-redux";
+import { get_category } from "../../store/Reducers/categoryReducer";
+import { add_product } from "../../store/Reducers/productReducer";
 /**
  * AddProduct Component
  *
@@ -23,28 +25,33 @@ import { IoMdCloseCircle } from "react-icons/io";
  */
 
 const AddProduct = () => {
-  const categorys = [
-    { id: 1, name: "Sports" },
-    { id: 2, name: "Electronics" },
-    { id: 3, name: "Clothing" },
-    { id: 4, name: "Books" },
-    { id: 5, name: "Home Appliances" },
-    { id: 6, name: "Beauty Products" },
-    { id: 7, name: "Toys" },
-    { id: 8, name: "Automotive" },
-  ];
+  // Redux dispatch function to trigger actions (e.g., add_product)
+  const dispatch = useDispatch();
+  // Get the list of categories from Redux state
+  const { categorys } = useSelector((state) => state.category);
 
-  // State for product fields
+  // Fetch categories from backend when component mounts
+  useEffect(() => {
+    dispatch(
+      get_category({
+        searchValue: "", // No search filter
+        parpage: "", // No per-page limit (fetch all)
+        page: "", // No specific page (fetch all)
+      })
+    );
+  }, []);
+
+  // State for product form fields
   const [state, setState] = useState({
-    name: "",
-    description: "",
-    discount: "",
-    price: "",
-    brand: "",
-    stock: "",
+    name: "", // Product name
+    description: "", // Product description
+    discount: "", // Discount percentage
+    price: "", // Product price
+    brand: "", // Brand name
+    stock: "", // Stock quantity
   });
 
-  // Handle input changes for all fields
+  // Handle input changes for all product fields
   const inputHandle = (e) => {
     setState({
       ...state,
@@ -52,32 +59,34 @@ const AddProduct = () => {
     });
   };
 
-  // Category dropdown show/hide
+  // State for category dropdown visibility
   const [categoryShow, setCategoryShow] = useState(false);
-  // Currently selected category
+  // State for currently selected category
   const [category, setCategory] = useState("");
-  // Filtered list for category search
-  const [allCategory, setAllCategory] = useState(categorys);
-  // Category search value
+  // State for filtered category list (for search)
+  const [allCategory, setAllCategory] = useState([]);
+  // State for category search input value
   const [searchValue, setSearchValue] = useState("");
 
-  // Handle category search/filter
+  // Handle category search/filter logic
   const categorySearch = (e) => {
     const value = e.target.value;
     setSearchValue(value);
     if (value) {
+      // Filter categories by search value (case-insensitive)
       let srcValue = categorys.filter(
         (curVal) => curVal.name.toLowerCase().indexOf(value.toLowerCase()) > -1
       );
       setAllCategory(srcValue);
     } else {
+      // If search is empty, show all categories
       setAllCategory(categorys);
     }
   };
 
-  // Product images (as File objects)
+  // State for product images (File objects)
   const [images, setImages] = useState([]);
-  // Product images (as preview URLs)
+  // State for product image previews (URLs)
   const [imageShow, setImageShow] = useState([]);
 
   // Handle multi-image upload and preview
@@ -85,8 +94,10 @@ const AddProduct = () => {
     const files = e.target.files;
     const length = files.length;
     if (length > 0) {
+      // Add new files to images state
       setImages([...images, ...files]);
       let imageUrl = [];
+      // Generate preview URLs for each uploaded image
       for (let i = 0; i < length; i++) {
         imageUrl.push({ url: URL.createObjectURL(files[i]) });
       }
@@ -99,6 +110,7 @@ const AddProduct = () => {
     if (img) {
       let tempUrl = imageShow;
       let tempImgaes = images;
+      // Replace the image file and its preview URL at the specified index
       tempImgaes[index] = img;
       tempUrl[index] = { url: URL.createObjectURL(img) };
 
@@ -109,12 +121,40 @@ const AddProduct = () => {
 
   // Remove an uploaded image at a given index
   const removeImage = (index) => {
+    // Remove the image file and its preview URL at the specified index
     const filterImage = images.filter((img, i) => i !== index);
     const filterImageUrl = imageShow.filter((img, i) => i !== index);
 
     setImages(filterImage);
     setImageShow(filterImageUrl);
   };
+
+  // Handle form submission to add a new product
+  const addProductInfo = (e) => {
+    e.preventDefault();
+    // Create a FormData object to send form fields and files as multipart/form-data
+    const formData = new FormData();
+    formData.append("name", state.name);
+    formData.append("brand", state.brand);
+    formData.append("category", category);
+    formData.append("stock", state.stock);
+    formData.append("price", state.price);
+    formData.append("discount", state.discount);
+    formData.append("description", state.description);
+    formData.append("shopName", "EasyShop"); // Hardcoded shop name
+
+    // Append all uploaded images to the form data
+    for (let i = 0; i < images.length; i++) {
+      formData.append("image", images[i]);
+    }
+    // Dispatch the add_product action with the form data
+    dispatch(add_product(formData));
+  };
+
+  // Update the filtered category list whenever the Redux category list changes
+  useEffect(() => {
+    setAllCategory(categorys);
+  }, [categorys]);
 
   return (
     <div className=" px-2 lg:pl-7 pt-5 ">
@@ -131,7 +171,7 @@ const AddProduct = () => {
         </div>
 
         <div>
-          <form>
+          <form onSubmit={addProductInfo}>
             {/* Product Name & Brand */}
             <div className="flex flex-col mb-3 md:flex-row gap-4 w-full text-[#d0d2d6]">
               <div className="flex flex-col w-full gap-2">
