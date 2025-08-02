@@ -88,11 +88,15 @@ class categoryController {
   get_Category = async (req, res) => {
     // Extract pagination and search parameters from the request query
     const { page, searchValue, parPage } = req.query;
-    // Calculate the number of documents to skip for pagination
-    // Example: page=2, parPage=10 => skipPage = 10 * (2 - 1) = 10
-    const skipPage = parseInt(parPage) * (parseInt(page) - 1);
 
     try {
+      let skipPage = "";
+      if (parPage && page) {
+        // Calculate the number of documents to skip for pagination
+        // Example: page=2, parPage=10 => skipPage = 10 * (2 - 1) = 10
+        skipPage = parseInt(parPage) * (parseInt(page) - 1);
+      }
+
       // If a search value is provided, perform a text search on categories
       if (searchValue && parPage && page) {
         // Find categories matching the search value, apply pagination and sort by creation date (descending)
