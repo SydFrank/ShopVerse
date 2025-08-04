@@ -136,17 +136,18 @@ const AddProduct = () => {
     const formData = new FormData();
     formData.append("name", state.name);
     formData.append("brand", state.brand);
-    formData.append("category", category);
     formData.append("stock", state.stock);
     formData.append("price", state.price);
     formData.append("discount", state.discount);
     formData.append("description", state.description);
     formData.append("shopName", "EasyShop"); // Hardcoded shop name
+    formData.append("category", category);
 
     // Append all uploaded images to the form data
     for (let i = 0; i < images.length; i++) {
       formData.append("image", images[i]);
     }
+    console.log(state);
     // Dispatch the add_product action with the form data
     dispatch(add_product(formData));
   };
