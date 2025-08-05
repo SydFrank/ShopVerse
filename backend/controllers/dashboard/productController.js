@@ -59,12 +59,16 @@ class productController {
       });
 
       try {
+        // Extract image(s) from parsed files
+        const rawImage = files.image;
+        // Normalize to array (whether single or multiple)
+        const images = Array.isArray(rawImage) ? rawImage : [rawImage];
         // Initialize an array to store the URLs of all uploaded images
         let allImageUrl = [];
         // Loop through each image file and upload to Cloudinary
-        for (let i = 0; i < image.length; i++) {
+        for (let i = 0; i < images.length; i++) {
           // Upload the image to the 'products' folder in Cloudinary
-          const result = await cloudinary.uploader.upload(image[i].filepath, {
+          const result = await cloudinary.uploader.upload(images[i].filepath, {
             folder: "products",
           });
           // Add the uploaded image URL to the array
@@ -91,7 +95,7 @@ class productController {
         });
       } catch (error) {
         // Log any errors that occur during image upload or database operation
-        console.error("🔥 PRODUCT ADD ERROR:", error);
+        // console.error("🔥 PRODUCT ADD ERROR:", error);
         // Return a 500 error response with the error message
         responseReturn(res, 500, {
           error: error.message,
@@ -100,6 +104,67 @@ class productController {
     });
   };
   // End of add_product method
+
+  products_get = async (req, res) => {
+    // console.log(req.query);
+    // console.log(req.id);
+    // Extract pagination and search parameters from the request query
+    const { page, searchValue, parPage } = req.query;
+    const { id } = req;
+
+    // Calculate the number of documents to skip for pagination
+    // Example: page=2, parPage=10 => skipPage = 10 * (2 - 1) = 10
+    const skipPage = parseInt(parPage) * (parseInt(page) - 1);
+
+    try {
+      // If a search value is provided, perform a text search on products
+      if (searchValue) {
+        // Find products matching the search value, apply pagination and sort by creation date (descending)
+        const products = await productModel
+          .find({
+            $text: { $search: searchValue }, // MongoDB text search
+            sellerId: id, // Filter by seller ID
+          })
+          .skip(skipPage) // Skip documents for pagination
+          .limit(parseInt(parPage)) // Limit the number of documents returned
+          .sort({ createdAt: -1 }); // Sort by newest first
+
+        // Count total number of products matching the search for pagination info
+        const totalProduct = await productModel
+          .find({
+            $text: { $search: searchValue },
+            sellerId: id, // Filter by seller ID
+          })
+          .countDocuments();
+
+        // Return the paginated products and total count in the response
+        responseReturn(res, 200, { products, totalProduct });
+      } else {
+        // If search value is empty but pagination parameters are provided,
+        const products = await productModel
+          .find({
+            sellerId: id, // Filter by seller ID
+          })
+          .skip(skipPage) // Skip documents for pagination
+          .limit(parseInt(parPage)) // Limit the number of documents returned
+          .sort({ createdAt: -1 }); // Sort by newest first
+
+        // Count total number of products matching the search for pagination info
+        const totalProduct = await productModel
+          .find({
+            sellerId: id, // Filter by seller ID
+          })
+          .countDocuments();
+        // Return the paginated products and total count in the response
+        responseReturn(res, 200, { products, totalProduct });
+      }
+    } catch (error) {
+      // Return a 500 error response with the error message
+      responseReturn(res, 500, {
+        error: error.message,
+      });
+    }
+  };
 }
 
 // Export instance of productController for use in routes
