@@ -50,8 +50,8 @@ export const add_product = createAsyncThunk(
  * @returns {Object} Response data or error.
  */
 
-export const get_product = createAsyncThunk(
-  "product/get_product",
+export const get_products = createAsyncThunk(
+  "product/get_products",
   // This thunk asynchronously fetches product data from the backend.
   async (
     { parPage, page, searchValue }, // Destructure pagination and search parameters from the payload
@@ -60,7 +60,7 @@ export const get_product = createAsyncThunk(
     try {
       // Make a GET request to the backend API with pagination and search parameters
       const { data } = await api.get(
-        `/category-get?page=${page}&&searchValue=${searchValue}&&parPage=${parPage}`,
+        `/product-get?page=${page}&&searchValue=${searchValue}&&parPage=${parPage}`,
         {
           withCredentials: true, // Include cookies for authentication/session
         }
@@ -119,9 +119,8 @@ const productSlice = createSlice({
         state.successMessage = payload.message;
         state.products = [...state.products, payload.product]; // Append new product to existing list
       })
-      .addCase(get_product.fulfilled, (state, { payload }) => {
+      .addCase(get_products.fulfilled, (state, { payload }) => {
         state.totalProduct = payload.totalProduct;
-        state.successMessage = payload.message;
         state.products = payload.products; // Update products with fetched data
       });
   },

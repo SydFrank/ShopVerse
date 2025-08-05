@@ -4,7 +4,12 @@ import { FaRegImages } from "react-icons/fa";
 import { IoMdCloseCircle } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { get_category } from "../../store/Reducers/categoryReducer";
-import { add_product } from "../../store/Reducers/productReducer";
+import { add_product, messageClear } from "../../store/Reducers/productReducer";
+import { overrideStyle } from "../../utils/utils"; // Custom spinner
+// style override
+import { PropagateLoader } from "react-spinners"; // Spinner component for indicating loading state
+import toast from "react-hot-toast"; // For displaying toast messages
+
 /**
  * AddProduct Component
  *
@@ -29,6 +34,10 @@ const AddProduct = () => {
   const dispatch = useDispatch();
   // Get the list of categories from Redux state
   const { categorys } = useSelector((state) => state.category);
+  // Get the loader state from product reducer
+  const { loader, successMessage, errorMessage } = useSelector(
+    (state) => state.product
+  );
 
   // Fetch categories from backend when component mounts
   useEffect(() => {
@@ -156,6 +165,41 @@ const AddProduct = () => {
   useEffect(() => {
     setAllCategory(categorys);
   }, [categorys]);
+
+  // // useEffect to handle category add response messages
+  // // - Shows a success toast if a category is added successfully
+  // // - Shows an error toast if there is an error
+  // // - Clears messages from Redux after displaying
+  // // - Resets form state and image preview after successful addition
+  useEffect(() => {
+    if (successMessage) {
+      // Show success toast notification
+      toast.success(successMessage);
+      // Clear success/error messages from Redux state
+      dispatch(messageClear());
+      // Reset form fields
+      setState({
+        name: "", // Product name
+        description: "", // Product description
+        discount: "", // Discount percentage
+        price: "", // Product price
+        brand: "", // Brand name
+        stock: "", // Stock quantity
+      });
+      // Reset image preview
+      setImageShow([]);
+      // Reset images state
+      setImages([]);
+      // Reset category selection
+      setCategory("");
+    }
+    if (errorMessage) {
+      // Show error toast notification
+      toast.error(errorMessage);
+      // Clear success/error messages from Redux state
+      dispatch(messageClear());
+    }
+  }, [successMessage, errorMessage]);
 
   return (
     <div className=" px-2 lg:pl-7 pt-5 ">
@@ -360,8 +404,17 @@ const AddProduct = () => {
             </div>
             {/* Submit Button */}
             <div className="flex">
-              <button className="bg-red-500 hover:shadow-red-500/40 hover:shadow-md text-white rounded-md px-7 py-2 my-2">
-                Add Product
+              <button
+                disabled={loader}
+                className="bg-red-500 w-[280px] hover:shadow-red-300/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3 flex items-center justify-center gap-2"
+              >
+                {loader ? (
+                  // Show loading spinner during API request
+                  <PropagateLoader color="white" cssOverride={overrideStyle} />
+                ) : (
+                  // Display lock icon and text if not loading
+                  <>Add Product</>
+                )}
               </button>
             </div>
           </form>

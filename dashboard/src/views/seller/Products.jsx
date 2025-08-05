@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Search from "../components/Search";
 import { Link } from "react-router-dom";
 import Pagination from "../Pagination";
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
-
+import { useDispatch, useSelector } from "react-redux";
+import { get_products } from "../../store/Reducers/productReducer";
 /**
  * Products component displays a paginated table of products with static demo data.
  * Includes search and page size controls, and action icons for each product row.
@@ -21,6 +22,13 @@ import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
  */
 
 const Products = () => {
+  // Redux dispatch function to trigger actions
+  // This is used to dispatch the categoryAdd action when adding a new category.
+  const dispatch = useDispatch();
+
+  // Destructure authentication-related state from Redux
+  const { products, totalProduct } = useSelector((state) => state.product);
+
   // State: current page number for pagination
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -29,6 +37,18 @@ const Products = () => {
 
   // State: number of products to display per page
   const [parPage, setParPage] = useState(5);
+
+  // useEffect to fetch products whenever search value, items per page, or current page changes
+  useEffect(() => {
+    // Build the request object with pagination and search parameters
+    const obj = {
+      parPage: parseInt(parPage), // Number of products per page
+      page: parseInt(currentPage), // Current page number
+      searchValue, // Search keyword for filtering products
+    };
+    // Dispatch Redux action to fetch categories based on current filters
+    dispatch(get_products(obj));
+  }, [searchValue, parPage, currentPage]);
 
   return (
     <div className="px-2 lg:px-7 pt-5">
@@ -75,67 +95,67 @@ const Products = () => {
             </thead>
             <tbody>
               {/* Static demo data for products */}
-              {[1, 2, 3, 4, 5].map((curVal, index) => (
+              {products.map((curVal, index) => (
                 <tr key={index}>
                   {/* Serial number */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    {curVal}
+                    {index + 1}
                   </td>
                   {/* Product image */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    <img
-                      className="w-[45px] h-[45px]"
-                      src={`/images/category/${curVal}.jpg`}
-                      alt={`Product ${curVal}`}
-                    />
+                    <img className="w-[45px] h-[45px]" src={curVal.images[0]} />
                   </td>
                   {/* Name */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    Men Full Sleeve
+                    {curVal?.name?.slice(0, 15)}...
                   </td>
                   {/* Category name */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    Tshirt
+                    {curVal.category}
                   </td>
                   {/* Brand */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    Nike
+                    {curVal.brand}
                   </td>
                   {/* Price */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    $50
+                    ${curVal.price}
                   </td>
                   {/* Discount */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    10%
+                    {curVal.discount === 0 ? (
+                      <span>No Discount</span>
+                    ) : (
+                      <span>{curVal.discount}%</span>
+                    )}
                   </td>
                   {/* Stock */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    50
+                    {curVal.stock}
                   </td>
                   {/* Edit, View, and Delete actions */}
                   <td
