@@ -105,7 +105,24 @@ class productController {
   };
   // End of add_product method
 
+  /**
+   * Handles fetching products for a specific seller.
+   * Supports pagination and search functionality.
+   * - If 'searchValue' is provided in the query, performs a text search on products.
+   * - Otherwise, fetches all products for the seller.
+   * - Results are paginated based on 'page' and 'parPage' query parameters.
+   * - Returns both the list of products and the total count for pagination.
+   *
+   * @param {Object} req - Express request object, expects query params:
+   *   - page: current page number (string or number)
+   *   - parPage: number of items per page (string or number)
+   *   - searchValue: optional search string for filtering products
+   *   - id: seller's ID (attached to req)
+   * @param {Object} res - Express response object
+   */
+
   products_get = async (req, res) => {
+    // Optionally log the request query and user ID for debugging
     // console.log(req.query);
     // console.log(req.id);
     // Extract pagination and search parameters from the request query
@@ -165,6 +182,8 @@ class productController {
       });
     }
   };
+
+  // End of products_get method
 }
 
 // Export instance of productController for use in routes
