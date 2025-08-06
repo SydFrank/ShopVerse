@@ -120,7 +120,6 @@ class productController {
    *   - id: seller's ID (attached to req)
    * @param {Object} res - Express response object
    */
-
   products_get = async (req, res) => {
     // Optionally log the request query and user ID for debugging
     // console.log(req.query);
@@ -177,13 +176,87 @@ class productController {
       }
     } catch (error) {
       // Return a 500 error response with the error message
+      // console.log(error.message);
       responseReturn(res, 500, {
         error: error.message,
       });
     }
   };
-
   // End of products_get method
+
+  /**
+   * Handles fetching a single product by its ID.
+   * Returns the product details if found, otherwise returns an error.
+   *
+   * @param {Object} req - Express request object, expects:
+   *   - params: contains productId (string)
+   * @param {Object} res - Express response object
+   */
+  product_get = async (req, res) => {
+    const { productId } = req.params;
+    // Optionally log the productId for debugging
+    // console.log(productId);
+    try {
+      // Find the product by its ID in the database
+      const product = await productModel.findById(productId);
+      // Return the product details in the response
+      responseReturn(res, 200, { product });
+    } catch (error) {
+      // Log any errors that occur during product retrieval
+      //  console.log(error.message);
+      // Return a 500 error response with the error message
+      responseReturn(res, 500, {
+        error: error.message,
+      });
+    }
+  };
+  // End of product_get method
+
+  /**
+   * Handles updating an existing product.
+   * Updates product fields based on the provided data in the request body.
+   * Returns the updated product details if successful, otherwise returns an error.
+   *
+   * @param {Object} req - Express request object, expects:
+   *   - body: contains product fields to update and productId
+   * @param {Object} res - Express response object
+   */
+  product_update = async (req, res) => {
+    let { name, description, price, stock, discount, category, productId } =
+      req.body;
+
+    // Trim whitespace from the product name
+    name = name.trim();
+    // Generate a slug by replacing spaces with hyphens in the name
+    const slug = name.split(" ").join("-");
+
+    try {
+      // Update the product in the database by its ID with the new fields
+      await productModel.findByIdAndUpdate(productId, {
+        name, // Updated product name
+        description, // Updated description
+        price, // Updated price
+        stock, // Updated stock
+        discount, // Updated discount
+        category, // Updated category
+        productId, // Product ID (redundant, but included)
+        slug, // Updated slug
+      });
+      // Retrieve the updated product from the database
+      const product = await productModel.findById(productId);
+      // Return a success response with the updated product details
+      responseReturn(res, 200, {
+        message: "Product Updated Successfully",
+        product,
+      });
+    } catch (error) {
+      // Return a 500 error response with the error message
+      responseReturn(res, 500, {
+        error: error.message,
+      });
+    }
+  };
+  // End of product_update method
 }
 
 // Export instance of productController for use in routes
