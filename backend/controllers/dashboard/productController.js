@@ -222,8 +222,16 @@ class productController {
    * @param {Object} res - Express response object
    */
   product_update = async (req, res) => {
-    let { name, description, price, stock, discount, category, productId } =
-      req.body;
+    let {
+      name,
+      description,
+      price,
+      stock,
+      brand,
+      discount,
+      category,
+      productId,
+    } = req.body;
 
     // Trim whitespace from the product name
     name = name.trim();
@@ -240,6 +248,7 @@ class productController {
         discount, // Updated discount
         category, // Updated category
         productId, // Product ID (redundant, but included)
+        brand, // Updated brand
         slug, // Updated slug
       });
       // Retrieve the updated product from the database
