@@ -166,11 +166,11 @@ const AddProduct = () => {
     setAllCategory(categorys);
   }, [categorys]);
 
-  // // useEffect to handle category add response messages
-  // // - Shows a success toast if a category is added successfully
-  // // - Shows an error toast if there is an error
-  // // - Clears messages from Redux after displaying
-  // // - Resets form state and image preview after successful addition
+  // useEffect to handle category add response messages
+  // - Shows a success toast if a category is added successfully
+  // - Shows an error toast if there is an error
+  // - Clears messages from Redux after displaying
+  // - Resets form state and image preview after successful addition
   useEffect(() => {
     if (successMessage) {
       // Show success toast notification

@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { FaRegImages } from "react-icons/fa";
 import { IoMdCloseCircle } from "react-icons/io";
+import { get_category } from "../../store/Reducers/categoryReducer";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  get_product,
+  messageClear,
+  update_product,
+} from "../../store/Reducers/productReducer";
+import { overrideStyle } from "../../utils/utils"; // Custom spinner style
+import { PropagateLoader } from "react-spinners"; // Spinner component for indicating loading state
+import toast from "react-hot-toast"; // For displaying toast messages
 
 /**
  * EditProduct Component
@@ -26,31 +36,50 @@ import { IoMdCloseCircle } from "react-icons/io";
  */
 
 const EditProduct = () => {
-  // List of available product categories (hardcoded for demo)
-  const categorys = [
-    { id: 1, name: "Sports" },
-    { id: 2, name: "Electronics" },
-    { id: 3, name: "Clothing" },
-    { id: 4, name: "Books" },
-    { id: 5, name: "Home Appliances" },
-    { id: 6, name: "Beauty Products" },
-    { id: 7, name: "Toys" },
-    { id: 8, name: "Automotive" },
-  ];
+  // Get product ID from URL parameters
+  const { productId } = useParams();
+
+  // Redux dispatch function to trigger actions (e.g., get_product, update_product)
+  const dispatch = useDispatch();
+
+  // Get the list of categories from Redux state
+  const { categorys } = useSelector((state) => state.category);
+
+  // Get the product details and status from Redux state
+  const { product, loader, successMessage, errorMessage } = useSelector(
+    (state) => state.product
+  );
+
+  // Fetch categories from backend when component mounts
+  useEffect(() => {
+    dispatch(
+      get_category({
+        searchValue: "", // No search filter
+        parpage: "", // No per-page limit (fetch all)
+        page: "", // No specific page (fetch all)
+      })
+    );
+  }, []);
+
+  // Fetch product details from backend when productId changes
+  useEffect(() => {
+    dispatch(get_product(productId));
+  }, [productId]);
 
   // State for product input fields
   const [state, setState] = useState({
-    name: "",
-    description: "",
-    discount: "",
-    price: "",
-    brand: "",
-    stock: "",
+    name: "", // Product name
+    description: "", // Product description
+    discount: "", // Discount percentage
+    price: "", // Product price
+    brand: "", // Brand name
+    stock: "", // Stock quantity
   });
 
   /**
    * Handles change for all input fields.
    * Updates the state dynamically based on input name.
+   * @param {Event} e - Input change event
    */
   const inputHandle = (e) => {
     setState({
@@ -59,39 +88,42 @@ const EditProduct = () => {
     });
   };
 
-  // Category dropdown visibility
+  // State for category dropdown visibility
   const [categoryShow, setCategoryShow] = useState(false);
 
-  // Selected category name
+  // State for currently selected category name
   const [category, setCategory] = useState("");
 
-  // List of categories to display (filtered)
-  const [allCategory, setAllCategory] = useState(categorys);
+  // State for filtered category list (for search)
+  const [allCategory, setAllCategory] = useState([]);
 
-  // Search value for category dropdown
+  // State for category search input value
   const [searchValue, setSearchValue] = useState("");
 
   /**
-   * Handles category search/filter.
-   * Filters category list based on input value.
+   * Handles category search/filter logic.
+   * Filters the category list based on the search input.
+   * @param {Event} e - Input change event
    */
   const categorySearch = (e) => {
     const value = e.target.value;
     setSearchValue(value);
     if (value) {
+      // Filter categories by search value (case-insensitive)
       let srcValue = categorys.filter(
         (curVal) => curVal.name.toLowerCase().indexOf(value.toLowerCase()) > -1
       );
       setAllCategory(srcValue);
     } else {
+      // If search is empty, show all categories
       setAllCategory(categorys);
     }
   };
 
-  // Product images (File objects)
+  // State for product images (File objects)
   const [images, setImages] = useState([]);
 
-  // Product images (preview URLs)
+  // State for product image previews (URLs)
   const [imageShow, setImageShow] = useState([]);
 
   /**
@@ -101,28 +133,78 @@ const EditProduct = () => {
    */
   const changeImage = (img, files) => {
     if (files.length > 0) {
+      // You can implement image replacement logic here if needed
       console.log(img);
       console.log(files[0]);
-      // Implement image replacement logic if required
     }
   };
 
   /**
-   * Load default product data for editing on component mount.
-   * Replace with real API calls in production.
+   * Loads default product data for editing when product data is available.
+   * Sets form fields and image previews based on product data.
    */
   useEffect(() => {
-    setState({
-      name: "Men Tshirt",
-      description: "Made for comfort. Designed to stand out.",
-      discount: "10%",
-      price: 150,
-      brand: "Nike",
-      stock: 50,
-    });
-    setCategory("Clothing");
-    setImageShow(["/images/category/1.jpg", "/images/category/2.jpg"]);
-  }, []);
+    if (product) {
+      setState({
+        name: product.name,
+        description: product.description,
+        discount: product.discount,
+        price: product.price,
+        brand: product.brand,
+        stock: product.stock,
+      });
+      setCategory(product.category);
+      setImageShow(product.images);
+    }
+  }, [product]);
+
+  /**
+   * Updates the filtered category list whenever the Redux category list changes.
+   */
+  useEffect(() => {
+    setAllCategory(categorys);
+  }, [categorys]);
+
+  /**
+   * useEffect to handle product update response messages
+   * - Shows a success toast if the product is updated successfully
+   * - Shows an error toast if there is an error
+   * - Clears messages from Redux after displaying
+   */
+  useEffect(() => {
+    if (successMessage) {
+      // Show success toast notification
+      toast.success(successMessage);
+      // Clear success/error messages from Redux state
+      dispatch(messageClear());
+    }
+    if (errorMessage) {
+      // Show error toast notification
+      toast.error(errorMessage);
+      // Clear success/error messages from Redux state
+      dispatch(messageClear());
+    }
+  }, [successMessage, errorMessage]);
+
+  /**
+   * Handles form submission to update product information.
+   * Dispatches the update_product action with the updated product data.
+   * @param {Event} e - Form submit event
+   */
+  const updateInfo = (e) => {
+    e.preventDefault(); // Prevent default form submission
+    const obj = {
+      name: state.name, // Product name
+      description: state.description, // Product description
+      discount: state.discount, // Discount percentage
+      price: state.price, // Product price
+      brand: state.brand, // Brand name
+      stock: state.stock, // Stock quantity
+      category: category, // Selected category
+      productId: productId, // Product ID for updating
+    };
+    dispatch(update_product(obj));
+  };
 
   return (
     <div className=" px-2 lg:pl-7 pt-5 ">
@@ -139,7 +221,7 @@ const EditProduct = () => {
         </div>
 
         <div>
-          <form>
+          <form onSubmit={updateInfo}>
             {/* Product Name & Brand */}
             <div className="flex flex-col mb-3 md:flex-row gap-4 w-full text-[#d0d2d6]">
               <div className="flex flex-col w-full gap-2">
@@ -200,22 +282,23 @@ const EditProduct = () => {
                   <div className="pt-14"></div>
 
                   <div className="flex justify-start items-start flex-col h-[200px] overflow-x-scroll">
-                    {allCategory.map((curVal, index) => (
-                      <span
-                        key={curVal.id}
-                        className={`px-4 py-2 hover:bg-indigo-500 hover:text-white hover:shadow-lg w-full cursor-pointer ${
-                          category === curVal.name && "bg-indigo-500"
-                        }`}
-                        onClick={() => {
-                          setCategoryShow(false);
-                          setCategory(curVal.name);
-                          setSearchValue("");
-                          setAllCategory(categorys);
-                        }}
-                      >
-                        {curVal.name}
-                      </span>
-                    ))}
+                    {allCategory.length > 0 &&
+                      allCategory.map((curVal, index) => (
+                        <span
+                          key={curVal.id}
+                          className={`px-4 py-2 hover:bg-indigo-500 hover:text-white hover:shadow-lg w-full cursor-pointer ${
+                            category === curVal.name && "bg-indigo-500"
+                          }`}
+                          onClick={() => {
+                            setCategoryShow(false);
+                            setCategory(curVal.name);
+                            setSearchValue("");
+                            setAllCategory(categorys);
+                          }}
+                        >
+                          {curVal.name}
+                        </span>
+                      ))}
                   </div>
                 </div>
               </div>
@@ -282,24 +365,35 @@ const EditProduct = () => {
             {/* Image Upload Section */}
             <div className="grid lg:grid-cols-4 grid-cols-3 sm:grid-cols-2 sm:gap-4 md:gap-4 gap-3 w-full text-[#d0d2d6] mb-4">
               {/* Display uploaded images with option to replace */}
-              {imageShow.map((img, index) => (
-                <div key={index}>
-                  <label htmlFor={index}>
-                    <img src={img} alt={`Product preview ${index + 1}`} />
-                  </label>
-                  <input
-                    onChange={(e) => changeImage(img, e.target.files)}
-                    type="file"
-                    id={index}
-                    className="hidden"
-                  />
-                </div>
-              ))}
+              {imageShow &&
+                imageShow.length > 0 &&
+                imageShow.map((img, index) => (
+                  <div key={index}>
+                    <label htmlFor={index}>
+                      <img src={img} alt={`Product preview ${index + 1}`} />
+                    </label>
+                    <input
+                      onChange={(e) => changeImage(img, e.target.files)}
+                      type="file"
+                      id={index}
+                      className="hidden"
+                    />
+                  </div>
+                ))}
             </div>
             {/* Submit Button */}
             <div className="flex">
-              <button className="bg-red-500 hover:shadow-red-500/40 hover:shadow-md text-white rounded-md px-7 py-2 my-2">
-                Save Changes
+              <button
+                disabled={loader}
+                className="bg-red-500 w-[280px] hover:shadow-red-300/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3 flex items-center justify-center gap-2"
+              >
+                {loader ? (
+                  // Show loading spinner during API request
+                  <PropagateLoader color="white" cssOverride={overrideStyle} />
+                ) : (
+                  // Display lock icon and text if not loading
+                  <>Save Changes</>
+                )}
               </button>
             </div>
           </form>

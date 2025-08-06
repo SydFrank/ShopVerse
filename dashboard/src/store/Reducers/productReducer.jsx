@@ -38,10 +38,10 @@ export const add_product = createAsyncThunk(
 // End of add_product async thunk
 
 /**
- * Async Thunk: Get Product
+ * Async Thunk: Get Products
  * ------------------------
- * Sends a request to the backend to fetch category data.
- * Uses axios (via `api`) to get category data.
+ * Sends a request to the backend to fetch product data.
+ * Uses axios (via `api`) to get product data.
  * Automatically generates pending, fulfilled, and rejected action types.
  *
  * @param {Object} info - Product payload (e.g. { name, image }).
@@ -60,7 +60,7 @@ export const get_products = createAsyncThunk(
     try {
       // Make a GET request to the backend API with pagination and search parameters
       const { data } = await api.get(
-        `/product-get?page=${page}&&searchValue=${searchValue}&&parPage=${parPage}`,
+        `/products-get?page=${page}&&searchValue=${searchValue}&&parPage=${parPage}`,
         {
           withCredentials: true, // Include cookies for authentication/session
         }
@@ -76,7 +76,83 @@ export const get_products = createAsyncThunk(
     }
   }
 );
-//End of get_category async thunk
+//End of get_products async thunk
+
+/**
+ * Async Thunk: Get Product
+ * ------------------------
+ * Sends a request to the backend to fetch product data.
+ * Uses axios (via `api`) to get product data.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ *
+ * @param {Object} info - Product payload (e.g. { name, image }).
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error.
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload.
+ * @returns {Object} Response data or error.
+ */
+
+export const get_product = createAsyncThunk(
+  "product/get_product",
+  // This thunk asynchronously fetches product data from the backend.
+  async (
+    productId, // The product ID to fetch details
+    { rejectWithValue, fulfillWithValue } // Helper functions for custom fulfilled/rejected payloads
+  ) => {
+    try {
+      // Make a GET request to the backend API to fetch product details by ID
+      const { data } = await api.get(`/product-get/${productId}`, {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      console.log(data); // Log the response data for debugging
+      // On success, dispatch the fulfilled action with the server's response data
+      return fulfillWithValue(data);
+    } catch (error) {
+      // On error, dispatch the rejected action with the backend error message
+      // error.response.data contains the error details sent from the server
+      // console.log(error.response.data); // Uncomment for error debugging
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+//End of get_product async thunk
+
+/**
+ * Async Thunk: Update Product
+ * ------------------------
+ * Sends a request to the backend to update product data.
+ * Uses axios (via `api`) to update product data.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ *
+ * @param {Object} info - Product payload (e.g. { name, image }).
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error.
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload.
+ * @returns {Object} Response data or error.
+ */
+
+export const update_product = createAsyncThunk(
+  "product/update_product",
+  // This thunk asynchronously updates product data on the backend.
+  async (
+    product, // The product object containing updated details
+    { rejectWithValue, fulfillWithValue } // Helper functions for custom fulfilled/rejected payloads
+  ) => {
+    try {
+      // Make a GET request to the backend API to fetch product details by ID
+      const { data } = await api.post(`/product-update`, product, {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      console.log(data); // Log the response data for debugging
+      // On success, dispatch the fulfilled action with the server's response data
+      return fulfillWithValue(data);
+    } catch (error) {
+      // On error, dispatch the rejected action with the backend error message
+      // error.response.data contains the error details sent from the server
+      // console.log(error.response.data); // Uncomment for error debugging
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+//End of update_product async thunk
 
 /**
  * The `auth` slice of the global Redux state.
@@ -95,6 +171,7 @@ const productSlice = createSlice({
     loader: false, // Indicates if login request is in progress
     products: [], // Stores products fetched from the backend
     totalProduct: 0,
+    product: "", // Stores a single product fetched by ID
   },
   reducers: {
     /**
@@ -122,6 +199,21 @@ const productSlice = createSlice({
       .addCase(get_products.fulfilled, (state, { payload }) => {
         state.totalProduct = payload.totalProduct;
         state.products = payload.products; // Update products with fetched data
+      })
+      .addCase(get_product.fulfilled, (state, { payload }) => {
+        state.product = payload.product; // Update product with fetched data
+      })
+      .addCase(update_product.pending, (state, { payload }) => {
+        state.loader = true;
+      })
+      .addCase(update_product.rejected, (state, { payload }) => {
+        state.loader = false;
+        state.errorMessage = payload.error; // Set error message from backend
+      })
+      .addCase(update_product.fulfilled, (state, { payload }) => {
+        state.loader = false;
+        state.successMessage = payload.message;
+        state.product = payload.product; // Update product with updated data
       });
   },
 });
