@@ -155,6 +155,49 @@ export const update_product = createAsyncThunk(
 //End of update_product async thunk
 
 /**
+ * Async Thunk: Product Image Update
+ * ------------------------
+ * Sends a request to the backend to update product image data.
+ * Uses axios (via `api`) to update product image data.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ *
+ * @param {Object} info - Product payload (e.g. { name, image }).
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error.
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload.
+ * @returns {Object} Response data or error.
+ */
+
+export const product_image_update = createAsyncThunk(
+  "product/product_image_update",
+  // This thunk asynchronously updates product data on the backend.
+  async (
+    { oldImage, newImage, productId }, // The product object containing updated details
+    { rejectWithValue, fulfillWithValue } // Helper functions for custom fulfilled/rejected payloads
+  ) => {
+    try {
+      // Create a FormData object to send the old and new images along with the product ID
+      const formData = new FormData();
+      formData.append("oldImage", oldImage);
+      formData.append("newImage", newImage);
+      formData.append("productId", productId);
+      // Make a GET request to the backend API to fetch product details by ID
+      const { data } = await api.post(`/product-image-update`, formData, {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      console.log(data); // Log the response data for debugging
+      // On success, dispatch the fulfilled action with the server's response data
+      return fulfillWithValue(data);
+    } catch (error) {
+      // On error, dispatch the rejected action with the backend error message
+      // error.response.data contains the error details sent from the server
+      // console.log(error.response.data); // Uncomment for error debugging
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+//End of product_image_update async thunk
+
+/**
  * The `auth` slice of the global Redux state.
  *
  * - `name`: Unique name for the slice.
@@ -212,6 +255,10 @@ const productSlice = createSlice({
       })
       .addCase(update_product.fulfilled, (state, { payload }) => {
         state.loader = false;
+        state.successMessage = payload.message;
+        state.product = payload.product; // Update product with updated data
+      })
+      .addCase(product_image_update.fulfilled, (state, { payload }) => {
         state.successMessage = payload.message;
         state.product = payload.product; // Update product with updated data
       });

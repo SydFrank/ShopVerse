@@ -8,6 +8,7 @@ import {
   get_product,
   messageClear,
   update_product,
+  product_image_update,
 } from "../../store/Reducers/productReducer";
 import { overrideStyle } from "../../utils/utils"; // Custom spinner style
 import { PropagateLoader } from "react-spinners"; // Spinner component for indicating loading state
@@ -134,8 +135,15 @@ const EditProduct = () => {
   const changeImage = (img, files) => {
     if (files.length > 0) {
       // You can implement image replacement logic here if needed
-      console.log(img);
-      console.log(files[0]);
+      // console.log(img);
+      // console.log(files[0]);
+      dispatch(
+        product_image_update({
+          oldImage: img,
+          newImage: files[0],
+          productId: productId,
+        })
+      );
     }
   };
 
