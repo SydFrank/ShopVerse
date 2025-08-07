@@ -266,6 +266,88 @@ class productController {
     }
   };
   // End of product_update method
+
+  /**
+   * Handles updating a specific image of a product.
+   * Expects a multipart/form-data request with:
+   *   - oldImage: the URL of the image to be replaced
+   *   - productId: the ID of the product whose image is being updated
+   *   - newImage: the new image file to upload
+   * The method uploads the new image to Cloudinary, replaces the old image URL in the product's images array,
+   * updates the product in the database, and returns the updated product details.
+   *
+   * @param {Object} req - Express request object, expects form-data fields and files
+   * @param {Object} res - Express response object
+   */
+  product_image_update = async (req, res) => {
+    // Create a new instance of the formidable form parser that supports multiple file uploads
+    const form = formidable({ multiples: true });
+    // Parse the incoming form data (fields and files)
+    form.parse(req, async (err, fields, files) => {
+      // Optionally log the parsed fields and files for debugging
+      // console.log(fields);
+      // console.log(files);
+
+      // Extract the 'oldImage' (URL of the image to be replaced) and 'productId' from the parsed fields
+      const { oldImage, productId } = fields;
+      // Extract the new image file from the parsed files
+      const { newImage } = files;
+
+      // If an error occurs during parsing, return a 400 error response
+      if (err) {
+        responseReturn(res, 400, {
+          error: err.message,
+        });
+      } else {
+        try {
+          // Configure Cloudinary with credentials from environment variables
+          cloudinary.config({
+            cloud_name: process.env.cloud_name,
+            api_key: process.env.api_key,
+            api_secret: process.env.api_secret,
+            secure: true,
+          });
+
+          // Upload the new image file to Cloudinary under the 'products' folder
+          const result = await cloudinary.uploader.upload(newImage.filepath, {
+            folder: "products",
+          });
+
+          // If the upload is successful, update the product's image in the database
+          if (result) {
+            // Retrieve the current images array from the product document
+            let { images } = await productModel.findById(productId);
+            // Find the index of the old image URL in the images array
+            const index = images.findIndex((img) => img === oldImage);
+            // Replace the old image URL with the new image URL
+            images[index] = result.url;
+            // Update the product document with the new images array
+            await productModel.findByIdAndUpdate(productId, {
+              images, // Updated images array with the new image URL
+            });
+            // Retrieve the updated product document
+            const product = await productModel.findById(productId);
+            // Return a success response with the updated product details
+            responseReturn(res, 200, {
+              message: "Product Image Updated Successfully",
+              product,
+            });
+          } else {
+            // If image upload fails, return a 400 error response
+            responseReturn(res, 400, {
+              error: "Image Upload Failed",
+            });
+          }
+        } catch (error) {
+          // Return a 404 error response with the error message
+          responseReturn(res, 404, {
+            error: error.message,
+          });
+        }
+      }
+    });
+  };
+  // End of product_image_update method
 }
 
 // Export instance of productController for use in routes

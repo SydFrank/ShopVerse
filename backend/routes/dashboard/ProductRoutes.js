@@ -26,5 +26,19 @@ router.post(
   productController.product_update
 );
 
+// Define a POST route at '/product-update' that uses the update_Product method from productController
+router.post(
+  "/product-update",
+  authMiddleware,
+  productController.product_update
+);
+
+// Define a POST route at '/product-image-update' that uses the product_image_update method from productController
+router.post(
+  "/product-image-update",
+  authMiddleware,
+  productController.product_image_update
+);
+
 // Export the router to be used in the main server application
 module.exports = router;
