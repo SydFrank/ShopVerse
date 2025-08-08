@@ -1,6 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaEdit, FaImages } from "react-icons/fa";
 import { FadeLoader } from "react-spinners";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  profile_image_upload,
+  messageClear,
+} from "../../store/Reducers/authReducer"; // Action to upload profile image
+import toast from "react-hot-toast"; // For displaying toast messages
 
 /**
  * Profile component renders the user's profile information and allows editing of personal details,
@@ -19,10 +25,43 @@ import { FadeLoader } from "react-spinners";
  */
 
 const Profile = () => {
-  const image = true;
-  const loader = true;
+  // Redux dispatch function to trigger actions (e.g., add_product)
+  const dispatch = useDispatch();
+  // Get the list of categories from Redux state
+  const { userInfo, loader, successMessage, errorMessage } = useSelector(
+    (state) => state.auth
+  );
+
   const status = "active";
-  const userInfo = true;
+
+  const add_image = (e) => {
+    if (e.target.files.length > 0) {
+      // console.log(e.target.files[0]);  // Handle the image upload logic here
+      const formData = new FormData();
+      formData.append("image", e.target.files[0]);
+      dispatch(profile_image_upload(formData));
+    }
+  };
+
+  // useEffect to handle category add response messages
+  // - Shows a success toast if a category is added successfully
+  // - Shows an error toast if there is an error
+  // - Clears messages from Redux after displaying
+  // - Resets form state and image preview after successful addition
+  useEffect(() => {
+    if (successMessage) {
+      // Show success toast notification
+      toast.success(successMessage);
+      // Clear success/error messages from Redux state
+      dispatch(messageClear());
+    }
+    if (errorMessage) {
+      // Show error toast notification
+      toast.error(errorMessage);
+      // Clear success/error messages from Redux state
+      dispatch(messageClear());
+    }
+  }, [successMessage, errorMessage]);
 
   return (
     <div className="px-2 lg:px-7 py-5 ">
@@ -32,12 +71,12 @@ const Profile = () => {
           <div className="w-full p-4 bg-[#6a5fdf] rounded-md text-[#d0d2d6]">
             {/* Profile Image Upload */}
             <div className="flex justify-center items-center py-3">
-              {image ? (
+              {userInfo?.image ? (
                 <label
                   htmlFor="img"
                   className="h-[150px] w-[200px] relative p-3 cursor-pointer overflow-hidden "
                 >
-                  <img src="/images/demo.jpg" />
+                  <img src={userInfo.image} />
                   {!loader && (
                     <div className="bg-slate-600 absolute left-0 top-0 w-full h-full opacity-17 flex justify-center items-center z-20">
                       <span>
@@ -64,7 +103,12 @@ const Profile = () => {
                   )}
                 </label>
               )}
-              <input type="file" id="img" className="hidden" />
+              <input
+                onChange={add_image}
+                type="file"
+                id="img"
+                className="hidden"
+              />
             </div>
 
             {/* User Information */}
@@ -76,30 +120,30 @@ const Profile = () => {
 
                 <div className="flex gap-2">
                   <span>Name: </span>
-                  <span>Frank Xu</span>
+                  <span>{userInfo.name}</span>
                 </div>
 
                 <div className="flex gap-2">
                   <span>Email: </span>
-                  <span>frankzhsy@gmail.com</span>
+                  <span>{userInfo.email}</span>
                 </div>
 
                 <div className="flex gap-2">
                   <span>Role: </span>
-                  <span>Seller</span>
+                  <span>{userInfo.role}</span>
                 </div>
 
                 <div className="flex gap-2">
                   <span>Status: </span>
-                  <span>Active</span>
+                  <span>{userInfo.status}</span>
                 </div>
 
                 <div className="flex gap-2">
                   <span>Payment Account: </span>
                   <p>
                     {status === "active" ? (
-                      <span className="bg-green-500 text-white text-xs cursor-pointer font-normal ml-2 px-2 py-0.5 rounded">
-                        Pending
+                      <span className="bg-red-500 text-white text-xs cursor-pointer font-normal ml-2 px-2 py-0.5 rounded">
+                        {userInfo.payment}
                       </span>
                     ) : (
                       <span className="bg-blue-500 text-white text-xs cursor-pointer font-normal ml-2 px-2 py-0.5 rounded">
@@ -113,7 +157,7 @@ const Profile = () => {
 
             {/* Shop Info or Edit Form */}
             <div className="px-0 md:px-5 py-2">
-              {!userInfo ? (
+              {!userInfo?.shopInfo ? (
                 <form>
                   {/* Editable Shop Information */}
                   <div className="flex flex-col w-full gap-2 mb-2">

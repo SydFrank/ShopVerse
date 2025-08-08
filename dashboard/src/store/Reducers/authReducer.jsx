@@ -32,6 +32,7 @@ export const admin_login = createAsyncThunk(
     }
   }
 );
+// End of admin_login async thunk
 
 /**
  * Async Thunk: Seller Login
@@ -64,6 +65,7 @@ export const seller_login = createAsyncThunk(
     }
   }
 );
+// End of seller_login async thunk
 
 /**
  * Async Thunk: Seller Register
@@ -96,6 +98,7 @@ export const seller_register = createAsyncThunk(
     }
   }
 );
+// End of seller_register async thunk
 
 /**
  * Async Thunk: Get User Info
@@ -128,6 +131,35 @@ export const get_user_info = createAsyncThunk(
     }
   }
 );
+// End of get_user_info async thunks
+
+/**
+ * Async Thunk: Profile Image Upload
+ * ------------------------
+ * Uploads a profile image to the backend.
+ * Uses axios (via `api`) to post the image data.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ *
+ * @param {Object} info - Profile image data (e.g. { imageFile }).
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error.
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload.
+ * @returns {Object} Response data or error.
+ */
+
+export const profile_image_upload = createAsyncThunk(
+  "auth/profile_image_upload",
+  async (image, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.post("/profile-image-upload", image, {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      return fulfillWithValue(data); // Dispatch success
+    } catch (error) {
+      return rejectWithValue(error.response.data); // Return backend error message
+    }
+  }
+);
+// End of profile_image_upload async thunks
 
 /**
  * Helper function: returnRole
@@ -155,6 +187,7 @@ const returnRole = (token) => {
     return ""; // Return empty if no token is present
   }
 };
+// End of returnRole function
 
 /**
  * The `auth` slice of the global Redux state.
@@ -233,6 +266,14 @@ const authSlice = createSlice({
       .addCase(get_user_info.fulfilled, (state, { payload }) => {
         state.loader = false;
         state.userInfo = payload.userInfo; // Store user info from backend
+      })
+      .addCase(profile_image_upload.pending, (state, { payload }) => {
+        state.loader = true;
+      })
+      .addCase(profile_image_upload.fulfilled, (state, { payload }) => {
+        state.loader = false;
+        state.userInfo = payload.userInfo; // Store user info from backend
+        state.successMessage = payload.message;
       });
   },
 });
