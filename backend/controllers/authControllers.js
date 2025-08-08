@@ -1,9 +1,14 @@
 const adminModel = require("../models/adminModel");
 const sellerModel = require("../models/sellerModel");
 const sellerCustomerModel = require("../models/chat/sellerCustomerModel");
-const { responseReturn } = require("../utils/response");
 const bcrpty = require("bcrypt");
 const { createToken } = require("../utils/tokenCreate");
+// Import the formidable library for handling form data (multipart/form-data, file uploads)
+const formidable = require("formidable");
+// Import custom response utility for consistent API responses
+const { responseReturn } = require("../utils/response");
+// Import the cloudinary library for image uploading and management
+const cloudinary = require("cloudinary").v2;
 
 // Define the authControllers class to handle authentication-related logic
 class authControllers {
@@ -206,6 +211,62 @@ class authControllers {
     }
   };
   // End of get_user method
+
+  /**
+   * Handles uploading and updating the seller's profile image.
+   * Expects a multipart/form-data request containing the new profile image.
+   * The method uploads the image to Cloudinary, updates the seller's profile image URL in the database,
+   * and returns the updated user info in the response.
+   *
+   * @param {Object} req - Express request object, expects:
+   *   - id: seller's ID (attached to req)
+   *   - form-data files: image (profile image file)
+   * @param {Object} res - Express response object
+   */
+  profile_image_upload = async (req, res) => {
+    // Extract the seller's ID from the request (assumed to be attached by authentication middleware)
+    const { id } = req;
+    // Use formidable to handle file uploads (supports multiple files, but only one is expected here)
+    const form = formidable({ multiples: true });
+    // Parse the incoming form data (fields and files)
+    form.parse(req, async (err, _, files) => {
+      // Configure Cloudinary with credentials from environment variables
+      cloudinary.config({
+        cloud_name: process.env.cloud_name,
+        api_key: process.env.api_key,
+        api_secret: process.env.api_secret,
+        secure: true,
+      });
+      // Extract the uploaded image file from the parsed files
+      const { image } = files;
+      try {
+        // Upload the new image file to Cloudinary under the 'profile' folder
+        const result = await cloudinary.uploader.upload(image.filepath, {
+          folder: "profile",
+        });
+        if (result) {
+          // Update the seller's profile image URL in the database
+          await sellerModel.findByIdAndUpdate(id, {
+            image: result.url, // Save the new image URL
+          });
+          // Retrieve the updated seller info from the database
+          const userInfo = await sellerModel.findById(id);
+          // Return success response with updated user info
+          return responseReturn(res, 201, {
+            message: "Profile Image Uploaded Successfully",
+            userInfo,
+          });
+        } else {
+          // Handle case where image upload fails
+          return responseReturn(res, 404, { error: "Image Upload Failed" });
+        }
+      } catch (error) {
+        // Handle upload error and return a 500 error response
+        return responseReturn(res, 500, { error: error.message });
+      }
+    });
+  };
+  // End of profile_image_upload
 }
 
 // Export instance of authControllers for use in routes

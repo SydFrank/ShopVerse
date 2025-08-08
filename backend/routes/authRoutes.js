@@ -17,5 +17,12 @@ router.post("/seller-register", authControllers.seller_register);
 // Define a POST route at '/seller-login' that uses the seller_login method from authControllers
 router.post("/seller-login", authControllers.seller_login);
 
+// Define a POST route at '/profile-image-upload' that uses the authMiddleware for authentication
+router.post(
+  "/profile-image-upload",
+  authMiddleware,
+  authControllers.profile_image_upload
+);
+
 // Export the router to be used in the main server application
 module.exports = router;
