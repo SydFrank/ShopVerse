@@ -37,10 +37,11 @@ app.use(cookieParser());
 app.use("/api", require("./routes/authRoutes"));
 app.use("/api", require("./routes/dashboard/CategoryRoutes"));
 app.use("/api", require("./routes/dashboard/ProductRoutes"));
+app.use("/api", require("./routes/dashboard/SellerRoutes"));
 
 // Define a GET route handler for the root path '/'
 // Sends a simple response message to the client to verify that the server is running
-app.get("/", (req, res) => res.send("My backend "));
+app.get("/", (req, res) => res.send("My backend is running"));
 
 // Retrieve the port number from environment variables
 const port = process.env.PORT;
