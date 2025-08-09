@@ -11,10 +11,10 @@
  *   // otherFeature: otherReducer,
  * }
  */
-
 import authReducer from "./Reducers/authReducer";
 import categoryReducer from "./Reducers/categoryReducer";
 import productReducer from "./Reducers/productReducer";
+import sellerReducer from "./Reducers/sellerReducer";
 /**
  * Combines all feature slice reducers into a single root reducer object.
  *
@@ -27,6 +27,13 @@ const rootReducer = {
   auth: authReducer,
   category: categoryReducer,
   product: productReducer,
+  seller: sellerReducer,
 };
+// const rootReducer = combineReducers({
+//   auth: authReducer,
+//   category: categoryReducer,
+//   product: productReducer,
+//   seller: sellerReducer,
+// });
 
 export default rootReducer;

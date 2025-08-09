@@ -1,5 +1,5 @@
 // Import necessary dependencies
-import { Link } from "react-router-dom"; // Navigation link
+import { Link, useNavigate } from "react-router-dom"; // Navigation link
 import { FaGoogle, FaFacebook } from "react-icons/fa"; // Social icons
 import { useEffect, useState } from "react"; // React hooks
 import { useSelector, useDispatch } from "react-redux"; // Redux hooks
@@ -26,6 +26,8 @@ import toast from "react-hot-toast"; // Toast notifications
 const Register = () => {
   // Initialize dispatch for Redux actions
   const dispatch = useDispatch();
+  // Use navigate from react-router-dom for navigation
+  const navigate = useNavigate();
 
   // Extract auth-related state from Redux store
   const { loader, successMessage, errorMessage } = useSelector(
@@ -67,6 +69,7 @@ const Register = () => {
     if (successMessage) {
       toast.success(successMessage); // Show success toast
       dispatch(messageClear()); // Clear message in Redux
+      navigate("/");
     }
     if (errorMessage) {
       toast.error(errorMessage); // Show error toast
