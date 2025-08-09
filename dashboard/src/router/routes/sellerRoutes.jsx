@@ -114,6 +114,6 @@ export const sellerRoutes = [
     path: "/seller/dashboard/profile", // Seller profile path
     element: <Profile />, // Profile component
     role: "seller", // Accessible by seller roles
-    status: "active", // Only active sellers can access
+    visibility: ["active", "deactive", "pending"], // Active, deactive, and pending sellers
   },
 ];

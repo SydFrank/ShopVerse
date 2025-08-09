@@ -162,6 +162,35 @@ export const profile_image_upload = createAsyncThunk(
 // End of profile_image_upload async thunks
 
 /**
+ * Async Thunk: profile Info add
+ * ------------------------
+ * Adds or updates user profile information.
+ * Uses axios (via `api`) to post the user info.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ *
+ * @param {Object} info - Profile form data (e.g. shopname,
+    division,district,sub_district).
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error.
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload.
+ * @returns {Object} Response data or error.
+ */
+
+export const profile_info_add = createAsyncThunk(
+  "auth/profile_info_add",
+  async (info, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.post("/profile-info-add", info, {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      return fulfillWithValue(data); // Dispatch success
+    } catch (error) {
+      return rejectWithValue(error.response.data); // Return backend error message
+    }
+  }
+);
+// End of profile_info_add async thunks
+
+/**
  * Helper function: returnRole
  * ---------------------------
  * Decodes a JWT token to determine the user's role and checks if the token is expired.
@@ -267,10 +296,20 @@ const authSlice = createSlice({
         state.loader = false;
         state.userInfo = payload.userInfo; // Store user info from backend
       })
+      // Handles profile image upload async flow
       .addCase(profile_image_upload.pending, (state, { payload }) => {
         state.loader = true;
       })
       .addCase(profile_image_upload.fulfilled, (state, { payload }) => {
+        state.loader = false;
+        state.userInfo = payload.userInfo; // Store user info from backend
+        state.successMessage = payload.message;
+      })
+      // Handles profile info add async flow
+      .addCase(profile_info_add.pending, (state, { payload }) => {
+        state.loader = true;
+      })
+      .addCase(profile_info_add.fulfilled, (state, { payload }) => {
         state.loader = false;
         state.userInfo = payload.userInfo; // Store user info from backend
         state.successMessage = payload.message;
