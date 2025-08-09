@@ -267,6 +267,49 @@ class authControllers {
     });
   };
   // End of profile_image_upload
+
+  /**
+   * Handles adding or updating the seller's shop profile information.
+   * Expects a JSON request containing shop details such as division, district, shop name, and sub-district.
+   * The method updates the seller's shopInfo field in the database and returns the updated user info.
+   *
+   * @param {Object} req - Express request object, expects:
+   *   - id: seller's ID (attached to req)
+   *   - body: contains division, district, shopName, sub_district
+   * @param {Object} res - Express response object
+   */
+  profile_info_add = async (req, res) => {
+    // Optionally log the request body for debugging
+    // console.log(req.body);
+
+    // Extract the seller's ID from the request (assumed to be attached by authentication middleware)
+    const { id } = req;
+    // Extract shop profile fields from the request body
+    const { division, district, shopName, sub_district } = req.body;
+
+    try {
+      // Update the seller's shopInfo field in the database with the new profile information
+      await sellerModel.findByIdAndUpdate(id, {
+        shopInfo: {
+          division, // Seller's division
+          district, // Seller's district
+          sub_district, // Seller's sub-district
+          shopName, // Seller's shop name
+        },
+      });
+      // Retrieve the updated seller info from the database
+      const userInfo = await sellerModel.findById(id);
+      // Return success response with updated user info
+      return responseReturn(res, 201, {
+        message: "Profile Info Added Successfully",
+        userInfo,
+      });
+    } catch (error) {
+      // Return a 500 error response if any error occurs during update
+      return responseReturn(res, 500, { error: error.message });
+    }
+  };
+  // End of profile_info_add
 }
 
 // Export instance of authControllers for use in routes

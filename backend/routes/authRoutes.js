@@ -24,5 +24,12 @@ router.post(
   authControllers.profile_image_upload
 );
 
+// Define a POST route at '/profile-info-add' that uses the authMiddleware for authentication
+router.post(
+  "/profile-info-add",
+  authMiddleware,
+  authControllers.profile_info_add
+);
+
 // Export the router to be used in the main server application
 module.exports = router;
