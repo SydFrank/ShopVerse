@@ -20,7 +20,7 @@ import { get_seller_request } from "../../store/Reducers/sellerReducer";
 
 const SellerRequest = () => {
   // Redux dispatch function to trigger actions
-  // This is used to dispatch the categoryAdd action when adding a new category.
+  // This is used to dispatch the get_seller_request action to fetch seller data.
   const dispatch = useDispatch();
 
   // Destructure authentication-related state from Redux
