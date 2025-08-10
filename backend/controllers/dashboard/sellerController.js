@@ -62,6 +62,64 @@ class sellerController {
     }
   };
   // End of request_seller_get method
+
+  /**
+   * Handles fetching a specific seller by their ID.
+   * - Expects the seller ID in the request parameters.
+   * - Returns the seller details if found.
+   * - Returns a 404 error if the seller is not found.
+   *
+   * @param {Object} req - Express request object, expects params:
+   *   - sellerId: ID of the seller to fetch (string)
+   * @param {Object} res - Express response object
+   */
+
+  get_seller = async (req, res) => {
+    // Extract sellerId from the request parameters
+    const { sellerId } = req.params;
+
+    try {
+      // Find the seller by ID in the database
+      const seller = await sellerModel.findById(sellerId);
+      // Return the seller details in the response
+      responseReturn(res, 200, { seller });
+    } catch (error) {
+      // Return a 500 error response if any error occurs during database operation
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+  // End of get_seller method
+
+  /**
+   * Handles updating the status of a seller.
+   * - Expects the seller ID and new status in the request body.
+   * - Updates the seller's status in the database.
+   *
+   * @param {Object} req - Express request object, expects body:
+   *   - sellerId: ID of the seller to update (string)
+   *   - status: new status for the seller (string)
+   * @param {Object} res - Express response object
+   */
+
+  seller_status_update = async (req, res) => {
+    // Extract sellerId and status from the request body
+    const { sellerId, status } = req.body;
+    try {
+      await sellerModel.findByIdAndUpdate(sellerId, {
+        status, // Update the seller's status
+      });
+      const seller = await sellerModel.findById(sellerId);
+      // Return the updated seller details in the response
+      responseReturn(res, 200, {
+        seller,
+        message: "Seller Status Updated Successfully",
+      });
+    } catch (error) {
+      // Return a 500 error response if any error occurs during database operation
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+  // End of seller_status_update method
 }
 
 // Export instance of sellerController for use in routes
