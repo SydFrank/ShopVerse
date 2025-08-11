@@ -15,6 +15,7 @@ import { FaLock } from "react-icons/fa"; // Lock icon
 import { Link, useLocation } from "react-router-dom";
 import { FaHeart } from "react-icons/fa";
 import { FaShoppingCart } from "react-icons/fa";
+import { FaPhoneAlt } from "react-icons/fa";
 
 /**
  * Header Component - Website top navigation bar
@@ -348,6 +349,47 @@ const Header = () => {
                 >
                   CONTACT US
                 </Link>
+              </li>
+            </ul>
+
+            {/* Social media links */}
+            <div className="flex  justify-start items-center gap-4 text-black">
+              <a href="#">
+                <FaFacebookF />
+              </a>
+              <a href="#">
+                <FaTwitter />
+              </a>
+              <a href="#">
+                <FaLinkedinIn />
+              </a>
+              {/* <a href="#">
+                  <FaGithub />
+                </a> */}
+            </div>
+
+            {/* Wishlist and Cart icons with counts */}
+            <div className="w-full flex justify-end max-lg:justify-start gap-3 items-center">
+              <div className="w-[48px] h-[48px] rounded-full flex bg-[#f5f5f5] justify-center items-center">
+                <span>
+                  <FaPhoneAlt />
+                </span>
+              </div>
+
+              <div className="flex justify-end flex-col gap-1">
+                <h2 className="text-sm font-semibold text-slate-700">
+                  +(61) 0499 567 480
+                </h2>
+                <span className="text-xs">Support 24/7</span>
+              </div>
+            </div>
+
+            <ul className="flex flex-col justify-start items-start gap-3 text-[#1c1c1c]">
+              <li className="flex justify-start items-center gap-2 text-sm">
+                <span>
+                  <MdEmail />
+                </span>
+                <span>support@gmail.com</span>
               </li>
             </ul>
           </div>
