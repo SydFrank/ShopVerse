@@ -28,6 +28,8 @@ const Header = () => {
 
   // State to manage sidebar visibility
   const [showSidebar, setShowSidebar] = useState(true);
+  // State to manage category visibility (not used in this snippet but can be implemented)
+  const [categoryShow, setCategoryShow] = useState(true);
 
   // Mock user login status (should be retrieved from state manager or API in actual project)
   const user = true;
@@ -392,6 +394,40 @@ const Header = () => {
                 <span>support@gmail.com</span>
               </li>
             </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="w-[85%] lg:w-[90%] mx-auto">
+        <div className="flex w-full flex-wrap max-lg:gap-8 ">
+          {/* Left section: Category dropdown */}
+          <div className="w-3/12 max-lg:w-full">
+            <div className="bg-white relative">
+              {/* Category dropdown button */}
+              <div
+                onClick={() => setCategoryShow(!categoryShow)}
+                className="h-[50px] bg-[#059473] text-white flex justify-center max-lg:justify-between max-lg:px-6 items-center gap-3 font-bold text-md cursor-pointer"
+              >
+                <div className="flex justify-center items-center gap-3">
+                  <span>
+                    <FaList />
+                  </span>
+                  <span>All Category</span>
+                </div>
+                <span className="pt-1">
+                  <MdKeyboardArrowDown />
+                </span>
+              </div>
+              {/* Category dropdown content */}
+              {/* This div is conditionally shown based on categoryShow state */}
+              <div
+                className={`${
+                  categoryShow ? "h-0" : "h-[400px]"
+                } overflow-hidden transition-all duration-500 max-lg:relative absolute z-[9999] bg-[#dbf3ed] w-full border-x `}
+              ></div>
+            </div>
+
+            <div></div>
           </div>
         </div>
       </div>
