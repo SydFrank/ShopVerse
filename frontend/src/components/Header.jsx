@@ -455,6 +455,27 @@ const Header = () => {
 
             <div></div>
           </div>
+          {/* Center section: Search bar */}
+          <div className="w-9/12 pl-8 max-lg:pl-0 max-lg:w-full">
+            <div className="flex flex-wrap w-full justify-between items-center max-lg:gap-6">
+              <div className="w-8/12 max-lg:w-full">
+                <div className="flex border h-[50px] items-center relative gap-6">
+                  <div className="relative after:absolute after:h-[25px] after:w-[1px] after:bg-[#afafaf] after:-right-[15px] max-md:hidden">
+                    <select
+                      name=""
+                      id=""
+                      className="w-[170px] text-slate-650 font-semibold bg-transparent px-2 h-full outline-0 border-none"
+                    >
+                      <option value="">Select Category</option>
+                      {categorys.map((curVal, index) => (
+                        <option value={curVal}>{curVal}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
