@@ -36,6 +36,18 @@ const Header = () => {
 
   const wishlist_count = 3; // Mock wishlist count (should be dynamic in actual project)
 
+  // Mock categories (should be fetched from an API or state manager in actual project)
+  const categorys = [
+    "Mobiles",
+    "Laptops",
+    "Speakers",
+    "Top wear",
+    "Footwear",
+    "Watches",
+    "Home Decor",
+    "Smart Watches",
+  ];
+
   return (
     // Main header container with full width and white background
     <div className="w-full bg-white">
@@ -424,7 +436,21 @@ const Header = () => {
                 className={`${
                   categoryShow ? "h-0" : "h-[400px]"
                 } overflow-hidden transition-all duration-500 max-lg:relative absolute z-[9999] bg-[#dbf3ed] w-full border-x `}
-              ></div>
+              >
+                {/* Category list */}
+                <ul className="py-2 text-slate-600 font-medium ">
+                  {categorys.map((curVal, index) => {
+                    return (
+                      <li
+                        key={index}
+                        className="flex justify-start items-center gap-2 px-[24px] py-[6px]"
+                      >
+                        <Link className="text-sm block">{curVal}</Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             </div>
 
             <div></div>
