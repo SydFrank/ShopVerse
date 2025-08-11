@@ -48,6 +48,12 @@ const Header = () => {
     "Smart Watches",
   ];
 
+  // State to manage search input value
+  const [searchValue, setSearchValue] = useState("");
+
+  // State to manage selected category (not used in this snippet but can be implemented)
+  const [category, setCategory] = useState("");
+
   return (
     // Main header container with full width and white background
     <div className="w-full bg-white">
@@ -462,6 +468,7 @@ const Header = () => {
                 <div className="flex border h-[50px] items-center relative gap-6">
                   <div className="relative after:absolute after:h-[25px] after:w-[1px] after:bg-[#afafaf] after:-right-[15px] max-md:hidden">
                     <select
+                      onChange={(e) => setCategory(e.target.value)}
                       name=""
                       id=""
                       className="w-[170px] text-slate-650 font-semibold bg-transparent px-2 h-full outline-0 border-none"
@@ -472,6 +479,15 @@ const Header = () => {
                       ))}
                     </select>
                   </div>
+
+                  <input
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    className="w-full relative text-slate-500 outline-0 px-3 h-full "
+                    type="text"
+                    name=""
+                    id=""
+                    placeholder="What do you need"
+                  />
                 </div>
               </div>
             </div>
