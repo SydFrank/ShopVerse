@@ -488,6 +488,30 @@ const Header = () => {
                     id=""
                     placeholder="What do you need"
                   />
+
+                  <button
+                    className="bg-[#059473] text-white right-0 absolute px-8 h-full font-semibold uppercase"
+                    type="button"
+                  >
+                    Search
+                  </button>
+                </div>
+              </div>
+
+              <div className="w-4/12 block max-lg:hidden pl-2 max-lg:w-full max-lg:pl-0 ">
+                <div className="w-full flex justify-end max-lg:justify-start gap-3 items-center">
+                  <div className="w-[48px] h-[48px] rounded-full flex bg-[#f5f5f5] justify-center items-center">
+                    <span>
+                      <FaPhoneAlt />
+                    </span>
+                  </div>
+
+                  <div className="flex justify-end flex-col gap-1">
+                    <h2 className="text-md font-semibold text-slate-700">
+                      +(61) 0499 567 480
+                    </h2>
+                    <span className="text-sm">Support 24/7</span>
+                  </div>
                 </div>
               </div>
             </div>
