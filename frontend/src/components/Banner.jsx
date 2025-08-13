@@ -8,6 +8,7 @@ import "react-multi-carousel/lib/styles.css";
 // The images are linked to a placeholder URL (can be modified as needed)
 
 const Banner = () => {
+  // Responsive settings for the carousel
   const responsive = {
     superLargeDesktop: {
       breakpoint: { max: 4000, min: 3000 },
@@ -39,7 +40,7 @@ const Banner = () => {
                 showDots={true}
                 responsive={responsive}
               >
-                {[1.2, 3, 4, 5, 6].map((image, index) => (
+                {[1, 2, 3, 4, 5, 6].map((image, index) => (
                   <Link key={index} to="#">
                     <img src={`/images/banner/${image}.jpg`} />
                   </Link>
