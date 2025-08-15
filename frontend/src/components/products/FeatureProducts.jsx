@@ -1,6 +1,7 @@
 import React from "react";
 import { FaEye, FaRegHeart } from "react-icons/fa";
 import { LuShoppingCart } from "react-icons/lu";
+import Rating from "../Rating"; // Importing the Rating component for product ratings
 
 const FeatureProducts = () => {
   return (
@@ -47,6 +48,9 @@ const FeatureProducts = () => {
               <h2 className="font-semibold">Product Name</h2>
               <div className="flex justify-start items-center gap-3">
                 <span className="text-md font-bold ">$29.99</span>
+                <div className="flex">
+                  <Rating ratings={4.5} />
+                </div>
               </div>
             </div>
           </div>
