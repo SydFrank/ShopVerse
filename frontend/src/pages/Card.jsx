@@ -5,7 +5,7 @@ import Header from "../components/Header"; // Website header component
 import Footer from "../components/Footer"; // Website footer component
 // Import navigation components and icons
 import { IoIosArrowForward } from "react-icons/io"; // Forward arrow icon for breadcrumb navigation
-import { Link } from "react-router-dom"; // React Router Link component for navigation
+import { Link, useNavigate } from "react-router-dom"; // React Router Link component for navigation
 
 /**
  * Card Component - Shopping Cart Page
@@ -17,6 +17,8 @@ import { Link } from "react-router-dom"; // React Router Link component for navi
  * @returns {JSX.Element} Complete shopping cart page with product management and checkout functionality
  */
 const Card = () => {
+  // Initialize navigation hook
+  const navigate = useNavigate();
   // Mock data for cart products - represents items currently in user's shopping cart
   // In production, this would be fetched from state management (Redux) or API
   const card_products = [1, 2]; // Array of product IDs or product objects
@@ -24,6 +26,18 @@ const Card = () => {
   // Mock data for out-of-stock products - items that are no longer available
   // These products remain in cart but cannot be purchased
   const outOfStockProducts = [1, 2]; // Array of unavailable product IDs
+
+  // Redirect to shipping page
+  const redirect = () => {
+    navigate("/shipping", {
+      state: {
+        products: [],
+        price: 500,
+        shipping_fee: 40,
+        items: 2,
+      },
+    });
+  };
 
   return (
     <div>
@@ -250,7 +264,10 @@ const Card = () => {
                       </div>
 
                       {/* Proceed to checkout button */}
-                      <button className="px-5 py-[6px] rounded-sm hover:shadow-red-500/50 hover:shadow-lg bg-red-500 text-sm uppercase text-white ">
+                      <button
+                        onClick={redirect}
+                        className="px-5 py-[6px] rounded-sm hover:shadow-red-500/50 hover:shadow-lg bg-red-500 text-sm uppercase text-white "
+                      >
                         Proceed to checkout
                       </button>
                     </div>
