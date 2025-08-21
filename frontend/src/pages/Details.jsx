@@ -13,6 +13,7 @@ import { FaHeart } from "react-icons/fa6";
 import { FaFacebookF } from "react-icons/fa"; // Facebook icon
 import { FaTwitter } from "react-icons/fa"; // Twitter icon
 import { FaLinkedinIn } from "react-icons/fa"; // LinkedIn icon
+import Reviews from "../components/Reviews";
 
 const Details = () => {
   const images = [1, 2, 3, 4, 5, 6];
@@ -22,6 +23,8 @@ const Details = () => {
   const discount = 15;
 
   const stock = 10;
+
+  const [state, setState] = useState("reviews");
 
   // Responsive breakpoints configuration for the carousel
   // Defines how many items to show at different screen sizes
@@ -258,6 +261,47 @@ const Details = () => {
                 >
                   Chat Seller
                 </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div className="w-[85%] max-md:w-[80%] max-sm:w-[90%] max-lg:w-[90%] h-full mx-auto pb-16 py-12">
+          <div className="flex flex-wrap ">
+            <div className="w-[72%] max-lg:w-full ">
+              <div className="pr-4 max-lg:pr-0 ">
+                <div className="grid grid-cols-2">
+                  <button
+                    onClick={() => setState("reviews")}
+                    className={`py-1 hover:text-white px-5 hover:bg-[#059473] ${
+                      state === "reviews"
+                        ? "bg-[#059473] text-white"
+                        : "bg-slate-200 text-slate-700"
+                    } rounded-sm`}
+                  >
+                    Reviews
+                  </button>
+                  <button
+                    onClick={() => setState("description")}
+                    className={`py-1 hover:text-white px-5 hover:bg-[#059473] ${
+                      state === "description"
+                        ? "bg-[#059473] text-white"
+                        : "bg-slate-200 text-slate-700"
+                    } rounded-sm`}
+                  >
+                    Description
+                  </button>
+                </div>
+
+                <div>
+                  {state === "reviews" ? (
+                    <Reviews />
+                  ) : (
+                    <p className="py-5 text-slate-600">No reviews yet. </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
