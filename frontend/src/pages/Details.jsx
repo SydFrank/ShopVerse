@@ -8,11 +8,16 @@ import { MdKeyboardArrowRight } from "react-icons/md";
 import Carousel from "react-multi-carousel";
 // Import default styles for the carousel component
 import "react-multi-carousel/lib/styles.css";
+import Rating from "../components/Rating";
 
 const Details = () => {
   const images = [1, 2, 3, 4, 5, 6];
 
   const [image, setImage] = useState("");
+
+  const discount = 15;
+
+  const stock = 3;
 
   // Responsive breakpoints configuration for the carousel
   // Defines how many items to show at different screen sizes
@@ -104,7 +109,11 @@ const Details = () => {
               <div className="p-5 border border-slate-200">
                 <img
                   className="h-[400px] w-full"
-                  src="/images/products/3.webp"
+                  src={
+                    image
+                      ? `/images/products/${image}.webp`
+                      : `/images/products/${images[2]}.webp`
+                  }
                 />
               </div>
 
@@ -118,7 +127,7 @@ const Details = () => {
                   >
                     {images.map((img, index) => {
                       return (
-                        <div key={index} onClick={() => {}}>
+                        <div key={index} onClick={() => setImage(img)}>
                           <img
                             src={`/images/products/${img}.webp`}
                             className=" h-[120px] cursor-pointer"
@@ -127,6 +136,32 @@ const Details = () => {
                       );
                     })}
                   </Carousel>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-5 ">
+              <div className="text-3xl text-slate-600 font-bold ">
+                <h3>Product Name</h3>
+              </div>
+
+              <div className="flex justify-start items-center gap-4">
+                <div className="flex text-xl ">
+                  <Rating ratings={4.5} />
+                </div>
+                <span className="text-green-500">(24 reviews)</span>
+              </div>
+
+              <div className="text-2xl text-red-500 font-bold flex gap-3">
+                {discount !== 0 ? (
+                  <>
+                    Price : <h2 className="line-through">$500</h2>
+                    <h2>
+                      ${500 - Math.floor((500 * discount) / 100)} (-{discount}%)
+                    </h2>
+                  </>
+                ) : (
+                  <h2>Price : $200</h2>
                 )}
               </div>
             </div>
