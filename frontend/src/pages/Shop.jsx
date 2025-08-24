@@ -61,15 +61,15 @@ const Shop = () => {
   const [styles, setStyles] = useState("grid");
 
   // Pagination state management
-  const [currentPage, setCurrentPage] = React.useState(1); // Current active page number
+  const [currentPage, setCurrentPage] = useState(1); // Current active page number
 
   // Search functionality state (not fully implemented in this version)
   // eslint-disable-next-line no-unused-vars
-  const [searchValue, setSearchValue] = React.useState(""); // Search query string
+  const [searchValue, setSearchValue] = useState(""); // Search query string
 
   // Products per page configuration
   // eslint-disable-next-line no-unused-vars
-  const [parPage, setParPage] = React.useState(5); // Number of items to display per page
+  const [parPage, setParPage] = useState(5); // Number of items to display per page
 
   return (
     <div>
