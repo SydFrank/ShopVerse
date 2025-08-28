@@ -21,7 +21,7 @@ import { FaPhoneAlt } from "react-icons/fa";
  * Header Component - Website top navigation bar
  * Contains contact information, social media links, language selector and user login status
  */
-const Header = () => {
+const Header = ({ categorys }) => {
   // Get the current pathname from the URL
   const { pathname } = useLocation();
   // console.log(pathname);
@@ -35,18 +35,6 @@ const Header = () => {
   const user = true;
 
   const wishlist_count = 3; // Mock wishlist count (should be dynamic in actual project)
-
-  // Mock categories (should be fetched from an API or state manager in actual project)
-  const categorys = [
-    "Mobiles",
-    "Laptops",
-    "Speakers",
-    "Top wear",
-    "Footwear",
-    "Watches",
-    "Home Decor",
-    "Smart Watches",
-  ];
 
   // State to manage search input value
   const [searchValue, setSearchValue] = useState("");
@@ -453,7 +441,11 @@ const Header = () => {
                         key={index}
                         className="flex justify-start items-center gap-2 px-[24px] py-[6px]"
                       >
-                        <Link className="text-sm block">{curVal}</Link>
+                        <img
+                          src={curVal.image}
+                          className="w-[30px] h-[30px] rounded-full overflow-hidden"
+                        />
+                        <Link className="text-sm block">{curVal.name}</Link>
                       </li>
                     );
                   })}
@@ -477,7 +469,9 @@ const Header = () => {
                     >
                       <option value="">Select Category</option>
                       {categorys.map((curVal, index) => (
-                        <option value={curVal}>{curVal}</option>
+                        <option key={index} value={curVal}>
+                          {curVal.name}
+                        </option>
                       ))}
                     </select>
                   </div>

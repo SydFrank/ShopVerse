@@ -14,20 +14,7 @@ import "react-multi-carousel/lib/styles.css";
  * Uses react-multi-carousel library for responsive behavior across different screen sizes
  */
 
-const Categorys = () => {
-  // Mock categories data - represents different product categories available in the store
-  // In a real application, this would typically be fetched from an API or Redux store
-  const categorys = [
-    "Mobiles", // Mobile phones and accessories
-    "Laptops", // Laptop computers and related items
-    "Speakers", // Audio equipment and speakers
-    "Top wear", // Shirts, t-shirts, and upper body clothing
-    "Footwear", // Shoes, sandals, and other footwear
-    "Watches", // Traditional and digital watches
-    "Home Decor", // Furniture and home decoration items
-    "Smart Watches", // Wearable technology and smartwatches
-  ];
-
+const Categorys = ({ categorys }) => {
   // Responsive breakpoints configuration for the carousel
   // Defines how many items to show at different screen sizes
   const responsive = {
@@ -96,8 +83,8 @@ const Categorys = () => {
             <div className="w-full h-full relative p-3">
               {/* Category image - dynamically loaded based on index */}
               <img
-                src={`/images/products/${index + 1}.webp`}
-                alt={`${curVal} category`} // Accessible alt text
+                src={curVal.image} // Dynamic image source from category data
+                alt={`${curVal.name} category`} // Accessible alt text
                 className="w-full h-full object-cover" // Responsive image styling
               />
 
@@ -105,7 +92,7 @@ const Categorys = () => {
               <div className="absolute bottom-6 w-full mx-auto font-bold left-0 flex justify-center items-center">
                 {/* Semi-transparent background with category name */}
                 <span className="py-2 px-6 bg-[#3330305d] text-white">
-                  {curVal} {/* Display category name */}
+                  {curVal.name} {/* Display category name */}
                 </span>
               </div>
             </div>
