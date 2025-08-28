@@ -39,6 +39,8 @@ app.use("/api", require("./routes/dashboard/CategoryRoutes"));
 app.use("/api", require("./routes/dashboard/ProductRoutes"));
 app.use("/api", require("./routes/dashboard/SellerRoutes"));
 
+app.use("/api/home", require("./routes/home/homeRoutes"));
+
 // Define a GET route handler for the root path '/'
 // Sends a simple response message to the client to verify that the server is running
 app.get("/", (req, res) => res.send("My backend is running"));
