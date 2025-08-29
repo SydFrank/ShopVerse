@@ -6,6 +6,7 @@ const router = require("express").Router();
 
 // Define route handlers using the home controller
 router.get("/get-categorys", homeControllers.get_categorys);
+router.get("/get-products", homeControllers.get_products);
 
 // Export the router to be used in the main server application
 module.exports = router;
