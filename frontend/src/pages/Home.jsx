@@ -41,7 +41,7 @@ import Footer from "../components/Footer"; // Site footer with links and informa
 
 // Redux imports for state management
 import { useDispatch, useSelector } from "react-redux"; // Redux hooks for dispatching actions and selecting state
-import { get_category } from "../store/reducers/homeReducer"; // Async thunk action to fetch categories
+import { get_category, get_products } from "../store/reducers/homeReducer"; // Async thunk action to fetch categories
 
 /**
  * Home Component Function
@@ -67,7 +67,13 @@ const Home = () => {
   const dispatch = useDispatch();
 
   // Select categories data from home reducer state
-  const { categorys } = useSelector((state) => state.home);
+  const {
+    categorys,
+    products,
+    latest_product,
+    topRated_product,
+    discount_product,
+  } = useSelector((state) => state.home);
 
   /**
    * Component Side Effect - Category Data Fetching
@@ -84,7 +90,8 @@ const Home = () => {
    */
   useEffect(() => {
     dispatch(get_category()); // Fetch categories on component mount
-  }, [dispatch]); // Include dispatch in dependencies for React hooks compliance
+    dispatch(get_products()); // Fetch products on component mount
+  }, []); // Include dispatch in dependencies for React hooks compliance
 
   /**
    * Homepage JSX Structure
@@ -112,22 +119,22 @@ const Home = () => {
       <Categorys categorys={categorys} />
 
       <div className="py-[45px]">
-        <FeatureProducts />
+        <FeatureProducts products={products} />
       </div>
 
       <div className="py-10">
         <div className="w-[85%] flex flex-wrap mx-auto">
           <div className="grid w-full grid-cols-3 max-lg:grid-cols-2 max-md:grid-cols-1 gap-7 ">
             <div className="overflow-hidden">
-              <Products title="Latest Product" />
+              <Products title="Latest Product" products={latest_product} />
             </div>
 
             <div className="overflow-hidden">
-              <Products title="Top Rated Product" />
+              <Products title="Top Rated Product" products={topRated_product} />
             </div>
 
             <div className="overflow-hidden">
-              <Products title="Discount Product" />
+              <Products title="Discount Product" products={discount_product} />
             </div>
           </div>
         </div>

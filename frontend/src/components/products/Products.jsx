@@ -19,15 +19,7 @@ import { FiChevronRight } from "react-icons/fi"; // Right arrow icon
  * @param {string} props.title - Title to display above the product carousel
  * @returns {JSX.Element} Product carousel with navigation controls
  */
-const Products = ({ title }) => {
-  // Mock products data - organized in groups for carousel display
-  // Each sub-array represents a column of products to be shown together
-  // In a real application, this would be fetched from an API or Redux store
-  const products = [
-    [1, 2, 3], // First column: Product IDs 1, 2, 3
-    [4, 5, 6], // Second column: Product IDs 4, 5, 6
-  ];
-
+const Products = ({ title, products }) => {
   // Responsive breakpoints configuration for the carousel
   // All breakpoints show 1 item at a time since each item contains multiple products
   const responsive = {
@@ -116,16 +108,16 @@ const Products = ({ title }) => {
                   {/* Product image */}
                   <img
                     className="w-[110px] h-[110px]"
-                    src={`/images/products/${pl}.webp`} // Dynamic image source based on product ID
+                    src={pl.images[0]} // Dynamic image source based on product ID
                     alt={`Product ${pl}`} // Accessible alt text
                   />
 
                   {/* Product details container */}
                   <div className="px-3 flex justify-start items-start gap-1 flex-col text-slate-600">
                     {/* Product name - placeholder text */}
-                    <h2>Product Name </h2>
+                    <h2>{pl.name} </h2>
                     {/* Product price - placeholder price */}
-                    <span className="text-lg font-bold">$500</span>
+                    <span className="text-lg font-bold">${pl.price}</span>
                   </div>
                 </Link>
               ))}

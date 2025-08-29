@@ -4,7 +4,7 @@ import { LuShoppingCart } from "react-icons/lu";
 import Rating from "../Rating"; // Importing the Rating component for product ratings
 import { Link } from "react-router-dom";
 
-const FeatureProducts = () => {
+const FeatureProducts = ({ products }) => {
   return (
     <div className="w-[85%] flex flex-wrap mx-auto">
       <div className="w-full">
@@ -15,17 +15,21 @@ const FeatureProducts = () => {
       </div>
 
       <div className="w-full grid grid-cols-4 max-lg:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1 gap-6">
-        {[1, 2, 3, 4, 5, 6].map((product, index) => (
+        {products.map((product, index) => (
           <div
             key={index}
             className="border group transition-all duration-500 hover:shadow-md hover:-mt-3"
           >
             <div className="relative overflow-hidden">
-              <div className="flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full bg-red-500 font-semibold text-xs left-2 top-2">
-                8%
-              </div>
+              {product.discount ? (
+                <div className="flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full bg-red-500 font-semibold text-xs left-2 top-2">
+                  {product.discount}%
+                </div>
+              ) : (
+                ""
+              )}
               <img
-                src={`/images/products/${index + 1}.webp`}
+                src={product.images[0]}
                 alt={`Product ${index + 1}`}
                 className="sm:w-full h-[240px] w-full"
               />
@@ -49,11 +53,11 @@ const FeatureProducts = () => {
             </div>
 
             <div className="py-3 text-slate-600 px-2">
-              <h2 className="font-semibold">Product Name</h2>
+              <h2 className="font-semibold">{product.name}</h2>
               <div className="flex justify-start items-center gap-3">
-                <span className="text-md font-bold ">$29.99</span>
+                <span className="text-md font-bold ">${product.price}</span>
                 <div className="flex">
-                  <Rating ratings={4.5} />
+                  <Rating ratings={product.rating} />
                 </div>
               </div>
             </div>
