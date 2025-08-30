@@ -11,6 +11,7 @@
  * - Immutable state updates with Redux Toolkit
  * - Category management for homepage display
  * - Multiple product type management (latest, top-rated, discount)
+ * - Price range filtering support for Shop page
  * - Error handling for API requests
  * - Extensible architecture for additional home page data
  *
@@ -20,13 +21,16 @@
  * - latest_product: Newest products for carousel display
  * - topRated_product: Highest-rated products for carousel display
  * - discount_product: Discounted products for carousel display
+ * - priceRange: Object with min/max price boundaries for filtering
  *
  * API Integration:
  * - GET /home/get-categorys: Fetches product categories
  * - GET /home/get-products: Fetches all product arrays
+ * - GET /home/price-range-latest-product: Fetches price range and latest products
  *
  * Usage in Components:
  * - Home.jsx: Main consumer of all state data
+ * - Shop.jsx: Uses categorys, priceRange, and latest_product
  * - Header.jsx: Uses categorys for navigation menu
  * - Products.jsx: Uses product arrays for carousel displays
  *
@@ -73,7 +77,7 @@ export const get_category = createAsyncThunk(
     }
   }
 );
-// End of get_category
+// End of get_category method
 
 /**
  * Async Thunk: Get Products
@@ -116,7 +120,53 @@ export const get_products = createAsyncThunk(
     }
   }
 );
-// End of get_products
+// End of get_products method
+
+/**
+ * Async Thunk: Get Price Range and Latest Products
+ *
+ * Fetches price range data and latest products from the backend API.
+ * This combined endpoint provides both the minimum/maximum price range
+ * for filtering purposes and the latest products for display.
+ *
+ * API Endpoint: GET /home/price-range-latest-product
+ *
+ * Expected Response Data:
+ * - priceRange: Object containing min/max price values
+ *   - low: Number representing minimum product price
+ *   - high: Number representing maximum product price
+ * - latest_product: Array of newest products for homepage display
+ *
+ * Used by:
+ * - Shop page: Price range for filter slider boundaries
+ * - Homepage: Latest products for promotional sections
+ *
+ * @async
+ * @function price_range_product
+ * @param {void} _ - No parameters required for this action
+ * @param {Object} thunkAPI - Redux Toolkit thunk API utilities
+ * @param {Function} thunkAPI.fulfillWithValue - Function to return successful data
+ * @returns {Promise} Promise resolving to price range and product data
+ */
+export const price_range_product = createAsyncThunk(
+  "product/price_range_product", // Action type prefix for Redux DevTools
+  async (_, { fulfillWithValue }) => {
+    try {
+      // Make API request to fetch price range and latest products
+      const { data } = await api.get("/home/price-range-latest-product");
+
+      // Return successful response data
+      return fulfillWithValue(data);
+    } catch (error) {
+      // Log error for debugging purposes
+      console.log(error.response);
+
+      // Note: Consider using rejectWithValue for proper error handling
+      // return rejectWithValue(error.response?.data?.message || 'Failed to fetch price range');
+    }
+  }
+);
+// End of price_range_product method
 
 /**
  * Home Redux Slice
@@ -148,12 +198,20 @@ export const homeReducer = createSlice({
    * - latest_product: Array of newest products (recently added to inventory)
    * - topRated_product: Array of highest-rated products (based on customer reviews)
    * - discount_product: Array of products with active discounts and sales
+   * - priceRange: Object containing price filtering boundaries
+   *   - low: Minimum product price in the database
+   *   - high: Maximum product price in the database
    *
    * Data Flow:
    * 1. Component mounts and dispatches async thunks
    * 2. API requests fetch data from backend
-   * 3. Successful responses update these state arrays
+   * 3. Successful responses update these state arrays and objects
    * 4. Components re-render with updated product data
+   *
+   * Price Range Usage:
+   * - Used by Shop page price filter slider for min/max boundaries
+   * - Dynamically updated from backend to reflect current inventory
+   * - Default values (0-100) are placeholders until API data loads
    */
   initialState: {
     categorys: [], // Array of product categories for homepage display
@@ -161,6 +219,10 @@ export const homeReducer = createSlice({
     latest_product: [], // Newest products for "Latest Product" section
     topRated_product: [], // Top-rated products for "Top Rated Product" section
     discount_product: [], // Discounted products for "Discount Product" section
+    priceRange: {
+      low: 0, // Minimum price boundary (default placeholder)
+      high: 100, // Maximum price boundary (default placeholder)
+    },
   },
 
   /**
@@ -188,11 +250,13 @@ export const homeReducer = createSlice({
    * Handled Actions:
    * - get_category.fulfilled: Updates categories when API request succeeds
    * - get_products.fulfilled: Updates all product arrays when API request succeeds
+   * - price_range_product.fulfilled: Updates price range and latest products
    *
    * Future Enhancement Opportunities:
    * - Add pending states for loading indicators
    * - Add rejected states for error handling
    * - Add loading and error properties to state
+   * - Implement optimistic updates for better UX
    *
    * Example of enhanced error handling:
    * .addCase(get_products.pending, (state) => {
@@ -222,6 +286,16 @@ export const homeReducer = createSlice({
         state.latest_product = payload.latest_product; // For "Latest Product" carousel
         state.topRated_product = payload.topRated_product; // For "Top Rated Product" carousel
         state.discount_product = payload.discount_product; // For "Discount Product" carousel
+      })
+      // Handle successful price range and latest products fetch
+      .addCase(price_range_product.fulfilled, (state, { payload }) => {
+        // Update price range boundaries for filter components
+        // Used by Shop page price slider to set min/max values
+        state.priceRange = payload.priceRange;
+
+        // Update latest products array (alternative source)
+        // This provides fresh latest product data alongside price range
+        state.latest_product = payload.latest_product; // For "Latest Product" carousel
       });
   },
 });

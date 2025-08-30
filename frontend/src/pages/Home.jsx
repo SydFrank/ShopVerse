@@ -41,7 +41,7 @@ import Footer from "../components/Footer"; // Site footer with links and informa
 
 // Redux imports for state management
 import { useDispatch, useSelector } from "react-redux"; // Redux hooks for dispatching actions and selecting state
-import { get_category, get_products } from "../store/reducers/homeReducer"; // Async thunk action to fetch categories
+import { get_products } from "../store/reducers/homeReducer"; // Async thunk action to fetch categories
 
 /**
  * Home Component Function
