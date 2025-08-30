@@ -67,13 +67,8 @@ const Home = () => {
   const dispatch = useDispatch();
 
   // Select categories data from home reducer state
-  const {
-    categorys,
-    products,
-    latest_product,
-    topRated_product,
-    discount_product,
-  } = useSelector((state) => state.home);
+  const { products, latest_product, topRated_product, discount_product } =
+    useSelector((state) => state.home);
 
   /**
    * Component Side Effect - Category Data Fetching
@@ -89,7 +84,7 @@ const Home = () => {
    * 4. Components re-render with updated categories
    */
   useEffect(() => {
-    dispatch(get_category()); // Fetch categories on component mount
+    // dispatch(get_category()); // Fetch categories on component mount
     dispatch(get_products()); // Fetch products on component mount
   }, []); // Include dispatch in dependencies for React hooks compliance
 
@@ -114,9 +109,9 @@ const Home = () => {
    */
   return (
     <div className="w-full">
-      <Header categorys={categorys} />
+      <Header />
       <Banner />
-      <Categorys categorys={categorys} />
+      <Categorys />
 
       <div className="py-[45px]">
         <FeatureProducts products={products} />

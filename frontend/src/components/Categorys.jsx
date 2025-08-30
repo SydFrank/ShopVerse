@@ -6,6 +6,7 @@ import Carousel from "react-multi-carousel";
 import { Link } from "react-router-dom";
 // Import default styles for the carousel component
 import "react-multi-carousel/lib/styles.css";
+import { useSelector } from "react-redux"; // Redux hooks for dispatching actions and selecting state
 
 /**
  * Categorys Component - Product Categories Carousel
@@ -14,7 +15,10 @@ import "react-multi-carousel/lib/styles.css";
  * Uses react-multi-carousel library for responsive behavior across different screen sizes
  */
 
-const Categorys = ({ categorys }) => {
+const Categorys = () => {
+  // Select categories data from home reducer state
+  const { categorys } = useSelector((state) => state.home);
+
   // Responsive breakpoints configuration for the carousel
   // Defines how many items to show at different screen sizes
   const responsive = {

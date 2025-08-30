@@ -16,12 +16,17 @@ import { Link, useLocation } from "react-router-dom";
 import { FaHeart } from "react-icons/fa";
 import { FaShoppingCart } from "react-icons/fa";
 import { FaPhoneAlt } from "react-icons/fa";
+// Redux imports for state management
+import { useSelector } from "react-redux"; // Redux hooks for dispatching actions and selecting state
 
 /**
  * Header Component - Website top navigation bar
  * Contains contact information, social media links, language selector and user login status
  */
-const Header = ({ categorys }) => {
+const Header = () => {
+  // Select categories data from home reducer state
+  const { categorys } = useSelector((state) => state.home);
+
   // Get the current pathname from the URL
   const { pathname } = useLocation();
   // console.log(pathname);

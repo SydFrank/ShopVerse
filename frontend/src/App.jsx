@@ -6,8 +6,19 @@ import Shipping from "./pages/Shipping";
 import Details from "./pages/Details";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import React, { useEffect } from "react"; // useEffect for side effects on component mount
+// Redux imports for state management
+import { useDispatch } from "react-redux"; // Redux hooks for dispatching actions and selecting state
+import { get_category } from "./store/reducers/homeReducer";
 
 function App() {
+  // Redux dispatch hook for triggering actions
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(get_category()); // Fetch categories on component mount
+  }, []); // Include dispatch in dependencies for React hooks compliance
+
   return (
     <BrowserRouter>
       <Routes>

@@ -163,7 +163,7 @@ const Shop = () => {
                   renderTrack={({ props, children }) => (
                     <div
                       {...props}
-                      className="w-full h-[6px] rounded-full cursor-pointer"
+                      className="w-full h-[6px] rounded-full cursor-pointer bg-gray-300"
                     >
                       {children}
                     </div>
@@ -328,7 +328,7 @@ const Shop = () => {
 
               {/* Latest products sidebar - hidden on mobile */}
               <div className="py-5 flex flex-col gap-4 max-md:hidden">
-                <Products title="Latest Product" />
+                {/* <Products title="Latest Product" /> */}
               </div>
             </div>
 
