@@ -121,6 +121,57 @@ class homeControllers {
     }
   };
   // End of get_products method
+
+  /**
+   * Handles fetching latest products with price range information.
+   * This method retrieves the 9 most recent products, formats them into groups of 3,
+   * and also calculates the price range (lowest to highest) of all products in the database.
+   * This is typically used for product filtering and display purposes on the frontend.
+   *
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   */
+  price_range_latest_product = async (req, res) => {
+    try {
+      // Initialize price range object with default values
+      const priceRange = {
+        low: 0, // Minimum price
+        high: 0, // Maximum price
+      };
+
+      // Fetch the 9 most recent products from the database
+      const products = await productModel.find({}).limit(9).sort({
+        createdAt: -1, // Sort by creation date in descending order (newest first)
+      });
+
+      // Format the latest products into groups of 3 for display
+      const latest_product = this.formateProduct(products);
+
+      // Fetch all products sorted by price in ascending order to determine price range
+      const getForPrice = await productModel.find({}).sort({
+        price: 1, // Sort by price in ascending order (lowest first)
+      });
+
+      // If products exist, set the price range from lowest to highest
+      if (getForPrice.length > 0) {
+        priceRange.low = getForPrice[0].price; // First product has lowest price
+        priceRange.high = getForPrice[getForPrice.length - 1].price; // Last product has highest price
+      }
+
+      // Optionally log the price range for debugging
+      // console.log(priceRange);
+
+      // Return the latest products and price range in the response
+      responseReturn(res, 200, {
+        latest_product, // Latest products grouped by 3
+        priceRange, // Price range object with low and high values
+      });
+    } catch (error) {
+      // Log error message to console for debugging purposes
+      console.log(error.message);
+    }
+  };
+  // End of price_range_latest_product method
 }
 
 // Export instance of homeControllers for use in routes
