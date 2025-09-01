@@ -57,7 +57,10 @@ import Pagination from "../components/Pagination"; // Pagination component
 import { BsFillGridFill } from "react-icons/bs"; // Grid view icon
 import { FaThList } from "react-icons/fa"; // List view icon
 import { useSelector, useDispatch } from "react-redux"; // Redux hooks for dispatching actions and selecting state
-import { price_range_product } from "../store/reducers/homeReducer";
+import {
+  price_range_product,
+  query_products,
+} from "../store/reducers/homeReducer";
 
 /**
  * Shop Component - Main shopping page with filters and product display
@@ -151,6 +154,33 @@ const Shop = () => {
   // eslint-disable-next-line no-unused-vars
   const [parPage, setParPage] = useState(5); // Number of items to display per page
 
+  const [sortPrice, setSortPrice] = useState("");
+
+  const [category, setCategory] = useState("");
+
+  const queryCategory = (e, value) => {
+    if (e.target.checked) {
+      setCategory(value);
+    } else {
+      setCategory("");
+    }
+  };
+
+  const [low, high] = state.values;
+
+  useEffect(() => {
+    dispatch(
+      query_products({
+        low,
+        high,
+        sortPrice,
+        category,
+        rating,
+        currentPage,
+      })
+    );
+  }, [low, high, sortPrice, category, rating, currentPage]);
+
   return (
     <div>
       {/* Website header with navigation and user info */}
@@ -237,21 +267,26 @@ const Shop = () => {
                 - Proper accessibility with id/htmlFor associations
               */}
               <div className="py-2">
-                {categorys.map((category, index) => (
+                {categorys.map((c, index) => (
                   <div
                     key={index}
                     className="flex justify-start items-center gap-2 py-1"
                   >
                     {/* Category checkbox input for multi-select filtering */}
-                    <input type="checkbox" id={category.name} />
+                    <input
+                      checked={category === c.name ? true : false}
+                      onChange={(e) => queryCategory(e, c.name)}
+                      type="checkbox"
+                      id={c.name}
+                    />
                     {/* Category label with click handling for accessibility */}
                     <label
                       className="text-slate-600"
                       block
                       cursor-pointer
-                      htmlFor={category.name}
+                      htmlFor={c.name}
                     >
-                      {category.name}
+                      {c.name}
                     </label>
                   </div>
                 ))}
@@ -474,6 +509,7 @@ const Shop = () => {
                   <div className="flex justify-center items-center gap-3">
                     {/* Sort by dropdown */}
                     <select
+                      onChange={(e) => setSortPrice(e.target.value)}
                       className="p-1 border border-slate-100 outline-0 text-slate-600"
                       name=""
                       id=""

@@ -168,6 +168,29 @@ export const price_range_product = createAsyncThunk(
 );
 // End of price_range_product method
 
+export const query_products = createAsyncThunk(
+  "product/query_products", // Action type prefix for Redux DevTools
+  async (query, { fulfillWithValue }) => {
+    try {
+      // Make API request to fetch products based on filters
+      const { data } = await api.get(
+        `/home/query-products?category=${query.category}&&rating=${query.rating}&&lowPrice=${query.low}&&highPrice=${query.high}&&sortPrice=${query.sortPrice}&&pageNumber=${query.currentPage}`
+      );
+      console.log(data); // Debugging output to view API response structure
+
+      // Return successful response data
+      return fulfillWithValue(data);
+    } catch (error) {
+      // Log error for debugging purposes
+      console.log(error.response);
+
+      // Note: Consider using rejectWithValue for proper error handling
+      // return rejectWithValue(error.response?.data?.message || 'Failed to fetch price range');
+    }
+  }
+);
+// End of query_products method
+
 /**
  * Home Redux Slice
  *
