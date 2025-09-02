@@ -11,6 +11,7 @@ router.get(
   "/price-range-latest-product",
   homeControllers.price_range_latest_product
 );
+router.get("/query-products", homeControllers.query_products);
 
 // Export the router to be used in the main server application
 module.exports = router;

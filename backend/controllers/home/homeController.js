@@ -4,6 +4,7 @@ const categoryModel = require("../../models/categoryModel");
 const productModel = require("../../models/productModel");
 // Import custom response utility for consistent API responses
 const { responseReturn } = require("../../utils/response");
+const queryProducts = require("../../utils/queryProducts");
 
 // Define the homeControllers class to handle home page related logic
 class homeControllers {
@@ -172,6 +173,20 @@ class homeControllers {
     }
   };
   // End of price_range_latest_product method
+
+  query_products = async (req, res) => {
+    const parpage = 12;
+    req.query.parpage = parpage;
+    // console.log(req.query);
+    try {
+      const products = await productModel.find({}).sort({
+        createdAt: -1,
+      });
+
+      const totalProduct = new this.queryProducts();
+    } catch (error) {}
+  };
+  // End of query_products method
 }
 
 // Export instance of homeControllers for use in routes
