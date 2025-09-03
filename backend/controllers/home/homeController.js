@@ -4,6 +4,7 @@ const categoryModel = require("../../models/categoryModel");
 const productModel = require("../../models/productModel");
 // Import custom response utility for consistent API responses
 const { responseReturn } = require("../../utils/response");
+// Import the queryProducts utility class for filtering and pagination
 const queryProducts = require("../../utils/queryProducts");
 
 // Define the homeControllers class to handle home page related logic
@@ -174,17 +175,65 @@ class homeControllers {
   };
   // End of price_range_latest_product method
 
+  /**
+   * Handles querying products based on various filters and pagination.
+   * This method supports filtering by category, rating, and price range,
+   * as well as sorting by price. Results are paginated using the queryProducts utility.
+   * The method returns both the filtered/paginated products and the total count
+   * of products that match the filter criteria (before pagination).
+   *
+   * @param {Object} req - Express request object, expects query params:
+   *   - category: optional category filter (string)
+   *   - rating: optional rating filter (string/number)
+   *   - lowPrice: minimum price filter (string/number)
+   *   - highPrice: maximum price filter (string/number)
+   *   - sortPrice: optional price sorting ("low-to-high" or other)
+   *   - pageNumber: current page number (string/number, defaults to 1)
+   * @param {Object} res - Express response object
+   */
   query_products = async (req, res) => {
-    const parpage = 12;
-    req.query.parpage = parpage;
+    // Set fixed page size for consistent pagination
+    const parPage = 9;
+    // Add parPage to the query object for use in queryProducts
+    req.query.parPage = parPage;
+
+    // Optionally log the query parameters for debugging
     // console.log(req.query);
+
     try {
+      // Fetch all products from the database sorted by creation date (newest first)
       const products = await productModel.find({}).sort({
         createdAt: -1,
       });
 
-      const totalProduct = new this.queryProducts();
-    } catch (error) {}
+      // Calculate total product count after applying filters but before pagination
+      // This is used for pagination controls on the frontend
+      const totalProduct = new queryProducts(products, req.query)
+        .categoryQuery() // Apply category filter
+        .ratingQuery() // Apply rating filter
+        .priceQuery() // Apply price range filter
+        .sortByPrice() // Apply price sorting
+        .countProducts(); // Get the count of filtered products
+
+      // Apply all filters, sorting, and pagination to get the final result
+      const result = new queryProducts(products, req.query)
+        .categoryQuery() // Apply category filter
+        .ratingQuery() // Apply rating filter
+        .priceQuery() // Apply price range filter
+        .sortByPrice() // Apply price sorting
+        .paginate() // Apply pagination (skip and limit)
+        .getProducts(); // Get the final filtered and paginated products
+
+      // Return the filtered/paginated products along with pagination info
+      responseReturn(res, 200, {
+        products: result, // Array of products for current page
+        totalProduct, // Total number of products matching filters
+        parPage, // Number of products per page
+      });
+    } catch (error) {
+      // Log error message to console for debugging purposes
+      console.log(error.message);
+    }
   };
   // End of query_products method
 }
