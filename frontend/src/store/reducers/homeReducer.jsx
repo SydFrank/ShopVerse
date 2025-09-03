@@ -162,11 +162,53 @@ export const price_range_product = createAsyncThunk(
 );
 // End of price_range_product method
 
+/**
+ * Async Thunk: Query Products with Filters
+ *
+ * Fetches filtered and sorted products from the backend API based on user-selected
+ * criteria. This is the main search and filter function used by the Shop page to
+ * provide dynamic product browsing with real-time filtering capabilities.
+ *
+ * API Endpoint: GET /home/query-products
+ *
+ * Query Parameters:
+ * - category: Selected product category for filtering (empty string for all categories)
+ * - rating: Minimum star rating filter (1-5 stars, empty for no filter)
+ * - lowPrice: Minimum price filter from price range slider
+ * - highPrice: Maximum price filter from price range slider
+ * - sortPrice: Sort order ("low-to-high", "high-to-low", or empty for default)
+ * - pageNumber: Current page number for pagination (1-based indexing)
+ *
+ * Expected Response Data:
+ * - products: Array of filtered products matching the criteria
+ * - totalProduct: Total number of products matching filters (for pagination)
+ * - parPage: Number of products per page (configured by backend)
+ *
+ * Used by:
+ * - Shop.jsx: Primary consumer for product listing with filters
+ * - Real-time filtering and sorting functionality
+ * - Pagination navigation between product pages
+ *
+ * @async
+ * @function query_products
+ * @param {Object} query - Filter parameters object containing search criteria
+ * @param {string} query.category - Selected category name or empty string
+ * @param {string|number} query.rating - Minimum rating filter or empty string
+ * @param {number} query.low - Minimum price filter value
+ * @param {number} query.high - Maximum price filter value
+ * @param {string} query.sortPrice - Price sort order preference
+ * @param {number} query.pageNumber - Current pagination page number
+ * @param {Object} thunkAPI - Redux Toolkit thunk API utilities
+ * @param {Function} thunkAPI.fulfillWithValue - Function to return successful data
+ * @param {Function} thunkAPI.rejectWithValue - Function to handle error responses
+ * @returns {Promise} Promise resolving to filtered products data or error handling
+ */
 export const query_products = createAsyncThunk(
   "product/query_products", // Action type prefix for Redux DevTools
   async (query, { fulfillWithValue, rejectWithValue }) => {
     try {
       // Make API request to fetch products based on filters
+      // Note: Using && as parameter separator as required by backend API
       const { data } = await api.get(
         `/home/query-products?category=${query.category}&&rating=${query.rating}&&lowPrice=${query.low}&&highPrice=${query.high}&&sortPrice=${query.sortPrice}&&pageNumber=${query.pageNumber}`
       );
@@ -200,19 +242,31 @@ export const homeReducer = createSlice({
   // Slice name - used in action types and Redux DevTools
   name: "home",
   initialState: {
-    categorys: [], // Array of product categories for homepage display
-    products: [], // General products array for main content sections
-    totalProduct: 0, // Total number of products matching current filters
-    parPage: 3, // Products per page for pagination
-    latest_product: [], // Newest products for "Latest Product" section
-    topRated_product: [], // Top-rated products for "Top Rated Product" section
-    discount_product: [], // Discounted products for "Discount Product" section
+    categorys: [], // Array of product categories for homepage display and shop filtering
+    products: [], // General products array for main shop content and search results
+    totalProduct: 0, // Total number of products matching current filters (pagination support)
+    parPage: 3, // Products per page for pagination (updated from backend response)
+    latest_product: [], // Newest products for "Latest Product" homepage carousel section
+    topRated_product: [], // Top-rated products for "Top Rated Product" homepage carousel section
+    discount_product: [], // Discounted products for "Discount Product" homepage carousel section
     priceRange: {
-      low: 0, // Minimum price boundary (default placeholder)
-      high: 100, // Maximum price boundary (default placeholder)
+      low: 0, // Minimum price boundary (updated from backend, used for price slider)
+      high: 100, // Maximum price boundary (updated from backend, used for price slider)
     },
   },
 
+  /**
+   * Synchronous Reducers
+   *
+   * Currently empty as all state updates are handled by async thunks.
+   * Future synchronous actions could be added here for immediate state changes
+   * like UI toggles, temporary state updates, or client-side filtering.
+   *
+   * Example usage:
+   * toggleProductView: (state, action) => {
+   *   state.viewMode = action.payload; // 'grid' or 'list'
+   * }
+   */
   reducers: {},
 
   /**
@@ -271,11 +325,15 @@ export const homeReducer = createSlice({
         // This provides fresh latest product data alongside price range
         state.latest_product = payload.latest_product; // For "Latest Product" carousel
       })
-      // Handle successful product query
+
+      // Handle Successful Product Query with Filters
       .addCase(query_products.fulfilled, (state, { payload }) => {
+        // Update main products array with filtered results from Shop page
         state.products = payload.products;
-        state.totalProduct = payload.totalProduct; // Update total product count
-        state.parPage = payload.parPage; // Update products per page
+
+        // Update pagination metadata for Shop page navigation
+        state.totalProduct = payload.totalProduct; // Total products matching current filters
+        state.parPage = payload.parPage; // Products displayed per page (backend setting)
       });
   },
 });
