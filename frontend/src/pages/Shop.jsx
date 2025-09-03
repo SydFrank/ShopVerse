@@ -75,10 +75,14 @@ const Shop = () => {
   const dispatch = useDispatch();
 
   // Redux state selectors - extract data from the home reducer
-  // eslint-disable-next-line no-unused-vars
-  const { products, categorys, priceRange, latest_product } = useSelector(
-    (state) => state.home
-  );
+  const {
+    products,
+    categorys,
+    priceRange,
+    latest_product,
+    totalProduct,
+    parPage,
+  } = useSelector((state) => state.home);
 
   /**
    * Component Side Effect - Price Range Data Fetching
@@ -89,7 +93,7 @@ const Shop = () => {
    */
   useEffect(() => {
     dispatch(price_range_product()); // Fetch price range data from API
-  }, [dispatch]); // Include dispatch in dependencies for React hooks compliance
+  }, []);
 
   /**
    * Component Side Effect - Price Range State Synchronization
@@ -128,7 +132,6 @@ const Shop = () => {
   // State for star rating filter selection
   // Stores selected rating (1-5 stars) for filtering products by review ratings
   // Empty string means no rating filter is applied (show all products)
-  // eslint-disable-next-line no-unused-vars
   const [rating, setRating] = useState("");
 
   // State for product display layout toggle
@@ -140,46 +143,101 @@ const Shop = () => {
   // Pagination state management
   // Controls which page of products is currently being displayed
   // Used with the Pagination component for navigation through product pages
-  const [currentPage, setCurrentPage] = useState(1); // Current active page number (1-based)
+  const [pageNumber, setPageNumber] = useState(1); // Current active page number (1-based)
 
   // Search functionality state (future implementation)
   // Stores the search query string for product name/description filtering
-  // Currently not fully implemented but reserved for search feature
-  // eslint-disable-next-line no-unused-vars
   const [searchValue, setSearchValue] = useState(""); // Search query string
 
-  // Products per page configuration
-  // Determines how many products to display on each page
-  // Used by pagination component to calculate total pages and navigation
-  // eslint-disable-next-line no-unused-vars
-  const [parPage, setParPage] = useState(5); // Number of items to display per page
-
+  // State for product sorting preferences
+  // Controls the order of product display based on price
+  // Values: "" (no sorting), "low-to-high", "high-to-low"
   const [sortPrice, setSortPrice] = useState("");
 
+  // State for category filter selection
+  // Stores the currently selected product category for filtering
+  // Empty string means no category filter is applied (show all categories)
   const [category, setCategory] = useState("");
 
+  /**
+   * Category Filter Handler
+   *
+   * Handles category checkbox selection/deselection for product filtering.
+   * Only allows single category selection at a time for better UX.
+   *
+   * @param {Event} e - Checkbox change event
+   * @param {string} value - Category name to filter by
+   */
   const queryCategory = (e, value) => {
     if (e.target.checked) {
-      setCategory(value);
+      setCategory(value); // Set selected category for filtering
     } else {
-      setCategory("");
+      setCategory(""); // Clear category filter to show all products
     }
   };
 
-  const [low, high] = state.values;
-
+  /**
+   * Component Side Effect - Product Query with Filters
+   *
+   * Automatically fetches products whenever filter parameters change.
+   * This creates a reactive filtering system where products update in real-time
+   * as users interact with category, price, rating, and pagination controls.
+   *
+   * Dependencies:
+   * - state.values: Price range slider values [min, max]
+   * - sortPrice: Selected sort order (low-to-high, high-to-low, or none)
+   * - category: Selected product category filter
+   * - rating: Selected star rating filter (1-5 stars)
+   * - pageNumber: Current pagination page
+   * - dispatch: Redux dispatch function for triggering actions
+   */
   useEffect(() => {
     dispatch(
       query_products({
-        low,
-        high,
-        sortPrice,
-        category,
-        rating,
-        currentPage,
+        low: state.values[0], // Minimum price from range slider
+        high: state.values[1], // Maximum price from range slider
+        sortPrice, // Sort preference for price ordering
+        category, // Selected category filter
+        rating, // Selected star rating filter
+        pageNumber, // Current page for pagination
       })
     );
-  }, [low, high, sortPrice, category, rating, currentPage]);
+  }, [dispatch, state.values, sortPrice, category, rating, pageNumber]);
+
+  /**
+   * Reset All Filters Function
+   *
+   * Clears all active filters and resets the shop to its default state.
+   * This provides users with a quick way to start fresh with their search
+   * and removes all applied category, rating, and price filters.
+   *
+   * Reset Actions:
+   * - Clear star rating filter
+   * - Clear category filter
+   * - Reset price range to full spectrum
+   * - Reset to first page
+   * - Fetch products with cleared filters
+   */
+  const resetRating = () => {
+    setRating(""); // Clear star rating filter
+    setCategory(""); // Clear category filter
+    setState({
+      values: [priceRange.low, priceRange.high], // Reset price range to full spectrum
+    });
+    setPageNumber(1); // Reset to first page
+
+    // Fetch products with all filters cleared
+    dispatch(
+      query_products({
+        low: priceRange.low, // Use full price range minimum
+        high: priceRange.high, // Use full price range maximum
+        sortPrice, // Keep current sort preference
+        category: "", // No category filter
+        rating: "", // No rating filter
+        pageNumber: 1, // Start from first page
+      })
+    );
+  };
 
   return (
     <div>
@@ -281,9 +339,7 @@ const Shop = () => {
                     />
                     {/* Category label with click handling for accessibility */}
                     <label
-                      className="text-slate-600"
-                      block
-                      cursor-pointer
+                      className="text-slate-600 cursor-pointer"
                       htmlFor={c.name}
                     >
                       {c.name}
@@ -467,9 +523,12 @@ const Shop = () => {
                     </span>
                   </div>
 
-                  {/* 0-star rating option (no rating filter) */}
-                  <div className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer ">
-                    {/* 5 empty stars */}
+                  {/* Clear all filters option (reset button) */}
+                  <div
+                    onClick={resetRating}
+                    className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer "
+                  >
+                    {/* 5 empty stars - clicking resets all filters */}
                     <span>
                       <CiStar />
                     </span>
@@ -498,16 +557,27 @@ const Shop = () => {
             {/* Right content area - Product display and controls */}
             <div className="w-9/12 max-lg:w-8/12 max-md:w-full ">
               <div className="pl-8 max-md:pl-0 ">
-                {/* Product controls bar - count, sorting, view toggle */}
+                {/* 
+                  Product Controls Bar
+                  - Product count display showing total results
+                  - Sort dropdown for price ordering (low-to-high, high-to-low)
+                  - View toggle buttons for grid/list layout (desktop only)
+                  - Clean white background with subtle border styling
+                */}
                 <div className="py-4 bg-white mb-10 px-3 rounded-md flex justify-between items-start border border-slate-200">
-                  {/* Product count display */}
+                  {/* Dynamic product count display with current total */}
                   <h2 className="text-lg font-medium text-slate-600">
-                    14 Products
+                    ({totalProduct}) Products
                   </h2>
 
-                  {/* Controls: sort dropdown and view toggle buttons */}
+                  {/* Right side controls: sorting and view options */}
                   <div className="flex justify-center items-center gap-3">
-                    {/* Sort by dropdown */}
+                    {/* 
+                      Price Sorting Dropdown
+                      - Allows users to sort products by price
+                      - Options: default (no sort), low-to-high, high-to-low
+                      - Triggers immediate product re-fetch on change
+                    */}
                     <select
                       onChange={(e) => setSortPrice(e.target.value)}
                       className="p-1 border border-slate-100 outline-0 text-slate-600"
@@ -519,9 +589,15 @@ const Shop = () => {
                       <option value="high-to-low">High to Low Price</option>
                     </select>
 
-                    {/* View toggle buttons (grid/list) - hidden on mobile */}
+                    {/* 
+                      Product View Toggle Buttons
+                      - Grid view: Card-based layout (default)
+                      - List view: Detailed horizontal layout
+                      - Hidden on mobile devices for better responsive design
+                      - Active state styling with background color change
+                    */}
                     <div className="flex justify-center items-start gap-4 max-lg:hidden">
-                      {/* Grid view button */}
+                      {/* Grid view toggle button */}
                       <div
                         onClick={() => setStyles("grid")}
                         className={`p-2 ${
@@ -531,7 +607,7 @@ const Shop = () => {
                         <BsFillGridFill />
                       </div>
 
-                      {/* List view button */}
+                      {/* List view toggle button */}
                       <div
                         onClick={() => setStyles("list")}
                         className={`p-2 ${
@@ -544,20 +620,33 @@ const Shop = () => {
                   </div>
                 </div>
 
-                {/* Main product display area */}
+                {/* 
+                  Main Product Display Area
+                  - Renders the ShopProducts component with filtered products
+                  - Passes products array and display style (grid/list)
+                  - Responsive layout with proper spacing
+                */}
                 <div className="pb-8 ">
-                  <ShopProducts styles={styles} />
+                  <ShopProducts products={products} styles={styles} />
                 </div>
 
-                {/* Pagination component */}
+                {/* 
+                  Pagination Section
+                  - Only shows when total products exceed per-page limit
+                  - Provides navigation through multiple pages of products
+                  - Calculates number of pagination buttons dynamically
+                  - Integrates with pageNumber state for navigation
+                */}
                 <div>
-                  <Pagination
-                    pageNumber={currentPage} // Current page number
-                    setPageNumber={setCurrentPage} // Function to change page
-                    totalItem={50} // Total number of products
-                    parPage={parPage} // Products per page
-                    showItem={Math.floor(10 / 3)} // Number of pagination buttons to show
-                  />
+                  {totalProduct > parPage && (
+                    <Pagination
+                      pageNumber={pageNumber} // Current active page number (1-based)
+                      setPageNumber={setPageNumber} // Function to update current page
+                      totalItem={totalProduct} // Total number of products for calculation
+                      parPage={parPage} // Number of products displayed per page
+                      showItem={Math.floor(totalProduct / parPage)} // Calculate pagination buttons to display
+                    />
+                  )}
                 </div>
               </div>
             </div>

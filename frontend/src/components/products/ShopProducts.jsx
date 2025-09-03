@@ -17,7 +17,7 @@ import Pagination from "../Pagination"; // Custom Pagination component (imported
  * @param {string} props.styles - Display style: "grid" for grid layout, "list" for list layout
  * @returns {JSX.Element} Product display grid/list with interactive product cards
  */
-const ShopProducts = ({ styles }) => {
+const ShopProducts = ({ styles, products }) => {
   return (
     // Main container with dynamic grid layout based on styles prop
     <div
@@ -28,7 +28,7 @@ const ShopProducts = ({ styles }) => {
       } gap-3`}
     >
       {/* Map through mock products array to generate product cards */}
-      {[1, 2, 3, 4, 5, 6].map((product, index) => (
+      {products.map((p, index) => (
         // Individual product card with hover effects
         <div
           key={index}
@@ -49,8 +49,8 @@ const ShopProducts = ({ styles }) => {
             {/* Product image with dynamic source based on index */}
             <img
               className="h-[240px] rounded-md max-md:h-[270px] max-xs:h-[170px] w-full object-cover"
-              src={`/images/products/${index + 1}.webp`}
-              alt={`Product ${index + 1}`} // Accessible alt text
+              src={p.images[0]}
+              alt="" // Accessible alt text
             />
 
             {/* Action buttons overlay - appears on hover */}
@@ -78,16 +78,17 @@ const ShopProducts = ({ styles }) => {
           {/* Product information section */}
           <div className="flex justify-start items-start flex-col gap-1">
             {/* Product name - placeholder text */}
-            <h2 className="font-semibold">Product Name</h2>
+            <h2 className="font-semibold">{p.name}</h2>
 
             {/* Price and rating container */}
             <div className="flex justify-start items-center gap-3">
               {/* Product price - placeholder price */}
-              <span className="text-md font-bold ">$29.99</span>
+              <span className="text-md font-bold ">${p.price}</span>
 
               {/* Product rating display using custom Rating component */}
               <div className="flex">
-                <Rating ratings={4.5} /> {/* 4.5 star rating example */}
+                <Rating ratings={p.rating} />{" "}
+                {/* Dynamic rating from product data */}
               </div>
             </div>
           </div>

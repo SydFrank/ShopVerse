@@ -60,7 +60,7 @@ import api from "../../api/api"; // Configured Axios instance for backend commun
  */
 export const get_category = createAsyncThunk(
   "product/get_category", // Action type prefix for Redux DevTools
-  async (_, { fulfillWithValue }) => {
+  async (_, { fulfillWithValue, rejectWithValue }) => {
     try {
       // Make API request to fetch categories
       const { data } = await api.get("/home/get-categorys");
@@ -71,9 +71,7 @@ export const get_category = createAsyncThunk(
     } catch (error) {
       // Log error for debugging purposes
       console.log(error.response);
-
-      // Note: Consider using rejectWithValue for proper error handling
-      // return rejectWithValue(error.response?.data?.message || 'Failed to fetch categories');
+      return rejectWithValue(error);
     }
   }
 );
@@ -103,20 +101,18 @@ export const get_category = createAsyncThunk(
  */
 export const get_products = createAsyncThunk(
   "product/get_products", // Action type prefix for Redux DevTools
-  async (_, { fulfillWithValue }) => {
+  async (_, { fulfillWithValue, rejectWithValue }) => {
     try {
       // Make API request to fetch all product categories
       const { data } = await api.get("/home/get-products");
-      console.log(data); // Debugging output to view API response structure
+      // console.log(data); // Debugging output to view API response structure
 
       // Return successful response data containing all product arrays
       return fulfillWithValue(data);
     } catch (error) {
       // Log error for debugging purposes
       console.log(error.response);
-
-      // Note: Consider using rejectWithValue for proper error handling
-      // return rejectWithValue(error.response?.data?.message || 'Failed to fetch products');
+      return rejectWithValue(error);
     }
   }
 );
@@ -150,7 +146,7 @@ export const get_products = createAsyncThunk(
  */
 export const price_range_product = createAsyncThunk(
   "product/price_range_product", // Action type prefix for Redux DevTools
-  async (_, { fulfillWithValue }) => {
+  async (_, { fulfillWithValue, rejectWithValue }) => {
     try {
       // Make API request to fetch price range and latest products
       const { data } = await api.get("/home/price-range-latest-product");
@@ -160,9 +156,7 @@ export const price_range_product = createAsyncThunk(
     } catch (error) {
       // Log error for debugging purposes
       console.log(error.response);
-
-      // Note: Consider using rejectWithValue for proper error handling
-      // return rejectWithValue(error.response?.data?.message || 'Failed to fetch price range');
+      return rejectWithValue(error);
     }
   }
 );
@@ -170,22 +164,21 @@ export const price_range_product = createAsyncThunk(
 
 export const query_products = createAsyncThunk(
   "product/query_products", // Action type prefix for Redux DevTools
-  async (query, { fulfillWithValue }) => {
+  async (query, { fulfillWithValue, rejectWithValue }) => {
     try {
       // Make API request to fetch products based on filters
       const { data } = await api.get(
-        `/home/query-products?category=${query.category}&&rating=${query.rating}&&lowPrice=${query.low}&&highPrice=${query.high}&&sortPrice=${query.sortPrice}&&pageNumber=${query.currentPage}`
+        `/home/query-products?category=${query.category}&&rating=${query.rating}&&lowPrice=${query.low}&&highPrice=${query.high}&&sortPrice=${query.sortPrice}&&pageNumber=${query.pageNumber}`
       );
-      console.log(data); // Debugging output to view API response structure
+
+      // console.log(data); // Debugging output to view API response structure
 
       // Return successful response data
       return fulfillWithValue(data);
     } catch (error) {
       // Log error for debugging purposes
       console.log(error.response);
-
-      // Note: Consider using rejectWithValue for proper error handling
-      // return rejectWithValue(error.response?.data?.message || 'Failed to fetch price range');
+      return rejectWithValue(error);
     }
   }
 );
@@ -206,39 +199,11 @@ export const query_products = createAsyncThunk(
 export const homeReducer = createSlice({
   // Slice name - used in action types and Redux DevTools
   name: "home",
-
-  /**
-   * Initial State Structure
-   *
-   * Defines the default state shape for the home slice.
-   * This state is used when the application first loads and before
-   * any API data is fetched. All arrays start empty and are populated
-   * through async thunk actions.
-   *
-   * State Properties:
-   * - categorys: Array of product categories for navigation and filtering
-   * - products: Array of general products for main display sections
-   * - latest_product: Array of newest products (recently added to inventory)
-   * - topRated_product: Array of highest-rated products (based on customer reviews)
-   * - discount_product: Array of products with active discounts and sales
-   * - priceRange: Object containing price filtering boundaries
-   *   - low: Minimum product price in the database
-   *   - high: Maximum product price in the database
-   *
-   * Data Flow:
-   * 1. Component mounts and dispatches async thunks
-   * 2. API requests fetch data from backend
-   * 3. Successful responses update these state arrays and objects
-   * 4. Components re-render with updated product data
-   *
-   * Price Range Usage:
-   * - Used by Shop page price filter slider for min/max boundaries
-   * - Dynamically updated from backend to reflect current inventory
-   * - Default values (0-100) are placeholders until API data loads
-   */
   initialState: {
     categorys: [], // Array of product categories for homepage display
     products: [], // General products array for main content sections
+    totalProduct: 0, // Total number of products matching current filters
+    parPage: 3, // Products per page for pagination
     latest_product: [], // Newest products for "Latest Product" section
     topRated_product: [], // Top-rated products for "Top Rated Product" section
     discount_product: [], // Discounted products for "Discount Product" section
@@ -248,20 +213,6 @@ export const homeReducer = createSlice({
     },
   },
 
-  /**
-   * Synchronous Reducers
-   *
-   * Standard reducer functions for handling synchronous state updates.
-   * Currently empty - all state updates are handled by async thunks.
-   *
-   * Example of how to add synchronous reducers:
-   * setCategorys: (state, action) => {
-   *   state.categorys = action.payload;
-   * },
-   * clearCategories: (state) => {
-   *   state.categorys = [];
-   * }
-   */
   reducers: {},
 
   /**
@@ -319,6 +270,12 @@ export const homeReducer = createSlice({
         // Update latest products array (alternative source)
         // This provides fresh latest product data alongside price range
         state.latest_product = payload.latest_product; // For "Latest Product" carousel
+      })
+      // Handle successful product query
+      .addCase(query_products.fulfilled, (state, { payload }) => {
+        state.products = payload.products;
+        state.totalProduct = payload.totalProduct; // Update total product count
+        state.parPage = payload.parPage; // Update products per page
       });
   },
 });
