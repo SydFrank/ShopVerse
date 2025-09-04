@@ -10,6 +10,7 @@ import React, { useEffect } from "react"; // useEffect for side effects on compo
 // Redux imports for state management
 import { useDispatch } from "react-redux"; // Redux hooks for dispatching actions and selecting state
 import { get_category } from "./store/reducers/homeReducer";
+import CategoryShop from "./pages/CategoryShop";
 
 function App() {
   // Redux dispatch hook for triggering actions
@@ -28,6 +29,7 @@ function App() {
         <Route path="/shops" element={<Shop />} />
         <Route path="/card" element={<Card />} />
         <Route path="/shipping" element={<Shipping />} />
+        <Route path="/products?" element={<CategoryShop />} />
         <Route path="/product/details/:slug" element={<Details />} />
       </Routes>
     </BrowserRouter>

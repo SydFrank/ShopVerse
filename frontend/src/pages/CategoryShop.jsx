@@ -1,26 +1,35 @@
 /**
- * Shop Page - Complete E-commerce Product Browsing Interface
+ * CategoryShop Page - Advanced Category-Based Product Discovery Interface
  *
- * Description:
- * Main shopping page that displays products with comprehensive filtering and sorting capabilities.
- * Provides users with intuitive product discovery through multiple filter options and view modes.
+ * Overview:
+ * Specialized shopping page for category-specific product browsing with comprehensive
+ * filtering, sorting, and search capabilities. Provides enhanced user experience
+ * for targeted product discovery within specific categories.
  *
- * Key Features:
- * - Category-based product filtering with dynamic category list
- * - Price range slider with customizable min/max values
- * - Star rating filter system (1-5 stars)
- * - Product sorting (price low-high, high-low, A-Z, Z-A)
- * - Dual view modes: Grid and List layout
- * - Responsive pagination with configurable items per page
- * - Real-time search and filter application
- * - Mobile-responsive design with Tailwind CSS
+ * Core Functionality:
+ * - Dynamic category-based product filtering via URL parameters
+ * - Advanced price range filtering with interactive slider
+ * - Multi-level rating system (1-5 stars) with visual feedback
+ * - Comprehensive sorting options (price, alphabetical, relevance)
+ * - Dual layout modes: responsive grid and detailed list views
+ * - Smart pagination with configurable items per page
+ * - Real-time search integration with instant results
+ * - SEO-friendly URL parameter management
+ *
+ * Technical Architecture:
+ * - React functional component with hooks-based state management
+ * - Redux Toolkit integration for global state and async operations
+ * - URL-based routing with useSearchParams for deep linking
+ * - React Range component for smooth price filtering UX
+ * - Responsive design using Tailwind CSS utility classes
+ * - Optimized re-renders with useEffect dependency management
  *
  */
 
 import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { IoIosArrowForward } from "react-icons/io";
 import { Range } from "react-range";
 import { AiFillStar } from "react-icons/ai";
@@ -36,18 +45,14 @@ import {
   query_products,
 } from "../store/reducers/homeReducer";
 
-const Shop = () => {
+const CategoryShop = () => {
+  let [searchParams] = useSearchParams();
+  const category = searchParams.get("category");
   const dispatch = useDispatch();
 
   // Redux state
-  const {
-    products,
-    categorys,
-    priceRange,
-    latest_product,
-    totalProduct,
-    parPage,
-  } = useSelector((state) => state.home);
+  const { products, priceRange, latest_product, totalProduct, parPage } =
+    useSelector((state) => state.home);
 
   // Fetch price range data on mount
   useEffect(() => {
@@ -61,32 +66,22 @@ const Shop = () => {
     });
   }, [priceRange]);
 
-  // Local state for UI controls
-  const [filter, setFilter] = useState(true); // Mobile filter sidebar toggle
+  // Local state
+  const [filter, setFilter] = useState(true);
   const [state, setState] = useState({
-    values: [priceRange.low, priceRange.high], // Price range slider values
+    values: [priceRange.low, priceRange.high],
   });
-  const [rating, setRating] = useState(""); // Star rating filter (1-5)
-  const [styles, setStyles] = useState("grid"); // Product display style (grid/list)
-  const [pageNumber, setPageNumber] = useState(1); // Current page for pagination
-  const [sortPrice, setSortPrice] = useState(""); // Price sorting (low-to-high/high-to-low)
-  const [category, setCategory] = useState(""); // Selected category filter
-
-  // Handle category filter selection
-  const queryCategory = (e, value) => {
-    if (e.target.checked) {
-      setCategory(value);
-    } else {
-      setCategory("");
-    }
-  };
+  const [rating, setRating] = useState("");
+  const [styles, setStyles] = useState("grid");
+  const [pageNumber, setPageNumber] = useState(1);
+  const [sortPrice, setSortPrice] = useState("");
 
   // Fetch products when filters change
   useEffect(() => {
     dispatch(
       query_products({
-        low: state.values[0],
-        high: state.values[1],
+        low: state.values[0] || "",
+        high: state.values[1] || "",
         sortPrice,
         category,
         rating,
@@ -98,26 +93,28 @@ const Shop = () => {
   // Reset all filters
   const resetRating = () => {
     setRating("");
-    setCategory("");
+    setSortPrice("");
     setState({
       values: [priceRange.low, priceRange.high],
     });
-    setPageNumber(1);
+    setPageNumber(1); // Reset to first page
 
+    // Fetch products with all filters cleared
     dispatch(
       query_products({
-        low: priceRange.low,
-        high: priceRange.high,
-        sortPrice,
-        category: "",
-        rating: "",
-        pageNumber: 1,
+        low: priceRange.low, // Use full price range minimum
+        high: priceRange.high, // Use full price range maximum
+        sortPrice, // Keep current sort preference
+        category: "", // No category filter
+        rating: "", // No rating filter
+        pageNumber: 1, // Start from first page
       })
     );
   };
 
   return (
     <div>
+      {/* Website header with navigation and user info */}
       <Header />
 
       {/* Hero Banner */}
@@ -125,13 +122,13 @@ const Shop = () => {
         <div className="absolute left-0 top-0 w-full h-full bg-[#2422228a]">
           <div className="w-[85%] max-md:w-[80%] max-sm:w-[90%] max-lg:w-[90%] h-full mx-auto">
             <div className="flex flex-col justify-center gap-1 items-center h-full w-full text-white">
-              <h2 className="text-3xl font-bold ">Shop Page</h2>
+              <h2 className="text-3xl font-bold ">Category Page</h2>
               <div className="flex justify-center items-center gap-2 text-2xl w-full">
                 <Link to="/">Home</Link>
                 <span className="pt-1">
                   <IoIosArrowForward />
                 </span>
-                <span>Shop</span>
+                <span>Category</span>
               </div>
             </div>
           </div>
@@ -166,53 +163,21 @@ const Shop = () => {
                   : "max-md:auto max-md:overflow-auto max-md:mb-0" // Visible on mobile when filter = false
               }`}
             >
-              {/* Category Filter */}
-              <h2 className="text-3xl font-bold mb-3 text-slate-600">
-                Category
-              </h2>
-
-              <div className="py-2">
-                {categorys.map((c, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-start items-center gap-2 py-1"
-                  >
-                    <input
-                      checked={category === c.name ? true : false}
-                      onChange={(e) => queryCategory(e, c.name)}
-                      type="checkbox"
-                      id={c.name}
-                    />
-                    <label
-                      className="text-slate-600 cursor-pointer"
-                      htmlFor={c.name}
-                    >
-                      {c.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
-
+              {/* 
+                Price Range Filter Section
               {/* Price Range Filter */}
               <div className="py-2 flex flex-col gap-5 ">
                 <h2 className="text-3xl font-bold mb-3 text-slate-600">
                   Price
                 </h2>
 
-                {/* 
-                  Price Range Slider Component
-                  - Dual-handle slider for min/max price selection
-                  - Custom styling for brand consistency
-                  - Step-based increments for better UX
-                */}
                 <Range
-                  step={5} // Price increment steps ($5 increments)
-                  min={priceRange.low} // Minimum price from backend
-                  max={priceRange.high} // Maximum price from backend
-                  values={state.values} // Current selected range [min, max]
-                  onChange={(values) => setState({ values })} // Update price range state
+                  step={5}
+                  min={priceRange.low}
+                  max={priceRange.high}
+                  values={state.values}
+                  onChange={(values) => setState({ values })}
                   renderTrack={({ props, children }) => (
-                    // Custom track styling - gray background bar
                     <div
                       {...props}
                       className="w-full h-[6px] rounded-full cursor-pointer bg-gray-300"
@@ -234,7 +199,7 @@ const Shop = () => {
                 ${Math.floor(state.values[0])} - ${Math.floor(state.values[1])}
               </span>
 
-              {/* Star Rating Filter */}
+              {/* Star rating filter section */}
               <div className="py-3 flex flex-col gap-4 ">
                 <h2 className="text-3xl font-bold mb-3 text-slate-600">
                   Rating
@@ -263,12 +228,11 @@ const Shop = () => {
                     </span>
                   </div>
 
-                  {/* 4-star rating option */}
+                  {/* 4-star rating */}
                   <div
                     onClick={() => setRating(4)}
                     className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer "
                   >
-                    {/* 4 filled stars + 1 empty star */}
                     <span>
                       <AiFillStar />
                     </span>
@@ -286,12 +250,11 @@ const Shop = () => {
                     </span>
                   </div>
 
-                  {/* 3-star rating option */}
+                  {/* 3-star rating */}
                   <div
                     onClick={() => setRating(3)}
                     className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer "
                   >
-                    {/* 3 filled stars + 2 empty stars */}
                     <span>
                       <AiFillStar />
                     </span>
@@ -355,12 +318,11 @@ const Shop = () => {
                     </span>
                   </div>
 
-                  {/* Clear all filters option (reset button) */}
+                  {/* Reset filters */}
                   <div
                     onClick={resetRating}
                     className="text-orange-500 flex justify-start items-start gap-2 text-xl cursor-pointer "
                   >
-                    {/* 5 empty stars - clicking resets all filters */}
                     <span>
                       <CiStar />
                     </span>
@@ -394,7 +356,6 @@ const Shop = () => {
                   <h2 className="text-lg font-medium text-slate-600">
                     ({totalProduct}) Products
                   </h2>
-
                   <div className="flex justify-center items-center gap-3">
                     <select
                       onChange={(e) => setSortPrice(e.target.value)}
@@ -407,15 +368,8 @@ const Shop = () => {
                       <option value="high-to-low">High to Low Price</option>
                     </select>
 
-                    {/* 
-                      Product View Toggle Buttons
-                      - Grid view: Card-based layout (default)
-                      - List view: Detailed horizontal layout
-                      - Hidden on mobile devices for better responsive design
-                      - Active state styling with background color change
-                    */}
+                    {/* View Toggle Buttons */}
                     <div className="flex justify-center items-start gap-4 max-lg:hidden">
-                      {/* Grid view toggle button */}
                       <div
                         onClick={() => setStyles("grid")}
                         className={`p-2 ${
@@ -425,7 +379,6 @@ const Shop = () => {
                         <BsFillGridFill />
                       </div>
 
-                      {/* List view toggle button */}
                       <div
                         onClick={() => setStyles("list")}
                         className={`p-2 ${
@@ -438,6 +391,10 @@ const Shop = () => {
                   </div>
                 </div>
 
+                {/* 
+                  Main Product Display Area
+                  - Renders the ShopProducts component with filtered products
+                  - Passes products array and display style (grid/list)
                 {/* Product Display */}
                 <div className="pb-8 ">
                   <ShopProducts products={products} styles={styles} />
@@ -466,4 +423,4 @@ const Shop = () => {
   );
 };
 
-export default Shop;
+export default CategoryShop;

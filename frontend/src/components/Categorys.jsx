@@ -81,7 +81,7 @@ const Categorys = () => {
           <Link
             className="h-[185px] border border-gray-200 block" // Fixed height with light border
             key={index} // Unique key for React list rendering
-            to="#" // Placeholder link (should link to category page)
+            to={`/products?category=${curVal.name}`}
           >
             {/* Category card container with padding */}
             <div className="w-full h-full relative p-3">

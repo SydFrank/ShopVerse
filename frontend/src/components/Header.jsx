@@ -450,7 +450,12 @@ const Header = () => {
                           src={curVal.image}
                           className="w-[30px] h-[30px] rounded-full overflow-hidden"
                         />
-                        <Link className="text-sm block">{curVal.name}</Link>
+                        <Link
+                          to={`/products?category=${curVal.name}`}
+                          className="text-sm block"
+                        >
+                          {curVal.name}
+                        </Link>
                       </li>
                     );
                   })}
