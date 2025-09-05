@@ -12,7 +12,7 @@ import { FaGithub } from "react-icons/fa6"; // GitHub icon
 import { FaUserAlt } from "react-icons/fa"; // User icon
 import { FaLock } from "react-icons/fa"; // Lock icon
 // Import Link component from React Router for navigation
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaHeart } from "react-icons/fa";
 import { FaShoppingCart } from "react-icons/fa";
 import { FaPhoneAlt } from "react-icons/fa";
@@ -24,6 +24,8 @@ import { useSelector } from "react-redux"; // Redux hooks for dispatching action
  * Contains contact information, social media links, language selector and user login status
  */
 const Header = () => {
+  const navigate = useNavigate();
+
   // Select categories data from home reducer state
   const { categorys } = useSelector((state) => state.home);
 
@@ -46,6 +48,12 @@ const Header = () => {
 
   // State to manage selected category (not used in this snippet but can be implemented)
   const [category, setCategory] = useState("");
+
+  const search = () => {
+    // console.log(category);
+    // console.log(searchValue);
+    navigate(`/products/search?category=${category}&&value=${searchValue}`);
+  };
 
   return (
     // Main header container with full width and white background
@@ -479,7 +487,7 @@ const Header = () => {
                     >
                       <option value="">Select Category</option>
                       {categorys.map((curVal, index) => (
-                        <option key={index} value={curVal}>
+                        <option key={index} value={curVal.name}>
                           {curVal.name}
                         </option>
                       ))}
@@ -496,6 +504,7 @@ const Header = () => {
                   />
 
                   <button
+                    onClick={search}
                     className="bg-[#059473] text-white right-0 absolute px-8 h-full font-semibold uppercase"
                     type="button"
                   >
