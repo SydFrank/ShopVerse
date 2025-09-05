@@ -55,6 +55,28 @@ class queryProducts {
   };
 
   /**
+   * Filters products by search value.
+   * If a searchValue is specified in the query, filters products to include only those
+   * whose names contain the search term (case-insensitive). The search is performed
+   * by converting both the product name and search value to uppercase and checking
+   * if the search term exists within the product name.
+   * If no searchValue is provided, returns all products unchanged.
+   *
+   * @returns {queryProducts} Returns this instance for method chaining
+   */
+  searchQuery = () => {
+    this.products = this.query.searchValue
+      ? this.products.filter(
+          (c) =>
+            // Convert product name to uppercase and check if it contains the search value
+            c.name.toUpperCase().indexOf(this.query.searchValue.toUpperCase()) >
+            -1
+        )
+      : this.products; // Return all products if no search value is provided
+    return this;
+  };
+
+  /**
    * Filters products by price range.
    * Filters products to include only those within the specified price range.
    * Uses parseInt to convert string values to numbers, with fallbacks:

@@ -212,6 +212,7 @@ class homeControllers {
         .categoryQuery() // Apply category filter
         .ratingQuery() // Apply rating filter
         .priceQuery() // Apply price range filter
+        .searchQuery() // Apply search filter
         .sortByPrice() // Apply price sorting
         .countProducts(); // Get the count of filtered products
 
@@ -220,6 +221,7 @@ class homeControllers {
         .categoryQuery() // Apply category filter
         .ratingQuery() // Apply rating filter
         .priceQuery() // Apply price range filter
+        .searchQuery() // Apply search filter
         .sortByPrice() // Apply price sorting
         .paginate() // Apply pagination (skip and limit)
         .getProducts(); // Get the final filtered and paginated products
