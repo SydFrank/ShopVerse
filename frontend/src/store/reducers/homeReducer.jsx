@@ -267,11 +267,6 @@ export const homeReducer = createSlice({
    * Currently empty as all state updates are handled by async thunks.
    * Future synchronous actions could be added here for immediate state changes
    * like UI toggles, temporary state updates, or client-side filtering.
-   *
-   * Example usage:
-   * toggleProductView: (state, action) => {
-   *   state.viewMode = action.payload; // 'grid' or 'list'
-   * }
    */
   reducers: {},
 
@@ -280,27 +275,6 @@ export const homeReducer = createSlice({
    *
    * Handles state updates from async thunk actions (pending, fulfilled, rejected).
    * Uses builder pattern for type-safe action handling and automatic action type matching.
-   *
-   * Handled Actions:
-   * - get_category.fulfilled: Updates categories when API request succeeds
-   * - get_products.fulfilled: Updates all product arrays when API request succeeds
-   * - price_range_product.fulfilled: Updates price range and latest products
-   *
-   * Future Enhancement Opportunities:
-   * - Add pending states for loading indicators
-   * - Add rejected states for error handling
-   * - Add loading and error properties to state
-   * - Implement optimistic updates for better UX
-   *
-   * Example of enhanced error handling:
-   * .addCase(get_products.pending, (state) => {
-   *   state.loading = true;
-   *   state.error = null;
-   * })
-   * .addCase(get_products.rejected, (state, action) => {
-   *   state.loading = false;
-   *   state.error = action.payload;
-   * })
    */
   extraReducers: (builder) => {
     // Handle successful category fetch

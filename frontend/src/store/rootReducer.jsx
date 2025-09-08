@@ -14,34 +14,27 @@
  * - Clear separation of concerns between different application features
  * - Type-safe state structure with predictable state shape
  *
- * Current State Structure:
- * - home: Manages homepage-related state (categories, products, banners, etc.)
- *
  * @module RootReducer
  */
 
 // Feature-specific reducer imports
-import homeReducer from "./reducers/homeReducer"; // Home page state management (products, categories, banners)
+import homeReducer from "./reducers/homeReducer";
+import authReducer from "./reducers/authReducer";
 
 /**
  * Root Reducer Object
  * Combines all feature-specific reducers into a single state tree.
  * Each key represents a slice of the application state, and its corresponding
  * reducer manages that specific portion of the state.
- *
- * State Structure:
- * {
- *   home: { ... } // Home page state managed by homeReducer
- * }
- *
  * To add new reducers:
  * 1. Import the new reducer
  * 2. Add it as a new key-value pair in the rootReducer object
  * 3. The state will be automatically available as state.keyName in components
  */
+
 const rootReducer = {
-  // Home page state slice - manages homepage data, product listings, categories, etc.
   home: homeReducer,
+  auth: authReducer,
 };
 
 // Export the composed root reducer for use in store configuration

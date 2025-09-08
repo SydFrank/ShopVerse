@@ -39,7 +39,7 @@ const Header = () => {
   const [categoryShow, setCategoryShow] = useState(true);
 
   // Mock user login status (should be retrieved from state manager or API in actual project)
-  const user = true;
+  const user = false;
 
   const wishlist_count = 3; // Mock wishlist count (should be dynamic in actual project)
 
@@ -130,7 +130,7 @@ const Header = () => {
                 /* Login link for non-logged in users */
                 <Link
                   className="flex cursor-pointer justify-center items-center gap-2 text-sm text-black "
-                  to="/dashboard"
+                  to="/login"
                 >
                   <span>
                     <FaLock />
