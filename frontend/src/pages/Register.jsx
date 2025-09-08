@@ -20,20 +20,30 @@
  * @returns {JSX.Element} Complete user registration page with form and social options
  */
 
-import React, { useDebugValue, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../components/Header"; // Website header with navigation and branding
 import Footer from "../components/Footer"; // Website footer with links and company info
 import { FaFacebookF } from "react-icons/fa"; // Facebook icon for social login
 import { IoLogoGoogle } from "react-icons/io5"; // Google icon for social login
 import { Link } from "react-router-dom"; // Navigation link component for login redirect
-import { useDispatch } from "react-redux";
-import { customer_register } from "../store/reducers/authReducer";
+import { useDispatch, useSelector } from "react-redux";
+import { customer_register, messageClear } from "../store/reducers/authReducer";
+import toast from "react-hot-toast"; // Toast notifications
+import { FadeLoader } from "react-spinners";
 
 /**
  * Register Functional Component
  * Manages user registration form state and submission handling
  */
 const Register = () => {
+  // Extract authentication state from Redux store
+  // loader: boolean indicating if registration request is in progress
+  // errorMessage: string containing error message if registration fails
+  // successMessage: string containing success message if registration succeeds
+  const { loader, errorMessage, successMessage } = useSelector(
+    (state) => state.auth
+  );
+
   // Registration form state object containing user input fields
   // Manages controlled inputs for name, email, and password
   const [state, setState] = useState({
@@ -42,6 +52,7 @@ const Register = () => {
     password: "", // User's chosen password for account security
   });
 
+  // Redux dispatch function for triggering actions
   const dispatch = useDispatch();
 
   /**
@@ -58,7 +69,7 @@ const Register = () => {
   /**
    * Registration Form Submission Handler
    * Processes the registration form submission and handles user account creation.
-   * Currently logs the state for development; in production would send data to backend API.
+   * Dispatches customer_register action with form data to Redux store.
    *
    * @param {Event} e - Form submission event
    */
@@ -67,8 +78,33 @@ const Register = () => {
     dispatch(customer_register(state));
   };
 
+  /**
+   * Effect Hook for Message Handling
+   * Monitors authentication state changes and displays toast notifications
+   * for success/error messages. Automatically clears messages after display
+   * to prevent persistent notifications on subsequent renders.
+   */
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage); // Show success toast notification
+      dispatch(messageClear()); // Clear message from Redux state
+    }
+    if (errorMessage) {
+      toast.error(errorMessage); // Show error toast notification
+      dispatch(messageClear()); // Clear message from Redux state
+    }
+  }, [successMessage, errorMessage, dispatch]); // Dependencies: re-run when messages or dispatch change
+
   return (
     <div>
+      {/* Loading Overlay - Full screen spinner during registration process */}
+      {loader && (
+        <div className="w-screen h-screen flex justify-center items-center fixed left-0 top-0 bg-[#38303033] z-[999]">
+          {/* FadeLoader component provides visual feedback during API calls */}
+          <FadeLoader />
+        </div>
+      )}
+
       {/* Website header component with navigation and user authentication */}
       <Header />
 
@@ -132,8 +168,13 @@ const Register = () => {
                 </div>
 
                 {/* Primary registration submit button */}
-                <button className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-md shadow">
-                  Register
+                {/* Triggers form validation and submission when clicked */}
+                {/* Disabled state managed by loader to prevent duplicate submissions */}
+                <button
+                  className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-md shadow disabled:bg-gray-400"
+                  disabled={loader} // Prevent multiple submissions during API call
+                >
+                  {loader ? "Registering..." : "Register"}
                 </button>
               </form>
 

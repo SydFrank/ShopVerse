@@ -70,7 +70,7 @@ export const get_category = createAsyncThunk(
       return fulfillWithValue(data);
     } catch (error) {
       // Log error for debugging purposes
-      console.log(error.response);
+      // console.log(error.response);
       return rejectWithValue(error);
     }
   }
