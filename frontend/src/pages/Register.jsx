@@ -20,19 +20,14 @@
  * @returns {JSX.Element} Complete user registration page with form and social options
  */
 
-// React core imports for functional component with state management
-import React, { useState } from "react";
-
-// Custom component imports for page structure
+import React, { useDebugValue, useState } from "react";
 import Header from "../components/Header"; // Website header with navigation and branding
 import Footer from "../components/Footer"; // Website footer with links and company info
-
-// React Icons for social media authentication buttons
 import { FaFacebookF } from "react-icons/fa"; // Facebook icon for social login
 import { IoLogoGoogle } from "react-icons/io5"; // Google icon for social login
-
-// React Router for navigation between pages
 import { Link } from "react-router-dom"; // Navigation link component for login redirect
+import { useDispatch } from "react-redux";
+import { customer_register } from "../store/reducers/authReducer";
 
 /**
  * Register Functional Component
@@ -46,6 +41,8 @@ const Register = () => {
     email: "", // User's email address (used for login and communication)
     password: "", // User's chosen password for account security
   });
+
+  const dispatch = useDispatch();
 
   /**
    * Input Change Handler
@@ -67,7 +64,7 @@ const Register = () => {
    */
   const register = (e) => {
     e.preventDefault(); // Prevent default form submission behavior
-    console.log(state); // Log form data for development (replace with API call)
+    dispatch(customer_register(state));
   };
 
   return (
