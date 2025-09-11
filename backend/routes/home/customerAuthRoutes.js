@@ -8,5 +8,7 @@ router.post(
   customerAuthControllers.customer_register
 );
 
+router.post("/customer/customer-login", customerAuthControllers.customer_login);
+
 // Export the router to be used in the main server application
 module.exports = router;

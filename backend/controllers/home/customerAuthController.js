@@ -74,6 +74,67 @@ class customerAuthControllers {
     }
   };
   // End of customer_register method
+
+  /**
+   * Handles customer login authentication.
+   * This method validates customer credentials, compares the provided password
+   * with the stored hashed password, generates an authentication token,
+   * and sets a cookie for session management upon successful login.
+   *
+   * @param {Object} req - Express request object, expects body:
+   *   - email: customer's email address (string)
+   *   - password: customer's plain text password (string)
+   * @param {Object} res - Express response object
+   */
+  customer_login = async (req, res) => {
+    // Extract login credentials from the request body
+    const { email, password } = req.body;
+
+    try {
+      // Find customer by email and include the password field (normally excluded)
+      const customer = await customerModel
+        .findOne({ email })
+        .select("+password"); // Include password field for comparison
+
+      if (customer) {
+        // Compare provided password with stored hashed password
+        const match = await bcrypt.compare(password, customer.password);
+
+        if (match) {
+          // Generate JWT token with customer information for authentication
+          const token = await createToken({
+            id: customer.id, // Customer's unique ID
+            name: customer.name, // Customer's name
+            email: customer.email, // Customer's email
+            method: customer.method, // Registration method
+          });
+
+          // Set authentication token as HTTP cookie with 7-day expiration
+          res.cookie("customerToken", token, {
+            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Cookie expires in 7 days
+          });
+
+          // Return success response with token
+          responseReturn(res, 201, {
+            message: "User Login Successfully",
+            token, // Include token in response for client-side storage
+          });
+        } else {
+          // Return error response if password doesn't match
+          responseReturn(res, 404, { error: "Password Wrong" });
+        }
+      } else {
+        // Return error response if email is not found in database
+        responseReturn(res, 404, { error: "Email Not Found" });
+      }
+    } catch (error) {
+      // Log error message to console for debugging purposes
+      console.log(error.message);
+      // Return internal server error response
+      responseReturn(res, 500, "Internal Server Error");
+    }
+  };
+  // End of customer_login method
 }
 
 // Export instance of customerAuthControllers for use in routes
