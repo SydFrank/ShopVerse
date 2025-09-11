@@ -28,6 +28,8 @@ const Header = () => {
 
   // Select categories data from home reducer state
   const { categorys } = useSelector((state) => state.home);
+  // Select user information from auth reducer state
+  const { userInfo } = useSelector((state) => state.auth);
 
   // Get the current pathname from the URL
   const { pathname } = useLocation();
@@ -115,7 +117,7 @@ const Header = () => {
               </div>
 
               {/* Conditional rendering based on user login status */}
-              {user ? (
+              {userInfo ? (
                 /* Logged in user display */
                 <Link
                   className="flex cursor-pointer justify-center items-center gap-2 text-sm text-black "
@@ -124,7 +126,7 @@ const Header = () => {
                   <span>
                     <FaUserAlt />
                   </span>
-                  <span>George Li</span>
+                  <span>{userInfo.name}</span>
                 </Link>
               ) : (
                 /* Login link for non-logged in users */
@@ -295,7 +297,7 @@ const Header = () => {
               </div>
 
               {/* Conditional rendering based on user login status */}
-              {user ? (
+              {userInfo ? (
                 /* Logged in user display */
                 <Link
                   className="flex cursor-pointer justify-center items-center gap-2 text-sm text-black "
@@ -304,7 +306,7 @@ const Header = () => {
                   <span>
                     <FaUserAlt />
                   </span>
-                  <span>George Li</span>
+                  <span>{userInfo.name}</span>
                 </Link>
               ) : (
                 /* Login link for non-logged in users */

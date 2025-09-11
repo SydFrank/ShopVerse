@@ -21,25 +21,31 @@
  */
 
 // React core imports for functional component with state management
-import React, { useState } from "react";
-
-// Custom component imports for page structure
-import Header from "../components/Header"; // Website header with navigation and branding
-import Footer from "../components/Footer"; // Website footer with links and company info
-
-// React Icons for social media authentication buttons
-import { FaFacebookF } from "react-icons/fa"; // Facebook icon for social login
-import { IoLogoGoogle } from "react-icons/io5"; // Google icon for social login
-
+import React, { useState, useEffect } from "react";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import { FaFacebookF } from "react-icons/fa";
+import { IoLogoGoogle } from "react-icons/io5";
 // React Router for navigation between pages
-import { Link } from "react-router-dom"; // Navigation link component for register redirect
+import { Link, useNavigate } from "react-router-dom"; // Navigation link component for register redirect
+import { useDispatch, useSelector } from "react-redux";
+import { customer_login, messageClear } from "../store/reducers/authReducer";
+import toast from "react-hot-toast"; // Toast notifications
+import { FadeLoader } from "react-spinners";
 
 /**
  * Login Functional Component
  * Manages user authentication form state and login submission handling
  */
 const Login = () => {
-  // Login form state object containing user credentials
+  const dispatch = useDispatch();
+
+  const navigate = useNavigate();
+
+  const { loader, errorMessage, successMessage, userInfo } = useSelector(
+    (state) => state.auth
+  );
+
   // Manages controlled inputs for email and password authentication
   const [state, setState] = useState({
     email: "", // User's email address for authentication
@@ -66,11 +72,40 @@ const Login = () => {
    */
   const login = (e) => {
     e.preventDefault(); // Prevent default form submission behavior
-    console.log(state); // Log credentials for development (replace with API authentication call)
+    // console.log(state);
+    dispatch(customer_login(state)); // Dispatch login action with user credentials
   };
+
+  /**
+   * Effect Hook for Message Handling
+   * Monitors authentication state changes and displays toast notifications
+   * for success/error messages. Automatically clears messages after display
+   * to prevent persistent notifications on subsequent renders.
+   */
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage); // Show success toast notification
+      dispatch(messageClear()); // Clear message from Redux state
+    }
+    if (errorMessage) {
+      toast.error(errorMessage); // Show error toast notification
+      dispatch(messageClear()); // Clear message from Redux state
+    }
+    if (userInfo) {
+      navigate("/"); // Redirect to homepage on successful login
+    }
+  }, [successMessage, errorMessage]); // Dependencies: re-run when messages or dispatch change
 
   return (
     <div>
+      {/* Loading Overlay - Full screen spinner during login process */}
+      {loader && (
+        <div className="w-screen h-screen flex justify-center items-center fixed left-0 top-0 bg-[#38303033] z-[999]">
+          {/* FadeLoader component provides visual feedback during API calls */}
+          <FadeLoader />
+        </div>
+      )}
+
       {/* Website header component with navigation and user authentication */}
       <Header />
 

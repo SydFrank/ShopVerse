@@ -25,7 +25,7 @@ import Header from "../components/Header"; // Website header with navigation and
 import Footer from "../components/Footer"; // Website footer with links and company info
 import { FaFacebookF } from "react-icons/fa"; // Facebook icon for social login
 import { IoLogoGoogle } from "react-icons/io5"; // Google icon for social login
-import { Link } from "react-router-dom"; // Navigation link component for login redirect
+import { Link, useNavigate } from "react-router-dom"; // Navigation link component for login redirect
 import { useDispatch, useSelector } from "react-redux";
 import { customer_register, messageClear } from "../store/reducers/authReducer";
 import toast from "react-hot-toast"; // Toast notifications
@@ -40,9 +40,11 @@ const Register = () => {
   // loader: boolean indicating if registration request is in progress
   // errorMessage: string containing error message if registration fails
   // successMessage: string containing success message if registration succeeds
-  const { loader, errorMessage, successMessage } = useSelector(
+  const { loader, errorMessage, successMessage, userInfo } = useSelector(
     (state) => state.auth
   );
+
+  const navigate = useNavigate();
 
   // Registration form state object containing user input fields
   // Manages controlled inputs for name, email, and password
@@ -93,7 +95,10 @@ const Register = () => {
       toast.error(errorMessage); // Show error toast notification
       dispatch(messageClear()); // Clear message from Redux state
     }
-  }, [successMessage, errorMessage, dispatch]); // Dependencies: re-run when messages or dispatch change
+    if (userInfo) {
+      navigate("/"); // Redirect to homepage on successful registration
+    }
+  }, [successMessage, errorMessage]); // Dependencies: re-run when messages or dispatch change
 
   return (
     <div>
