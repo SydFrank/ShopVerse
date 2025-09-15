@@ -36,69 +36,48 @@ import { FadeLoader } from "react-spinners";
  * Manages user registration form state and submission handling
  */
 const Register = () => {
-  // Extract authentication state from Redux store
-  // loader: boolean indicating if registration request is in progress
-  // errorMessage: string containing error message if registration fails
-  // successMessage: string containing success message if registration succeeds
+  // Get auth state: loader, messages, and user info
   const { loader, errorMessage, successMessage, userInfo } = useSelector(
     (state) => state.auth
   );
 
   const navigate = useNavigate();
 
-  // Registration form state object containing user input fields
-  // Manages controlled inputs for name, email, and password
+  // Form state for name, email, and password
   const [state, setState] = useState({
-    name: "", // User's full name for account creation
-    email: "", // User's email address (used for login and communication)
-    password: "", // User's chosen password for account security
+    name: "",
+    email: "",
+    password: "",
   });
 
-  // Redux dispatch function for triggering actions
+  // Redux dispatch function
   const dispatch = useDispatch();
 
-  /**
-   * Input Change Handler
-   * Handles controlled input updates for all form fields using dynamic property assignment.
-   * Uses the input's name attribute to update the corresponding state property.
-   *
-   * @param {Event} e - Input change event containing name and value
-   */
+  // Handle input changes
   const inputHandler = (e) => {
     setState({ ...state, [e.target.name]: e.target.value });
   };
 
-  /**
-   * Registration Form Submission Handler
-   * Processes the registration form submission and handles user account creation.
-   * Dispatches customer_register action with form data to Redux store.
-   *
-   * @param {Event} e - Form submission event
-   */
+  // Handle form submission
   const register = (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
+    e.preventDefault();
     dispatch(customer_register(state));
   };
 
-  /**
-   * Effect Hook for Message Handling
-   * Monitors authentication state changes and displays toast notifications
-   * for success/error messages. Automatically clears messages after display
-   * to prevent persistent notifications on subsequent renders.
-   */
+  // Show toast messages and handle successful registration
   useEffect(() => {
     if (successMessage) {
-      toast.success(successMessage); // Show success toast notification
-      dispatch(messageClear()); // Clear message from Redux state
+      toast.success(successMessage);
+      dispatch(messageClear());
     }
     if (errorMessage) {
-      toast.error(errorMessage); // Show error toast notification
-      dispatch(messageClear()); // Clear message from Redux state
+      toast.error(errorMessage);
+      dispatch(messageClear());
     }
     if (userInfo) {
       navigate("/"); // Redirect to homepage on successful registration
     }
-  }, [successMessage, errorMessage]); // Dependencies: re-run when messages or dispatch change
+  }, [successMessage, errorMessage, dispatch, navigate, userInfo]);
 
   return (
     <div>

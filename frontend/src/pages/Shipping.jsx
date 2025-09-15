@@ -1,111 +1,56 @@
-// React core imports for functional component with state management
+/**
+ * Shipping Page - Shipping information and order checkout
+ * Handles address form, cart display, and order summary
+ */
+
 import React, { useState } from "react";
-
-// Custom component imports for page structure
-import Header from "../components/Header"; // Website header with navigation and user info
-import Footer from "../components/Footer"; // Website footer with links and company info
-
-// React Icons library for UI elements
-import { IoIosArrowForward } from "react-icons/io"; // Forward arrow icon for breadcrumb navigation
-
-// React Router for navigation between pages
-import { Link } from "react-router-dom"; // React Router Link component for navigation
-
-/**
- * Shipping Component - E-commerce Shipping Information and Order Summary Page
- *
- * This component renders the shipping page of the ShopVerse e-commerce application,
- * handling user shipping information collection, address management, cart item display,
- * and order summary with checkout functionality. The page includes form validation,
- * responsive design, and conditional rendering based on whether shipping information
- * has been saved or not.
- *
- * Features:
- * - Comprehensive shipping address form with 7 fields (name, address, phone, etc.)
- * - Form validation and controlled inputs with real-time updates
- * - Toggle between form editing and saved address display modes
- * - Cart items display with product details, pricing, and quantity controls
- * - Order summary calculation with itemized breakdown and total
- * - Responsive design optimized for all screen sizes
- * - Conditional checkout button based on shipping information completion
- *
- * @component
- * @returns {JSX.Element} Complete shipping page with form, cart, and checkout
- */
-
-/**
- * Shipping Functional Component
- * Manages shipping information form, cart display, and order checkout process
- */
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import { IoIosArrowForward } from "react-icons/io";
+import { Link } from "react-router-dom";
 const Shipping = () => {
-  // State to track whether shipping information has been saved and confirmed
-  // Controls the display toggle between form editing mode and address confirmation mode
+  // Toggle between form and saved address display
   const [res, setRes] = useState(false);
 
-  // Get the state from the location (currently commented out)
-  // const { state } = useLocation();
-  // console.log(state);
-
-  // Shipping form state object containing all required address fields
-  // Manages controlled inputs for comprehensive shipping information collection
+  // Shipping form state
   const [state, setState] = useState({
-    name: "", // Customer's full name for shipping
-    address: "", // Street address for delivery
-    phone: "", // Contact phone number for delivery coordination
-    post: "", // Postal/ZIP code for location identification
-    province: "", // Province/state for regional addressing
-    city: "", // City name for delivery location
-    area: "", // Specific area/district for precise delivery
+    name: "",
+    address: "",
+    phone: "",
+    post: "",
+    province: "",
+    city: "",
+    area: "",
   });
 
-  /**
-   * Input Change Handler
-   * Handles controlled input updates for all form fields using dynamic property assignment.
-   * Uses the input's name attribute to update the corresponding state property.
-   *
-   * @param {Event} e - Input change event containing name and value
-   */
+  // Handle input changes
   const inputHandle = (e) => {
     setState({ ...state, [e.target.name]: e.target.value });
   };
 
-  /**
-   * Form Submission Handler
-   * Processes shipping information form submission with validation and state update.
-   * Validates all required fields are filled before enabling confirmation mode.
-   * In production, this would send data to backend API for processing.
-   *
-   * @param {Event} e - Form submission event
-   */
+  // Save shipping information
   const save = (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
-    // console.log(state);
-
-    // Destructure all required shipping fields for validation
+    e.preventDefault();
     const { name, address, phone, post, province, city, area } = state;
 
-    // Validate all fields are populated before proceeding
+    // Validate all fields are filled
     if (name && address && phone && post && province && city && area) {
-      // Send the data to the server (commented for development)
-      // console.log("Sending data to the server:", state);
-      setRes(true); // Switch to address confirmation display mode
+      setRes(true); // Show saved address
     }
   };
 
   return (
     <div>
-      {/* Website header component with navigation and user authentication */}
+      {/* Header */}
       <Header />
 
-      {/* Hero banner section with shipping page title and breadcrumb navigation */}
+      {/* Page Banner */}
       <section className="bg-[url('/images/banner/shop.png')] h-[220px] mt-6 bg-cover bg-no-repeat relative bg-left">
-        {/* Dark overlay for better text readability over background image */}
         <div className="absolute left-0 top-0 w-full h-full bg-[#2422228a]">
           <div className="w-[85%] max-md:w-[80%] max-sm:w-[90%] max-lg:w-[90%] h-full mx-auto">
-            {/* Centered content with page title and navigation breadcrumb */}
             <div className="flex flex-col justify-center gap-1 items-center h-full w-full text-white">
               <h2 className="text-3xl font-bold ">Shipping Page</h2>
-              {/* Breadcrumb navigation for user orientation */}
+              {/* Breadcrumb Navigation */}
               <div className="flex justify-center items-center gap-2 text-2xl w-full">
                 <Link to="/">Home</Link>
                 <span className="pt-1">
@@ -118,20 +63,20 @@ const Shipping = () => {
         </div>
       </section>
 
-      {/* Main content section with shipping form and cart summary */}
+      {/* Main Content */}
       <section className="bg-[#eeeeee]">
         <div className="w-[85%] max-lg:w-[90%] max-md:w-[90%] max-sm:w-[90%] mx-auto py-16">
           <div className="w-full flex flex-wrap ">
-            {/* Left section: Shipping information form and cart items (67% width on desktop) */}
+            {/* Left: Shipping Form & Cart */}
             <div className="w-[67%] max-lg:w-full ">
               <div className="flex flex-col gap-3">
-                {/* Shipping information form container */}
+                {/* Shipping Information */}
                 <div className="bg-white p-6 shadow-sm rounded-md">
                   <h2 className="text-slate-600 font-bold pb-3 ">
                     Shipping Information
                   </h2>
 
-                  {/* Conditional rendering: Show form when address not saved (!res) */}
+                  {/* Show form or saved address */}
                   {!res && (
                     <>
                       <form onSubmit={save}>
@@ -409,7 +354,7 @@ const Shipping = () => {
         </div>
       </section>
 
-      {/* Website footer component with links and company information */}
+      {/* Footer */}
       <Footer />
     </div>
   );
