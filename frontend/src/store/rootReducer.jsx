@@ -20,6 +20,7 @@
 // Feature-specific reducer imports
 import homeReducer from "./reducers/homeReducer";
 import authReducer from "./reducers/authReducer";
+import cartReducer from "./reducers/cartReducer";
 
 /**
  * Root Reducer Object
@@ -35,6 +36,7 @@ import authReducer from "./reducers/authReducer";
 const rootReducer = {
   home: homeReducer,
   auth: authReducer,
+  cart: cartReducer,
 };
 
 // Export the composed root reducer for use in store configuration
