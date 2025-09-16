@@ -8,7 +8,7 @@ import { IoIosArrowForward } from "react-icons/io"; // Forward arrow icon for br
 import { Link, useNavigate } from "react-router-dom"; // React Router Link component for navigation
 
 /**
- * Card Component - Shopping Cart Page
+ * Cart Component - Shopping Cart Page
  * Displays user's shopping cart with in-stock and out-of-stock products
  * Features product management (quantity adjustment, removal), order summary, and checkout
  * Includes responsive design for mobile and desktop views
@@ -16,7 +16,7 @@ import { Link, useNavigate } from "react-router-dom"; // React Router Link compo
  *
  * @returns {JSX.Element} Complete shopping cart page with product management and checkout functionality
  */
-const Card = () => {
+const Cart = () => {
   // Initialize navigation hook
   const navigate = useNavigate();
   // Mock data for cart products - represents items currently in user's shopping cart
@@ -292,5 +292,5 @@ const Card = () => {
   );
 };
 
-// Export the Card component as default export for use in other parts of the application
-export default Card;
+// Export the Cart component as default export for use in other parts of the application
+export default Cart;

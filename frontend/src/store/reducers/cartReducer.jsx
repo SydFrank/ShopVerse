@@ -101,7 +101,7 @@ export const cartReducer = createSlice({
       // Add to cart success state
       .addCase(add_to_cart.fulfilled, (state, { payload }) => {
         state.successMessage = payload.message; // Display success message to user
-        state.cart_product_count = payload.cart_product_count + 1; // Update cart badge count
+        state.cart_product_count = state.cart_product_count + 1; // Update cart badge count
       })
 
       // Add to cart error state

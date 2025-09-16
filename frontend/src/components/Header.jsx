@@ -8,7 +8,6 @@ import { MdKeyboardArrowDown } from "react-icons/md"; // Dropdown arrow icon
 import { FaFacebookF, FaList } from "react-icons/fa"; // Facebook icon
 import { FaTwitter } from "react-icons/fa"; // Twitter icon
 import { FaLinkedinIn } from "react-icons/fa"; // LinkedIn icon
-import { FaGithub } from "react-icons/fa6"; // GitHub icon
 import { FaUserAlt } from "react-icons/fa"; // User icon
 import { FaLock } from "react-icons/fa"; // Lock icon
 // Import Link component from React Router for navigation
@@ -30,6 +29,8 @@ const Header = () => {
   const { categorys } = useSelector((state) => state.home);
   // Select user information from auth reducer state
   const { userInfo } = useSelector((state) => state.auth);
+  // Select cart product count from cart reducer state
+  const { cart_product_count } = useSelector((state) => state.cart);
 
   // Get the current pathname from the URL
   const { pathname } = useLocation();
@@ -55,6 +56,14 @@ const Header = () => {
     // console.log(category);
     // console.log(searchValue);
     navigate(`/products/search?category=${category}&&value=${searchValue}`);
+  };
+
+  const redirect_cart_page = () => {
+    if (userInfo) {
+      navigate("/cart");
+    } else {
+      navigate("/login");
+    }
   };
 
   return (
@@ -249,13 +258,19 @@ const Header = () => {
                     </div>
 
                     {/* Cart icon with count */}
-                    <div className="relative flex justify-center items-center cursor-pointer w-[35px] h-[35px] rounded-full bg-[#e2e2e2]">
+                    <div
+                      onClick={redirect_cart_page}
+                      className="relative flex justify-center items-center cursor-pointer w-[35px] h-[35px] rounded-full bg-[#e2e2e2]"
+                    >
                       <span className="text-xl text-green-500">
                         <FaShoppingCart />
                       </span>
-                      <div className="w-[20px] h-[20px] absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px]">
-                        {wishlist_count}
-                      </div>
+
+                      {cart_product_count !== 0 && (
+                        <div className="w-[20px] h-[20px] absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px]">
+                          {cart_product_count}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
