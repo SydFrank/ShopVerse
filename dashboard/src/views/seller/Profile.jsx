@@ -80,7 +80,7 @@ const Profile = () => {
    * - Clears messages from Redux after displaying.
    */
   useEffect(() => {
-    if (successMessage) {
+    if (successMessage && successMessage !== "Login success") {
       toast.success(successMessage);
       dispatch(messageClear());
     }
