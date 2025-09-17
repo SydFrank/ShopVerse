@@ -149,7 +149,7 @@ const AddProduct = () => {
     formData.append("price", state.price);
     formData.append("discount", state.discount);
     formData.append("description", state.description);
-    formData.append("shopName", "EasyShop"); // Hardcoded shop name
+    // formData.append("shopName", userInfo.shopName);
     formData.append("category", category);
 
     // Append all uploaded images to the form data
