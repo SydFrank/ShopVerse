@@ -2,6 +2,8 @@
 const cartModel = require("../../models/cartModel");
 // Import custom response utility for consistent API responses
 const { responseReturn } = require("../../utils/response");
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 // Define the cartControllers class to handle shopping cart related logic
 class cartControllers {
@@ -67,6 +69,59 @@ class cartControllers {
     }
   };
   // End of add_to_cart method
+
+  get_cart_products = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+      const cart_products = await cartModel.aggregate([
+        {
+          $match: {
+            userId: {
+              $eq: new ObjectId(userId),
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: "products", // Name of the products collection
+            localField: "productId", // Field in cartModel
+            foreignField: "_id", // Field in products collection
+            as: "products", // Alias for the joined data
+          },
+        },
+      ]);
+
+      let buy_product_item = 0;
+      let calculate_price = 0;
+      let cart_product_count = 0;
+      const outOfStockProduct = cart_products.filter((item) => {
+        return item.products[0].stock < item.quantity;
+      });
+      for (let i = 0; i < outOfStockProduct.length; i++) {
+        cart_product_count = cart_product_count + outOfStockProduct[i].quantity;
+      }
+      const stockProduct = cart_products.filter((item) => {
+        return item.products[0].stock >= item.quantity;
+      });
+      for (let i = 0; i < stockProduct.length; i++) {
+        const { quantity } = stockProduct[i];
+        cart_product_count = cart_product_count + quantity;
+        buy_product_item = buy_product_item + quantity;
+        const { discount, price } = stockProduct[i].products[0];
+        if (discount !== 0) {
+          calculate_price =
+            calculate_price + quantity * (price - price * (discount / 100));
+        } else {
+          calculate_price = calculate_price + quantity * price;
+        }
+      }
+      calculate_price = parseFloat(calculate_price.toFixed(2));
+
+      console.log(calculate_price);
+    } catch (error) {}
+  };
+  // End of get_cart_products method
 }
 
 // Export instance of cartControllers for use in routes
