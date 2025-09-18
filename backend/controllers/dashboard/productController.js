@@ -6,6 +6,7 @@ const { responseReturn } = require("../../utils/response");
 const cloudinary = require("cloudinary").v2;
 // Import the product model for database operations
 const productModel = require("../../models/productModel");
+const sellerModel = require("../../models/sellerModel");
 
 // Define the productController class to handle product-related logic
 class productController {
@@ -41,8 +42,11 @@ class productController {
         stock,
         discount,
         description,
-        shopName,
+        // shopName,
       } = fields;
+      const seller = await sellerModel.findById(id);
+      const shopName = seller.shopInfo.shopName;
+
       // Extract the image files from the parsed files
       const { image } = files;
       // Trim whitespace from the product name

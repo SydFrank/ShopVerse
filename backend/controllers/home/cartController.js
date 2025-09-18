@@ -70,56 +70,167 @@ class cartControllers {
   };
   // End of add_to_cart method
 
+  /**
+   * Handles retrieving and calculating cart products for a specific user.
+   * This method aggregates cart items with product details, separates in-stock
+   * and out-of-stock products, calculates total prices including discounts and
+   * commission, groups products by seller, and returns comprehensive cart information.
+   *
+   * @param {Object} req - Express request object, expects params:
+   *   - userId: ID of the customer whose cart to retrieve (string)
+   * @param {Object} res - Express response object
+   */
   get_cart_products = async (req, res) => {
+    // Define commission percentage that will be deducted from seller's earnings
+    const commision = 5; // 5% commission on each product
+    // Extract userId from request parameters
     const { userId } = req.params;
 
     try {
+      // Aggregate cart products with product details using MongoDB aggregation pipeline
       const cart_products = await cartModel.aggregate([
         {
+          // Match cart items belonging to the specific user
           $match: {
             userId: {
-              $eq: new ObjectId(userId),
+              $eq: new ObjectId(userId), // Convert userId string to ObjectId for matching
             },
           },
         },
         {
+          // Join cart items with product collection to get product details
           $lookup: {
-            from: "products", // Name of the products collection
-            localField: "productId", // Field in cartModel
-            foreignField: "_id", // Field in products collection
-            as: "products", // Alias for the joined data
+            from: "products", // Name of the products collection in MongoDB
+            localField: "productId", // Field in cartModel that references product
+            foreignField: "_id", // Field in products collection (primary key)
+            as: "products", // Alias for the joined product data
           },
         },
       ]);
 
-      let buy_product_item = 0;
-      let calculate_price = 0;
-      let cart_product_count = 0;
+      // Initialize variables for calculations
+      let buy_product_item = 0; // Count of items that can be purchased (in stock)
+      let calculate_price = 0; // Total price of purchasable items
+      let cart_product_count = 0; // Total count of all items in cart
+
+      // Filter products that are out of stock (insufficient inventory)
       const outOfStockProduct = cart_products.filter((item) => {
-        return item.products[0].stock < item.quantity;
+        return item.products[0].stock < item.quantity; // Check if requested quantity exceeds available stock
       });
+
+      // Count total quantity of out-of-stock products
       for (let i = 0; i < outOfStockProduct.length; i++) {
         cart_product_count = cart_product_count + outOfStockProduct[i].quantity;
       }
+
+      // Filter products that are in stock (sufficient inventory)
       const stockProduct = cart_products.filter((item) => {
-        return item.products[0].stock >= item.quantity;
+        return item.products[0].stock >= item.quantity; // Check if stock is sufficient for requested quantity
       });
+
+      // Calculate total price and quantities for in-stock products
       for (let i = 0; i < stockProduct.length; i++) {
-        const { quantity } = stockProduct[i];
-        cart_product_count = cart_product_count + quantity;
-        buy_product_item = buy_product_item + quantity;
+        const { quantity } = stockProduct[i]; // Get quantity from cart item
+        cart_product_count = cart_product_count + quantity; // Add to total cart count
+        buy_product_item = buy_product_item + quantity; // Add to purchasable items count
+
+        // Get product pricing information
         const { discount, price } = stockProduct[i].products[0];
+
+        // Calculate price based on whether discount is applied
         if (discount !== 0) {
+          // Apply discount: final price = original price - (original price * discount percentage)
           calculate_price =
             calculate_price + quantity * (price - price * (discount / 100));
         } else {
+          // No discount: use original price
           calculate_price = calculate_price + quantity * price;
         }
       }
+
+      // Round calculated price to 2 decimal places
       calculate_price = parseFloat(calculate_price.toFixed(2));
 
-      console.log(calculate_price);
-    } catch (error) {}
+      // Initialize array to store products grouped by seller
+      let product = [];
+
+      // Get unique seller IDs from in-stock products
+      let unique = [
+        ...new Set(
+          stockProduct.map((item) => item.products[0].sellerId.toString())
+        ),
+      ];
+
+      // Group products by seller and calculate seller-specific totals
+      for (let i = 0; i < unique.length; i++) {
+        let price = 0; // Initialize price for current seller
+
+        // Process all products for current seller
+        for (let j = 0; j < stockProduct.length; j++) {
+          const tempProduct = stockProduct[j].products[0]; // Get product details
+
+          // Check if current product belongs to current seller
+          if (unique[i] === tempProduct.sellerId.toString()) {
+            let singleProductPrice = 0;
+
+            // Calculate single product price with discount if applicable
+            if (tempProduct.discount !== 0) {
+              singleProductPrice =
+                tempProduct.price -
+                Math.floor(tempProduct.price * (tempProduct.discount / 100));
+            } else {
+              singleProductPrice = tempProduct.price;
+            }
+
+            // Deduct commission from seller's price
+            singleProductPrice =
+              singleProductPrice -
+              Math.floor(singleProductPrice * (commision / 100));
+
+            // Calculate total price for this product (price * quantity)
+            price = price + singleProductPrice * stockProduct[j].quantity;
+
+            // Build product object grouped by seller
+            product[i] = {
+              sellerId: unique[i], // Seller's unique ID
+              shopName: tempProduct.shopName, // Seller's shop name
+              price, // Total price for all products from this seller
+              products: product[i]
+                ? [
+                    // If seller already has products, add to existing array
+                    ...product[i].products,
+                    {
+                      _id: stockProduct[j]._id, // Cart item ID
+                      quantity: stockProduct[j].quantity, // Quantity in cart
+                      productInfo: tempProduct, // Complete product information
+                    },
+                  ]
+                : [
+                    // If first product for this seller, create new array
+                    {
+                      _id: stockProduct[j]._id, // Cart item ID
+                      quantity: stockProduct[j].quantity, // Quantity in cart
+                      productInfo: tempProduct, // Complete product information
+                    },
+                  ],
+            };
+          }
+        }
+      }
+
+      // Return comprehensive cart information
+      responseReturn(res, 200, {
+        cart_products: product, // Products grouped by seller
+        price: calculate_price, // Total price of purchasable items
+        cart_product_count, // Total number of items in cart
+        shipping_fee: 20 * product.length, // Shipping fee (20 per seller)
+        buy_product_item, // Number of items that can be purchased
+        outOfStockProduct, // Array of out-of-stock products
+      });
+    } catch (error) {
+      // Return error response if any exception occurs
+      responseReturn(res, 500, { error: "Internal Server Error" });
+    }
   };
   // End of get_cart_products method
 }
