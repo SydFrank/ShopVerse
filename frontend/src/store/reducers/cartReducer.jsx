@@ -51,6 +51,32 @@ export const add_to_cart = createAsyncThunk(
     }
   }
 );
+// End of add_to_cart thunk
+
+/**
+ * Get Cart Products - Fetch user's cart items from backend
+ * Retrieves all products in user's shopping cart with quantities and pricing
+ *
+ * @param {string} userId - Customer's unique identifier
+ * @param {Object} thunkAPI - Redux Toolkit thunk API helpers
+ * @returns {Promise} - Resolved with cart products array or rejected with error
+ */
+export const get_cart_products = createAsyncThunk(
+  "cart/get_cart_products", // Action type prefix for Redux DevTools
+  async (userId, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      // Make API request to get cart products for specific user
+      const { data } = await api.get(
+        `/home/product/get-cart-products/${userId}`
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      // Return error data for proper error handling in UI
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of get_cart_products thunk
 
 /**
  * Cart slice configuration
@@ -75,6 +101,7 @@ export const cartReducer = createSlice({
     successMessage: "", // Success messages for completed cart operations
     shipping_fee: 0, // Calculated shipping cost based on cart total
     outofstock_products: [], // Array of products that are out of stock
+    buy_product_item: 0, // Specific item to buy (for direct purchase flow)
   },
 
   // Synchronous reducers for immediate state updates
@@ -107,6 +134,14 @@ export const cartReducer = createSlice({
       // Add to cart error state
       .addCase(add_to_cart.rejected, (state, { payload }) => {
         state.errorMessage = payload.error; // Display error message from API
+      })
+      .addCase(get_cart_products.fulfilled, (state, { payload }) => {
+        state.cart_products = payload.cart_products; // Update cart products array
+        state.price = payload.price; // Update total cart price
+        state.cart_product_count = payload.cart_product_count; // Update cart item count
+        state.shipping_fee = payload.shipping_fee; // Update shipping fee
+        state.outofstock_products = payload.outOfStockProduct; // Update out-of-stock items
+        state.buy_product_item = payload.buy_product_item; // Update buy product item
       });
   },
 });

@@ -1,11 +1,13 @@
 // Import React library
-import React from "react";
+import React, { useEffect } from "react";
 // Import layout components
 import Header from "../components/Header"; // Website header component
 import Footer from "../components/Footer"; // Website footer component
 // Import navigation components and icons
 import { IoIosArrowForward } from "react-icons/io"; // Forward arrow icon for breadcrumb navigation
 import { Link, useNavigate } from "react-router-dom"; // React Router Link component for navigation
+import { useDispatch, useSelector } from "react-redux";
+import { get_cart_products } from "../store/reducers/cartReducer";
 
 /**
  * Cart Component - Shopping Cart Page
@@ -17,15 +19,24 @@ import { Link, useNavigate } from "react-router-dom"; // React Router Link compo
  * @returns {JSX.Element} Complete shopping cart page with product management and checkout functionality
  */
 const Cart = () => {
+  const dispatch = useDispatch();
+
+  const { userInfo } = useSelector((state) => state.auth);
+  const {
+    cart_products,
+    price,
+    buy_product_item,
+    shipping_fee,
+    outofstock_products,
+    successMessage,
+  } = useSelector((state) => state.cart);
+
   // Initialize navigation hook
   const navigate = useNavigate();
-  // Mock data for cart products - represents items currently in user's shopping cart
-  // In production, this would be fetched from state management (Redux) or API
-  const card_products = [1, 2]; // Array of product IDs or product objects
 
-  // Mock data for out-of-stock products - items that are no longer available
-  // These products remain in cart but cannot be purchased
-  const outOfStockProducts = [1, 2]; // Array of unavailable product IDs
+  useEffect(() => {
+    dispatch(get_cart_products(userInfo.id));
+  }, []);
 
   // Redirect to shipping page
   const redirect = () => {
@@ -69,7 +80,7 @@ const Cart = () => {
       <section className="bg-[#eeeeee]">
         <div className="w-[85%] max-lg:w-[90%] max-md:w-[90%] max-sm:w-[90%] mx-auto py-16">
           {/* Conditional rendering: show cart contents if products exist, otherwise show empty cart */}
-          {card_products.length > 0 || outOfStockProducts.length > 0 ? (
+          {cart_products.length > 0 || outofstock_products.length > 0 ? (
             <div className="flex flex-wrap">
               {/* Left section: Cart items (67% width on desktop, full width on mobile) */}
               <div className="w-[67%] max-lg:w-full">
@@ -78,12 +89,12 @@ const Cart = () => {
                     {/* In-stock products section */}
                     <div className="bg-white p-4">
                       <h2 className="text-md text-green-500 font-semibold">
-                        Stock Products {card_products.length}
+                        Stock Products {cart_products.length}
                       </h2>
                     </div>
 
                     {/* Map through in-stock products to display cart items */}
-                    {card_products.map((p, i) => (
+                    {cart_products.map((p, i) => (
                       <div
                         key={i}
                         className="flex bg-white p-4 flex-col gap-2 "
@@ -91,12 +102,12 @@ const Cart = () => {
                         {/* Store/seller information header */}
                         <div className="flex justify-start items-center">
                           <h2 className="text-md text-slate-600 font-bold ">
-                            Easy Shop
+                            {p.shopName}
                           </h2>
                         </div>
 
                         {/* Map through products from this seller */}
-                        {[1, 2].map((product, index) => (
+                        {p.products.map((pt, index) => (
                           <div key={index} className="w-full flex flex-wrap ">
                             {/* Left section: Product image and details (58% width) */}
                             <div className="flex max-sm:w-full gap-2 w-7/12">
@@ -104,16 +115,18 @@ const Cart = () => {
                                 {/* Product image */}
                                 <img
                                   className="w-[80px] h-[80px]"
-                                  src={`/images/products/${index + 1}.webp`}
+                                  src={pt.productInfo.images[0]}
                                   alt={`Product ${index + 1}`} // Accessible alt text
                                 />
 
                                 {/* Product information */}
                                 <div className="pr-4 text-slate-600">
                                   <h2 className="text-md font-semibold">
-                                    Product Name
+                                    {pt.productInfo.name}
                                   </h2>
-                                  <span className="text-sm">Brand: VIVO</span>
+                                  <span className="text-sm">
+                                    Brand: {pt.productInfo.brand}
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -123,11 +136,19 @@ const Cart = () => {
                               {/* Price information with discount */}
                               <div className="pl-4 max-sm:pl-0 ">
                                 <h2 className="text-lg text-orange-500">
-                                  $1500 {/* Current discounted price */}
+                                  {pt.productInfo.price -
+                                    Math.floor(
+                                      pt.productInfo.price *
+                                        (pt.productInfo.discount / 100)
+                                    )}{" "}
+                                  {/* Current discounted price */}
                                 </h2>
-                                <p className="line-through">$2000</p>{" "}
+                                <p className="line-through">
+                                  ${pt.productInfo.price}
+                                </p>{" "}
                                 {/* Original price with strikethrough */}
-                                <p>-25%</p> {/* Discount percentage */}
+                                <p>-{pt.productInfo.discount}%</p>{" "}
+                                {/* Discount percentage */}
                               </div>
 
                               {/* Quantity controls and delete button */}
@@ -136,7 +157,9 @@ const Cart = () => {
                                 <div className="flex bg-slate-200 h-[30px] justify-center items-center text-xl">
                                   <div className="px-3 cursor-pointer">-</div>{" "}
                                   {/* Decrease quantity */}
-                                  <div className="px-3 ">2</div>{" "}
+                                  <div className="px-3 ">
+                                    {pt.quantity}
+                                  </div>{" "}
                                   {/* Current quantity */}
                                   <div className="px-3 cursor-pointer">
                                     +
@@ -156,18 +179,18 @@ const Cart = () => {
                     ))}
 
                     {/* Out-of-stock products section - only show if there are unavailable items */}
-                    {outOfStockProducts.length > 0 && (
+                    {outofstock_products.length > 0 && (
                       <div className="flex flex-col gap-3">
                         {/* Out-of-stock section header */}
                         <div className="bg-white p-4">
                           <h2 className="text-md text-red-500 font-semibold">
-                            Out of Stock {outOfStockProducts.length}
+                            Out of Stock {outofstock_products.length}
                           </h2>
                         </div>
 
                         {/* Out-of-stock products container */}
                         <div className="bg-white p-4">
-                          {[1].map((product, index) => (
+                          {outofstock_products.map((p, index) => (
                             <div key={index} className="w-full flex flex-wrap ">
                               {/* Product image and details section */}
                               <div className="flex max-sm:w-full gap-2 w-7/12">
@@ -175,16 +198,18 @@ const Cart = () => {
                                   {/* Product image */}
                                   <img
                                     className="w-[80px] h-[80px]"
-                                    src={`/images/products/${index + 1}.webp`}
+                                    src={p.products[0].images[0]}
                                     alt={`Out of stock product ${index + 1}`} // Accessible alt text
                                   />
 
                                   {/* Product information */}
                                   <div className="pr-4 text-slate-600">
                                     <h2 className="text-md font-semibold">
-                                      Product Name
+                                      {p.products[0].name}
                                     </h2>
-                                    <span className="text-sm">Brand: VIVO</span>
+                                    <span className="text-sm">
+                                      Brand: {p.products[0].brand}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
@@ -194,10 +219,17 @@ const Cart = () => {
                                 {/* Price information (same as in-stock items) */}
                                 <div className="pl-4 max-sm:pl-0 ">
                                   <h2 className="text-lg text-orange-500">
-                                    $1500
+                                    $
+                                    {p.products[0].price -
+                                      Math.floor(
+                                        p.products[0].price *
+                                          (p.products[0].discount / 100)
+                                      )}
                                   </h2>
-                                  <p className="line-through">$2000</p>
-                                  <p>-25%</p>
+                                  <p className="line-through">
+                                    ${p.products[0].price}
+                                  </p>
+                                  <p>-{p.products[0].discount}%</p>
                                 </div>
 
                                 {/* Quantity controls (disabled for out-of-stock) and delete option */}
@@ -205,7 +237,7 @@ const Cart = () => {
                                   {/* Quantity selector (non-functional for out-of-stock items) */}
                                   <div className="flex bg-slate-200 h-[30px] justify-center items-center text-xl">
                                     <div className="px-3 cursor-pointer">-</div>
-                                    <div className="px-3 ">2</div>
+                                    <div className="px-3 ">{p.quantity}</div>
                                     <div className="px-3 cursor-pointer">+</div>
                                   </div>
 
@@ -228,7 +260,7 @@ const Cart = () => {
               <div className="w-[33%] max-lg:w-full ">
                 <div className="pl-3 max-md:pl-0 max-lg:mt-5">
                   {/* Order summary - only show if there are in-stock products */}
-                  {card_products.length > 0 && (
+                  {cart_products.length > 0 && (
                     <div className="bg-white p-3 text-slate-600 flex flex-col gap-3 ">
                       {/* Order summary header */}
                       <h2 className="text-xl font-bold">Order Summary</h2>
