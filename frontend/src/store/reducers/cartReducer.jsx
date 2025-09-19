@@ -79,6 +79,31 @@ export const get_cart_products = createAsyncThunk(
 // End of get_cart_products thunk
 
 /**
+ * Delete Cart Product - Remove specific item from user's shopping cart
+ * Handles API call to delete a product from cart and update cart state
+ *
+ * @param {string} cart_id - Unique identifier for the cart item to be removed
+ * @param {Object} thunkAPI - Redux Toolkit thunk API helpers
+ * @returns {Promise} - Resolved with success message or rejected with error
+ */
+export const delete_cart_product = createAsyncThunk(
+  "cart/delete_cart_product",
+  async (cart_id, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      // Make API request to delete specific cart product
+      const { data } = await api.delete(
+        `/home/product/delete-cart-product/${cart_id}`
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      // Return error data for proper error handling in UI
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of delete_cart_product thunk
+
+/**
  * Cart slice configuration
  * Defines initial state, reducers, and async action handlers for shopping cart
  *
@@ -135,6 +160,8 @@ export const cartReducer = createSlice({
       .addCase(add_to_cart.rejected, (state, { payload }) => {
         state.errorMessage = payload.error; // Display error message from API
       })
+
+      // Get cart products success state
       .addCase(get_cart_products.fulfilled, (state, { payload }) => {
         state.cart_products = payload.cart_products; // Update cart products array
         state.price = payload.price; // Update total cart price
@@ -142,6 +169,11 @@ export const cartReducer = createSlice({
         state.shipping_fee = payload.shipping_fee; // Update shipping fee
         state.outofstock_products = payload.outOfStockProduct; // Update out-of-stock items
         state.buy_product_item = payload.buy_product_item; // Update buy product item
+      })
+
+      // Delete cart product success state
+      .addCase(delete_cart_product.fulfilled, (state, { payload }) => {
+        state.successMessage = payload.message; // Display success message to user
       });
   },
 });

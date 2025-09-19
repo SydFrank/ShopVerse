@@ -7,7 +7,12 @@ import Footer from "../components/Footer"; // Website footer component
 import { IoIosArrowForward } from "react-icons/io"; // Forward arrow icon for breadcrumb navigation
 import { Link, useNavigate } from "react-router-dom"; // React Router Link component for navigation
 import { useDispatch, useSelector } from "react-redux";
-import { get_cart_products } from "../store/reducers/cartReducer";
+import {
+  get_cart_products,
+  delete_cart_product,
+  messageClear,
+} from "../store/reducers/cartReducer";
+import toast from "react-hot-toast"; // Toast notifications
 
 /**
  * Cart Component - Shopping Cart Page
@@ -49,6 +54,15 @@ const Cart = () => {
       },
     });
   };
+
+  // Show toast messages and handle successful deletion
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(messageClear());
+      dispatch(get_cart_products(userInfo.id)); // Refresh cart products after deletion
+    }
+  }, [successMessage]);
 
   return (
     <div>
@@ -168,7 +182,12 @@ const Cart = () => {
                                 </div>
 
                                 {/* Remove item from cart button */}
-                                <button className="px-5 py-[3px] bg-red-500 text-white">
+                                <button
+                                  onClick={() =>
+                                    dispatch(delete_cart_product(pt._id))
+                                  }
+                                  className="px-5 py-[3px] bg-red-500 text-white"
+                                >
                                   Delete
                                 </button>
                               </div>
@@ -267,14 +286,14 @@ const Cart = () => {
 
                       {/* Items count and subtotal */}
                       <div className="flex justify-between items-center ">
-                        <span>2 Items</span>
-                        <span>$343</span>
+                        <span>{buy_product_item} Items</span>
+                        <span>${price}</span>
                       </div>
 
                       {/* Shipping fee */}
                       <div className="flex justify-between items-center ">
                         <span>Shipping Fee</span>
-                        <span>$40</span>
+                        <span>${shipping_fee}</span>
                       </div>
 
                       {/* Coupon/voucher input section */}
@@ -292,7 +311,9 @@ const Cart = () => {
                       {/* Total price calculation */}
                       <div className="flex justify-between items-center ">
                         <span>Total</span>
-                        <span className="text-lg text-[#059473]">$430</span>
+                        <span className="text-lg text-[#059473]">
+                          ${price + shipping_fee}
+                        </span>
                       </div>
 
                       {/* Proceed to checkout button */}
@@ -300,7 +321,7 @@ const Cart = () => {
                         onClick={redirect}
                         className="px-5 py-[6px] rounded-sm hover:shadow-red-500/50 hover:shadow-lg bg-red-500 text-sm uppercase text-white "
                       >
-                        Proceed to checkout
+                        Proceed to checkout ({buy_product_item})
                       </button>
                     </div>
                   )}
