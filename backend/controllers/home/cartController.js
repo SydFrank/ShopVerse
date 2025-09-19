@@ -233,6 +233,32 @@ class cartControllers {
     }
   };
   // End of get_cart_products method
+
+  /**
+   * Handles removing a product from the shopping cart.
+   * This method deletes a specific cart item using the cart item's ID.
+   * Once deleted, the product will no longer appear in the user's cart.
+   *
+   * @param {Object} req - Express request object, expects params:
+   *   - cart_id: ID of the cart item to be deleted (string)
+   * @param {Object} res - Express response object
+   */
+  delete_cart_product = async (req, res) => {
+    // Extract cart item ID from request parameters
+    const { cart_id } = req.params;
+
+    try {
+      // Find and delete the cart item by its ID
+      await cartModel.findByIdAndDelete(cart_id);
+
+      // Return success response confirming deletion
+      responseReturn(res, 200, { message: "Product Removed Successfully" });
+    } catch (error) {
+      // Return error response if deletion fails
+      responseReturn(res, 500, { error: "Internal Server Error" });
+    }
+  };
+  // End of delete_cart_product method
 }
 
 // Export instance of cartControllers for use in routes

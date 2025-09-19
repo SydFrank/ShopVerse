@@ -9,5 +9,10 @@ router.get(
   cartControllers.get_cart_products
 );
 
+router.delete(
+  "/home/product/delete-cart-product/:cart_id",
+  cartControllers.delete_cart_product
+);
+
 // Export the router to be used in the main server application
 module.exports = router;
