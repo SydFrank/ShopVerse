@@ -11,6 +11,8 @@ import {
   get_cart_products,
   delete_cart_product,
   messageClear,
+  quantity_increment,
+  quantity_decrement,
 } from "../store/reducers/cartReducer";
 import toast from "react-hot-toast"; // Toast notifications
 
@@ -63,6 +65,24 @@ const Cart = () => {
       dispatch(get_cart_products(userInfo.id)); // Refresh cart products after deletion
     }
   }, [successMessage]);
+
+  // Increase product quantity in cart
+  // Checks stock availability before incrementing
+  const increment = (quantity, stock, cart_id) => {
+    const temp = quantity + 1;
+    if (temp <= stock) {
+      dispatch(quantity_increment(cart_id));
+    }
+  };
+
+  // Decrease product quantity in cart
+  // Prevents quantity from going below 1
+  const decrement = (quantity, cart_id) => {
+    const temp = quantity - 1;
+    if (temp !== 0) {
+      dispatch(quantity_decrement(cart_id));
+    }
+  };
 
   return (
     <div>
@@ -169,13 +189,29 @@ const Cart = () => {
                               <div className="flex gap-2 flex-col">
                                 {/* Quantity selector with increment/decrement buttons */}
                                 <div className="flex bg-slate-200 h-[30px] justify-center items-center text-xl">
-                                  <div className="px-3 cursor-pointer">-</div>{" "}
+                                  <div
+                                    onClick={() =>
+                                      decrement(pt.quantity, pt._id)
+                                    }
+                                    className="px-3 cursor-pointer"
+                                  >
+                                    -
+                                  </div>{" "}
                                   {/* Decrease quantity */}
                                   <div className="px-3 ">
                                     {pt.quantity}
                                   </div>{" "}
                                   {/* Current quantity */}
-                                  <div className="px-3 cursor-pointer">
+                                  <div
+                                    onClick={() =>
+                                      increment(
+                                        pt.quantity,
+                                        pt.productInfo.stock,
+                                        pt._id
+                                      )
+                                    }
+                                    className="px-3 cursor-pointer"
+                                  >
                                     +
                                   </div>{" "}
                                   {/* Increase quantity */}
@@ -255,13 +291,25 @@ const Cart = () => {
                                 <div className="flex gap-2 flex-col">
                                   {/* Quantity selector (non-functional for out-of-stock items) */}
                                   <div className="flex bg-slate-200 h-[30px] justify-center items-center text-xl">
-                                    <div className="px-3 cursor-pointer">-</div>
+                                    <div
+                                      onClick={() =>
+                                        decrement(p.quantity, p._id)
+                                      }
+                                      className="px-3 cursor-pointer"
+                                    >
+                                      -
+                                    </div>
                                     <div className="px-3 ">{p.quantity}</div>
                                     <div className="px-3 cursor-pointer">+</div>
                                   </div>
 
                                   {/* Remove out-of-stock item from cart */}
-                                  <button className="px-5 py-[3px] bg-red-500 text-white">
+                                  <button
+                                    onClick={() =>
+                                      dispatch(delete_cart_product(p._id))
+                                    }
+                                    className="px-5 py-[3px] bg-red-500 text-white"
+                                  >
                                     Delete
                                   </button>
                                 </div>

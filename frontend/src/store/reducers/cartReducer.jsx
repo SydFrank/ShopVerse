@@ -104,6 +104,56 @@ export const delete_cart_product = createAsyncThunk(
 // End of delete_cart_product thunk
 
 /**
+ * Quantity Increment - Increase cart item quantity by 1
+ * Updates cart item quantity on server and recalculates totals
+ *
+ * @param {string} cart_id - Unique identifier for the cart item
+ * @param {Object} thunkAPI - Redux Toolkit thunk API helpers
+ * @returns {Promise} - Resolved with updated cart data or rejected with error
+ */
+export const quantity_increment = createAsyncThunk(
+  "cart/quantity_increment",
+  async (cart_id, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      // Make API request to increment cart item quantity
+      const { data } = await api.put(
+        `/home/product/quantity-increment/${cart_id}`
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      // Return error data for proper error handling in UI
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of quantity_increment thunk
+
+/**
+ * Quantity Decrement - Decrease cart item quantity by 1
+ * Updates cart item quantity on server and recalculates totals
+ *
+ * @param {string} cart_id - Unique identifier for the cart item
+ * @param {Object} thunkAPI - Redux Toolkit thunk API helpers
+ * @returns {Promise} - Resolved with updated cart data or rejected with error
+ */
+export const quantity_decrement = createAsyncThunk(
+  "cart/quantity_decrement",
+  async (cart_id, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      // Make API request to decrement cart item quantity
+      const { data } = await api.put(
+        `/home/product/quantity-decrement/${cart_id}`
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      // Return error data for proper error handling in UI
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of quantity_decrement thunk
+
+/**
  * Cart slice configuration
  * Defines initial state, reducers, and async action handlers for shopping cart
  *
@@ -173,6 +223,14 @@ export const cartReducer = createSlice({
 
       // Delete cart product success state
       .addCase(delete_cart_product.fulfilled, (state, { payload }) => {
+        state.successMessage = payload.message; // Display success message to user
+      })
+      // Quantity increment success state
+      .addCase(quantity_increment.fulfilled, (state, { payload }) => {
+        state.successMessage = payload.message; // Display success message to user
+      })
+      // Quantity decrement success state
+      .addCase(quantity_decrement.fulfilled, (state, { payload }) => {
         state.successMessage = payload.message; // Display success message to user
       });
   },
