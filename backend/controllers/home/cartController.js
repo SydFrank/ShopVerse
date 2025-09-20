@@ -259,7 +259,68 @@ class cartControllers {
     }
   };
   // End of delete_cart_product method
-}
 
+  /**
+   * Handles incrementing the quantity of a product in the shopping cart.
+   * This method retrieves the current quantity of a cart item, increases it by 1,
+   * and updates the cart in the database. Used when customers want to add
+   * more of the same product to their cart.
+   *
+   * @param {Object} req - Express request object, expects params:
+   *   - cart_id: ID of the cart item to increment quantity (string)
+   * @param {Object} res - Express response object
+   */
+  quantity_increment = async (req, res) => {
+    // Extract cart item ID from request parameters
+    const { cart_id } = req.params;
+
+    try {
+      // Find the cart item by its ID to get current quantity
+      const product = await cartModel.findById(cart_id);
+      // Extract current quantity from the cart item
+      const { quantity } = product;
+      // Update the cart item with incremented quantity (current quantity + 1)
+      await cartModel.findByIdAndUpdate(cart_id, { quantity: quantity + 1 });
+      // Return success response confirming quantity increment
+      responseReturn(res, 200, { message: "Quantity Incremented" });
+    } catch (error) {
+      // Return error response if increment operation fails
+      responseReturn(res, 500, { error: "Internal Server Error" });
+    }
+  };
+  // End of quantity_increment method
+
+  /**
+   * Handles decrementing the quantity of a product in the shopping cart.
+   * This method retrieves the current quantity of a cart item, decreases it by 1,
+   * and updates the cart in the database. Used when customers want to reduce
+   * the number of items of the same product in their cart.
+   * Note: This method does not check if quantity goes below 1, which should be
+   * handled on the frontend or with additional validation.
+   *
+   * @param {Object} req - Express request object, expects params:
+   *   - cart_id: ID of the cart item to decrement quantity (string)
+   * @param {Object} res - Express response object
+   */
+  quantity_decrement = async (req, res) => {
+    // Extract cart item ID from request parameters
+    const { cart_id } = req.params;
+
+    try {
+      // Find the cart item by its ID to get current quantity
+      const product = await cartModel.findById(cart_id);
+      // Extract current quantity from the cart item
+      const { quantity } = product;
+      // Update the cart item with decremented quantity (current quantity - 1)
+      await cartModel.findByIdAndUpdate(cart_id, { quantity: quantity - 1 });
+      // Return success response confirming quantity decrement
+      responseReturn(res, 200, { message: "Quantity Decremented" });
+    } catch (error) {
+      // Return error response if decrement operation fails
+      responseReturn(res, 500, { error: "Internal Server Error" });
+    }
+  };
+  // End of quantity_decrement method
+}
 // Export instance of cartControllers for use in routes
 module.exports = new cartControllers();
