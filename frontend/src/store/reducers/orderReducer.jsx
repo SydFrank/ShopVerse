@@ -1,9 +1,9 @@
-// Redux Toolkit imports for modern state management
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../api/api"; // Configured Axios instance for backend communication
+import api from "../../api/api";
 
+// Place order and navigate to payment page
 export const place_order = createAsyncThunk(
-  "order/place_order", // Action type prefix for Redux DevTools
+  "order/place_order",
   async ({
     price,
     products,
@@ -14,6 +14,7 @@ export const place_order = createAsyncThunk(
     navigate,
   }) => {
     try {
+      // Send order data to API
       const { data } = await api.post("/home/order/place-order", {
         price,
         products,
@@ -23,55 +24,48 @@ export const place_order = createAsyncThunk(
         userId,
         navigate,
       });
+
+      // Navigate to payment with order details
+      navigate("/payment", {
+        state: {
+          price: price + shipping_fee,
+          items: items,
+          orderId: data.orderId,
+        },
+      });
       console.log(data);
     } catch (error) {
       console.log(error.response);
     }
   }
 );
-// End of placeOrder thunk
 
 export const orderReducer = createSlice({
-  name: "order", // Slice name - used in action types and Redux DevTools
+  name: "order",
 
-  // Initial state structure for cart management
+  // Initial state for order management
   initialState: {
-    myOrders: [], // Array to hold user's past orders
-    errorMessage: "", // Error messages for failed cart operations
-    successMessage: "", // Success messages for completed cart operations
-    myOrder: {}, // Details of a single order
+    myOrders: [], // User's order history
+    errorMessage: "", // Error messages for order operations
+    successMessage: "", // Success messages for order operations
+    myOrder: {}, // Current order details
   },
 
-  // Synchronous reducers for immediate state updates
+  // Synchronous actions
   reducers: {
-    /**
-     * Message Clear Action
-     * Resets both error and success messages to empty strings
-     *
-     * Usage:
-     * - Called after displaying toast notifications for order operations
-     * - Prevents messages from persisting across component re-renders
-     * - Ensures clean slate for subsequent order API operations
-     */
-    messageClear: (state, _) => {
+    // Clear all messages
+    messageClear: (state) => {
       state.errorMessage = "";
       state.successMessage = "";
     },
   },
 
-  // Handle async action states (pending, fulfilled, rejected)
-  extraReducers: (builder) => {},
+  // Handle async action states
+  extraReducers: () => {},
 });
 
-/**
- * Exported Action Creators
- * Available for use in React components via useDispatch hook
- */
+// Export actions for component usage
 export const { messageClear } = orderReducer.actions;
 
-/**
- * Default Export - Reducer Function
- * Used in store configuration (rootReducer.js) to handle cart state slice
- * Compatible with Redux Toolkit's configureStore function
- */
+// Export reducer for store configuration
 export default orderReducer.reducer;

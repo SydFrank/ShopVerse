@@ -12,6 +12,7 @@ import { useDispatch } from "react-redux"; // Redux hooks for dispatching action
 import { get_category } from "./store/reducers/homeReducer";
 import CategoryShop from "./pages/CategoryShop";
 import SearchProducts from "./pages/SearchProducts";
+import Payment from "./pages/Payment";
 
 function App() {
   // Redux dispatch hook for triggering actions
@@ -33,6 +34,7 @@ function App() {
         <Route path="/products?" element={<CategoryShop />} />
         <Route path="/products/search?" element={<SearchProducts />} />
         <Route path="/product/details/:slug" element={<Details />} />
+        <Route path="/payment" element={<Payment />} />
       </Routes>
     </BrowserRouter>
   );

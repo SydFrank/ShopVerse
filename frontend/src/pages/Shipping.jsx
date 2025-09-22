@@ -15,7 +15,10 @@ const Shipping = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Get user authentication info
   const { userInfo } = useSelector((state) => state.auth);
+
+  // Get order data from Cart page navigation state
   const {
     state: { products, price, shipping_fee, items },
   } = useLocation();
@@ -50,6 +53,8 @@ const Shipping = () => {
     }
   };
 
+  // Place order with shipping information
+  // Dispatches order creation with all necessary data
   const placeOrder = () => {
     dispatch(
       place_order({
@@ -261,30 +266,31 @@ const Shipping = () => {
                   )}
                 </div>
 
-                {/* Cart items display section - Map through mock sellers/stores */}
+                {/* Cart Items Display */}
+                {/* Map through products by store/seller */}
                 {products.map((p, i) => (
                   <div key={i} className="flex bg-white p-4 flex-col gap-2 ">
-                    {/* Store/seller information header for grouping products */}
+                    {/* Store name header */}
                     <div className="flex justify-start items-center">
                       <h2 className="text-md text-slate-600 font-bold ">
                         {p.shopName}
                       </h2>
                     </div>
 
-                    {/* Map through products from this specific seller */}
+                    {/* Products from this store */}
                     {p.products.map((pt, index) => (
                       <div key={index} className="w-full flex flex-wrap ">
-                        {/* Left section: Product image and details (7/12 width on desktop) */}
+                        {/* Product Image & Info */}
                         <div className="flex max-sm:w-full gap-2 w-7/12">
                           <div className="flex gap-2 justify-start items-center ">
                             {/* Product image */}
                             <img
                               className="w-[80px] h-[80px]"
                               src={pt.productInfo.images[0]}
-                              alt={`Product ${index + 1}`} // Accessible alt text
+                              alt={`Product ${index + 1}`}
                             />
 
-                            {/* Product information */}
+                            {/* Product details */}
                             <div className="pr-4 text-slate-600">
                               <h2 className="text-md font-semibold">
                                 {pt.productInfo.name}
@@ -324,33 +330,32 @@ const Shipping = () => {
               </div>
             </div>
 
-            {/* Right section: Order summary and checkout (1/3 width on desktop, full width on mobile) */}
+            {/* Right: Order Summary */}
             <div className="w-[33%] max-lg:w-full ">
               <div className="pl-3 max-md:pl-0 max-lg:mt-5">
-                {/* Order summary card with pricing breakdown and checkout */}
+                {/* Order Summary Card */}
                 <div className="bg-white p-3 text-slate-600 flex flex-col gap-3 ">
-                  {/* Order summary section header */}
                   <h2 className="text-xl font-bold">Order Summary</h2>
 
-                  {/* Items count and subtotal calculation */}
+                  {/* Items total */}
                   <div className="flex justify-between items-center ">
                     <span>Items Total({items})</span>
                     <span>${price}</span>
                   </div>
 
-                  {/* Shipping/delivery fee display */}
+                  {/* Delivery fee */}
                   <div className="flex justify-between items-center ">
                     <span>Delivery Fee</span>
                     <span>${shipping_fee}</span>
                   </div>
 
-                  {/* Total payment amount before final calculation */}
+                  {/* Total payment */}
                   <div className="flex justify-between items-center ">
                     <span>Total payment</span>
                     <span className="text-lg ">${price + shipping_fee}</span>
                   </div>
 
-                  {/* Final total amount with emphasized styling */}
+                  {/* Final total */}
                   <div className="flex justify-between items-center ">
                     <span>Total </span>
                     <span className="text-lg text-[#059473]">
@@ -358,12 +363,12 @@ const Shipping = () => {
                     </span>
                   </div>
 
-                  {/* Conditional place order button - disabled until shipping info is saved */}
+                  {/* Place Order Button - enabled only when shipping address is saved */}
                   <button
                     onClick={placeOrder}
-                    disabled={res ? false : true} // Enable only when shipping address is confirmed
+                    disabled={res ? false : true}
                     className={`px-5 py-[6px] rounded-sm hover:shadow-red-500/50 hover:shadow-lg ${
-                      res ? "bg-red-500" : "bg-red-300" // Dynamic styling based on shipping status
+                      res ? "bg-red-500" : "bg-red-300"
                     }  text-sm uppercase text-white`}
                   >
                     Place order
