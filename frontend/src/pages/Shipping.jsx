@@ -7,8 +7,19 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { IoIosArrowForward } from "react-icons/io";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { place_order } from "../store/reducers/orderReducer";
+
 const Shipping = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { userInfo } = useSelector((state) => state.auth);
+  const {
+    state: { products, price, shipping_fee, items },
+  } = useLocation();
+
   // Toggle between form and saved address display
   const [res, setRes] = useState(false);
 
@@ -37,6 +48,20 @@ const Shipping = () => {
     if (name && address && phone && post && province && city && area) {
       setRes(true); // Show saved address
     }
+  };
+
+  const placeOrder = () => {
+    dispatch(
+      place_order({
+        price,
+        products,
+        shipping_fee,
+        items,
+        shippingInfo: state,
+        userId: userInfo.id,
+        navigate,
+      })
+    );
   };
 
   return (
@@ -237,17 +262,17 @@ const Shipping = () => {
                 </div>
 
                 {/* Cart items display section - Map through mock sellers/stores */}
-                {[1, 2].map((p, i) => (
+                {products.map((p, i) => (
                   <div key={i} className="flex bg-white p-4 flex-col gap-2 ">
                     {/* Store/seller information header for grouping products */}
                     <div className="flex justify-start items-center">
                       <h2 className="text-md text-slate-600 font-bold ">
-                        Easy Shop
+                        {p.shopName}
                       </h2>
                     </div>
 
                     {/* Map through products from this specific seller */}
-                    {[1, 2].map((product, index) => (
+                    {p.products.map((pt, index) => (
                       <div key={index} className="w-full flex flex-wrap ">
                         {/* Left section: Product image and details (7/12 width on desktop) */}
                         <div className="flex max-sm:w-full gap-2 w-7/12">
@@ -255,16 +280,18 @@ const Shipping = () => {
                             {/* Product image */}
                             <img
                               className="w-[80px] h-[80px]"
-                              src={`/images/products/${index + 1}.webp`}
+                              src={pt.productInfo.images[0]}
                               alt={`Product ${index + 1}`} // Accessible alt text
                             />
 
                             {/* Product information */}
                             <div className="pr-4 text-slate-600">
                               <h2 className="text-md font-semibold">
-                                Product Name
+                                {pt.productInfo.name}
                               </h2>
-                              <span className="text-sm">Brand: VIVO</span>
+                              <span className="text-sm">
+                                Brand: {pt.productInfo.brand}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -274,29 +301,20 @@ const Shipping = () => {
                           {/* Price information with discount */}
                           <div className="pl-4 max-sm:pl-0 ">
                             <h2 className="text-lg text-orange-500">
-                              $1500 {/* Current discounted price */}
+                              $
+                              {pt.productInfo.price -
+                                Math.floor(
+                                  pt.productInfo.price *
+                                    (pt.productInfo.discount / 100)
+                                )}{" "}
+                              {/* Current discounted price */}
                             </h2>
-                            <p className="line-through">$2000</p>{" "}
+                            <p className="line-through">
+                              ${pt.productInfo.price}
+                            </p>{" "}
                             {/* Original price with strikethrough */}
-                            <p>-25%</p> {/* Discount percentage */}
-                          </div>
-
-                          {/* Quantity controls and delete button */}
-                          <div className="flex gap-2 flex-col">
-                            {/* Quantity selector with increment/decrement buttons */}
-                            <div className="flex bg-slate-200 h-[30px] justify-center items-center text-xl">
-                              <div className="px-3 cursor-pointer">-</div>{" "}
-                              {/* Decrease quantity */}
-                              <div className="px-3 ">2</div>{" "}
-                              {/* Current quantity */}
-                              <div className="px-3 cursor-pointer">+</div>{" "}
-                              {/* Increase quantity */}
-                            </div>
-
-                            {/* Remove item from cart button */}
-                            <button className="px-5 py-[3px] bg-red-500 text-white">
-                              Delete
-                            </button>
+                            <p>-{pt.productInfo.discount}%</p>{" "}
+                            {/* Discount percentage */}
                           </div>
                         </div>
                       </div>
@@ -316,30 +334,33 @@ const Shipping = () => {
 
                   {/* Items count and subtotal calculation */}
                   <div className="flex justify-between items-center ">
-                    <span>Items Total(5)</span>
-                    <span>$343</span>
+                    <span>Items Total({items})</span>
+                    <span>${price}</span>
                   </div>
 
                   {/* Shipping/delivery fee display */}
                   <div className="flex justify-between items-center ">
                     <span>Delivery Fee</span>
-                    <span>$40</span>
+                    <span>${shipping_fee}</span>
                   </div>
 
                   {/* Total payment amount before final calculation */}
                   <div className="flex justify-between items-center ">
                     <span>Total payment</span>
-                    <span className="text-lg ">$430</span>
+                    <span className="text-lg ">${price + shipping_fee}</span>
                   </div>
 
                   {/* Final total amount with emphasized styling */}
                   <div className="flex justify-between items-center ">
                     <span>Total </span>
-                    <span className="text-lg text-[#059473]">$430</span>
+                    <span className="text-lg text-[#059473]">
+                      ${price + shipping_fee}
+                    </span>
                   </div>
 
                   {/* Conditional place order button - disabled until shipping info is saved */}
                   <button
+                    onClick={placeOrder}
                     disabled={res ? false : true} // Enable only when shipping address is confirmed
                     className={`px-5 py-[6px] rounded-sm hover:shadow-red-500/50 hover:shadow-lg ${
                       res ? "bg-red-500" : "bg-red-300" // Dynamic styling based on shipping status
