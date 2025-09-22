@@ -30,7 +30,7 @@ const authSchema = new Schema(
     },
 
     shippingInfo: {
-      type: Object,
+      type: String,
       required: true, // Shipping information for the order
     },
 
