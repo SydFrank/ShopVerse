@@ -2,7 +2,7 @@
 const { Schema, model } = require("mongoose");
 
 // Define the schema for the "customerOrders" collection
-const customerOrderSchema = new Schema(
+const customerOrder = new Schema(
   {
     customerId: {
       type: Schema.ObjectId,
