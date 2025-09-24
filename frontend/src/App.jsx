@@ -13,6 +13,8 @@ import { get_category } from "./store/reducers/homeReducer";
 import CategoryShop from "./pages/CategoryShop";
 import SearchProducts from "./pages/SearchProducts";
 import Payment from "./pages/Payment";
+import Dashboard from "./pages/Dashboard";
+import ProtectUser from "./utils/ProtectUser";
 
 function App() {
   // Redux dispatch hook for triggering actions
@@ -35,6 +37,10 @@ function App() {
         <Route path="/products/search?" element={<SearchProducts />} />
         <Route path="/product/details/:slug" element={<Details />} />
         <Route path="/payment" element={<Payment />} />
+
+        <Route path="/dashboard" element={<ProtectUser />}>
+          <Route path="" element={<Dashboard />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

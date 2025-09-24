@@ -5,10 +5,12 @@ import { useLocation } from "react-router-dom";
 import Stripe from "../components/Stripe";
 
 const Payment = () => {
+  // Get order details from navigation state
   const {
     state: { price, items, orderId },
   } = useLocation();
 
+  // Payment method selection (stripe or cod)
   const [paymentMethod, setPaymentMethod] = useState("stripe");
 
   return (
@@ -17,8 +19,10 @@ const Payment = () => {
       <section className="bg-[#eeeeee]">
         <div className="w-[85%] max-lg:w-[90%] max-md:w-[90%] max-sm:w-[90%] mx-auto py-16">
           <div className="flex flex-wrap max-md:flex-col-reverse">
+            {/* Payment Method Selection */}
             <div className="w-7/12 max-md:w-full ">
               <div className="pr-2 max-md:pr-0">
+                {/* Payment method tabs */}
                 <div className="flex flex-wrap">
                   <div
                     onClick={() => setPaymentMethod("stripe")}
@@ -46,12 +50,14 @@ const Payment = () => {
                 </div>
               </div>
 
+              {/* Stripe payment component */}
               {paymentMethod === "stripe" && (
                 <div>
                   <Stripe />
                 </div>
               )}
 
+              {/* Cash on delivery option */}
               {paymentMethod === "cod" && (
                 <div className="w-full px-4 py-8 bg-white shadow-sm">
                   <button className="px-10 py-[6px] rounded-sm hover:shadow-green-500/20 hover:shadow-lg bg-[#059473] text-white ">
@@ -61,14 +67,17 @@ const Payment = () => {
               )}
             </div>
 
+            {/* Order Summary */}
             <div className="w-5/12 max-md:w-full ">
               <div className="pl-2 max-md:pl-0 max-md:mb-0 ">
                 <div className="bg-white shadow p-5 text-slate-600 flex flex-col gap-3 ">
                   <h2 className="font-bold text-lg ">Order Summary</h2>
+                  {/* Order details */}
                   <div className="flex justify-between items-center">
                     <span>{items} Items and Shipping Fee Included</span>
                     <span>${price}</span>
                   </div>
+                  {/* Total amount */}
                   <div className="flex justify-between items-center font-semibold">
                     <span>Total Amount</span>
                     <span className="text-lg text-green-600">${price}</span>
