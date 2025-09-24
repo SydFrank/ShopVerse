@@ -16,6 +16,7 @@ import Payment from "./pages/Payment";
 import Dashboard from "./pages/Dashboard";
 import ProtectUser from "./utils/ProtectUser";
 import Subindex from "./components/dashboard/Subindex";
+import Orders from "./components/dashboard/Orders";
 
 function App() {
   // Redux dispatch hook for triggering actions
@@ -42,6 +43,7 @@ function App() {
         <Route path="/dashboard" element={<ProtectUser />}>
           <Route path="" element={<Dashboard />}>
             <Route path="" element={<Subindex />} />
+            <Route path="my-orders" element={<Orders />} />
           </Route>
         </Route>
       </Routes>
