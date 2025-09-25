@@ -82,7 +82,7 @@ const Dashboard = () => {
                   <span className="text-xl">
                     <TbLockPassword />
                   </span>
-                  <Link to="/dashboard" className="block ">
+                  <Link to="/dashboard/change-password" className="block ">
                     Change Password
                   </Link>
                 </li>
