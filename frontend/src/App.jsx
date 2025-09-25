@@ -18,6 +18,7 @@ import ProtectUser from "./utils/ProtectUser";
 import Subindex from "./components/dashboard/Subindex";
 import Orders from "./components/dashboard/Orders";
 import ChangePassword from "./components/dashboard/ChangePassword";
+import Wishlist from "./components/dashboard/Wishlist";
 
 function App() {
   // Redux dispatch hook for triggering actions
@@ -46,6 +47,7 @@ function App() {
             <Route path="" element={<Subindex />} />
             <Route path="my-orders" element={<Orders />} />
             <Route path="change-password" element={<ChangePassword />} />
+            <Route path="my-wishlist" element={<Wishlist />} />
           </Route>
         </Route>
       </Routes>
