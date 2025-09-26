@@ -1,17 +1,20 @@
 import React, { useEffect } from "react";
 import { IoCartSharp } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { get_dashboard_index_data } from "../../store/reducers/dashboardReducer";
 
 // Dashboard overview component with order statistics
 const Subindex = () => {
+  // Hook for navigation
+  const navigate = useNavigate();
   // Redux dispatch function
   const dispatch = useDispatch();
 
   // Get user info from auth state
   const { userInfo } = useSelector((state) => state.auth);
 
+  // Get dashboard data from Redux store
   const { recentOrders, totalOrder, pendingOrder, cancelledOrder } =
     useSelector((state) => state.dashboard);
 
@@ -19,6 +22,21 @@ const Subindex = () => {
   useEffect(() => {
     dispatch(get_dashboard_index_data(userInfo.id));
   }, []);
+
+  // Redirect to payment page with order details
+  const redirect = (order) => {
+    let items = 0;
+    for (let i = 0; i < order.length; i++) {
+      items = order.products[i].quantity + items;
+    }
+    navigate("/payment", {
+      state: {
+        price: order.price,
+        items: items,
+        orderId: order._id,
+      },
+    });
+  };
 
   return (
     <div>
@@ -134,17 +152,20 @@ const Subindex = () => {
                         className="px-6 py-4 font-medium whitespace-nowrap"
                       >
                         {/* Action buttons */}
-                        <Link>
+                        <Link to={`/dashboard/order/details/${order._id}`}>
                           <span className="bg-green-200 text-green-800 text-md font-semibold mr-2 px-3 py-[2px] rounded">
                             View
                           </span>
                         </Link>
 
-                        <Link>
-                          <span className="bg-green-200 text-green-800 text-md font-semibold mr-2 px-3 py-[2px] rounded">
+                        {order.payment_status !== "paid" && (
+                          <span
+                            onClick={() => redirect(order)}
+                            className="bg-green-200 text-green-800 text-md font-semibold mr-2 px-3 py-[2px] rounded cursor-pointer"
+                          >
                             Pay Now
                           </span>
-                        </Link>
+                        )}
                       </td>
                     </tr>
                   ))

@@ -1,42 +1,48 @@
-// Redux Toolkit imports for modern state management
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../api/api"; // Configured Axios instance for backend communication
+import api from "../../api/api";
 
+// Fetch dashboard data including orders and statistics
 export const get_dashboard_index_data = createAsyncThunk(
-  "dashboard/get_dashboard_index_data", // Action type prefix for Redux DevTools
+  "dashboard/get_dashboard_index_data",
   async (userId, { fulfillWithValue, rejectWithValue }) => {
     try {
+      // Get user dashboard data from API
       const { data } = await api.get(
         `/home/customer/get-dashboard-data/${userId}`
       );
-      // console.log(data);
       return fulfillWithValue(data);
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
   }
 );
-// End of get_dashboard_index_data thunk
 
 export const dashboardReducer = createSlice({
   name: "dashboard",
+
+  // Initial state for dashboard data
   initialState: {
-    recentOrders: [],
-    errorMessage: "",
-    successMessage: "",
-    totalOrder: 0,
-    pendingOrder: 0,
-    cancelledOrder: 0,
+    recentOrders: [], // Recent order history
+    errorMessage: "", // Error messages for dashboard operations
+    successMessage: "", // Success messages for dashboard operations
+    totalOrder: 0, // Total number of orders
+    pendingOrder: 0, // Number of pending orders
+    cancelledOrder: 0, // Number of cancelled orders
   },
+
+  // Synchronous actions
   reducers: {
+    // Clear all messages
     messageClear: (state) => {
       state.errorMessage = "";
       state.successMessage = "";
     },
   },
+
+  // Handle async actions
   extraReducers: (builder) => {
     builder
-      // Get dashboard index data
+      // Handle successful dashboard data fetch
       .addCase(get_dashboard_index_data.fulfilled, (state, { payload }) => {
         state.recentOrders = payload.recentOrders;
         state.totalOrder = payload.totalOrder;
@@ -46,5 +52,8 @@ export const dashboardReducer = createSlice({
   },
 });
 
+// Export actions for component usage
 export const { messageClear } = dashboardReducer.actions;
+
+// Export reducer for store configuration
 export default dashboardReducer.reducer;
