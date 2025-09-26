@@ -22,6 +22,7 @@ import homeReducer from "./reducers/homeReducer";
 import authReducer from "./reducers/authReducer";
 import cartReducer from "./reducers/cartReducer";
 import orderReducer from "./reducers/orderReducer";
+import dashboardReducer from "./reducers/dashboardReducer";
 
 /**
  * Root Reducer Object
@@ -39,6 +40,7 @@ const rootReducer = {
   auth: authReducer,
   cart: cartReducer,
   order: orderReducer,
+  dashboard: dashboardReducer,
 };
 
 // Export the composed root reducer for use in store configuration
