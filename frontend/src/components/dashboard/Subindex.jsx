@@ -1,9 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { IoCartSharp } from "react-icons/io5";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { get_dashboard_index_data } from "../../store/reducers/dashboardReducer";
 
 // Dashboard overview component with order statistics
 const Subindex = () => {
+  // Redux dispatch function
+  const dispatch = useDispatch();
+
+  // Get user info from auth state
+  const { userInfo } = useSelector((state) => state.auth);
+
+  const { recentOrders, totalOrder, pendingOrder, cancelledOrder } =
+    useSelector((state) => state.dashboard);
+
+  // Fetch dashboard data on component mount
+  useEffect(() => {
+    dispatch(get_dashboard_index_data(userInfo.id));
+  }, []);
+
   return (
     <div>
       {/* Statistics cards grid */}
@@ -17,7 +33,7 @@ const Subindex = () => {
           </div>
 
           <div className="flex flex-col justify-start items-start text-slate-600 ">
-            <h2 className="text-3xl font-bold">45</h2>
+            <h2 className="text-3xl font-bold">{totalOrder}</h2>
             <span>Orders</span>
           </div>
         </div>
@@ -31,7 +47,7 @@ const Subindex = () => {
           </div>
 
           <div className="flex flex-col justify-start items-start text-slate-600 ">
-            <h2 className="text-3xl font-bold">25</h2>
+            <h2 className="text-3xl font-bold">{pendingOrder}</h2>
             <span>Pending Orders</span>
           </div>
         </div>
@@ -45,7 +61,7 @@ const Subindex = () => {
           </div>
 
           <div className="flex flex-col justify-start items-start text-slate-600 ">
-            <h2 className="text-3xl font-bold">2</h2>
+            <h2 className="text-3xl font-bold">{cancelledOrder}</h2>
             <span>Cancel Orders</span>
           </div>
         </div>
@@ -81,101 +97,58 @@ const Subindex = () => {
 
               {/* Table body with order data */}
               <tbody>
-                {/* Order row */}
-                <tr className="bg-white border-b">
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    #344
-                  </td>
+                {
+                  // Map through recent orders and display each order in a table row
+                  recentOrders.map((order, index) => (
+                    <tr className="bg-white border-b">
+                      <td
+                        scope="row"
+                        className="px-6 py-4 font-medium whitespace-nowrap"
+                      >
+                        #{order._id}
+                      </td>
 
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    $300
-                  </td>
+                      <td
+                        scope="row"
+                        className="px-6 py-4 font-medium whitespace-nowrap"
+                      >
+                        ${order.price}
+                      </td>
 
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    Pending
-                  </td>
+                      <td
+                        scope="row"
+                        className="px-6 py-4 font-medium whitespace-nowrap"
+                      >
+                        {order.payment_status}
+                      </td>
 
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    Pending
-                  </td>
+                      <td
+                        scope="row"
+                        className="px-6 py-4 font-medium whitespace-nowrap"
+                      >
+                        {order.delivery_status}
+                      </td>
 
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    {/* Action buttons */}
-                    <Link>
-                      <span className="bg-green-200 text-green-800 text-md font-semibold mr-2 px-3 py-[2px] rounded">
-                        View
-                      </span>
-                    </Link>
+                      <td
+                        scope="row"
+                        className="px-6 py-4 font-medium whitespace-nowrap"
+                      >
+                        {/* Action buttons */}
+                        <Link>
+                          <span className="bg-green-200 text-green-800 text-md font-semibold mr-2 px-3 py-[2px] rounded">
+                            View
+                          </span>
+                        </Link>
 
-                    <Link>
-                      <span className="bg-green-200 text-green-800 text-md font-semibold mr-2 px-3 py-[2px] rounded">
-                        Pay Now
-                      </span>
-                    </Link>
-                  </td>
-                </tr>
-
-                <tr className="bg-white border-b">
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    #344
-                  </td>
-
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    $300
-                  </td>
-
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    Pending
-                  </td>
-
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    Pending
-                  </td>
-
-                  <td
-                    scope="row"
-                    className="px-6 py-4 font-medium whitespace-nowrap"
-                  >
-                    <Link>
-                      <span className="bg-green-200 text-green-800 text-md font-semibold mr-2 px-3 py-[2px] rounded">
-                        View
-                      </span>
-                    </Link>
-
-                    <Link>
-                      <span className="bg-green-200 text-green-800 text-md font-semibold mr-2 px-3 py-[2px] rounded">
-                        Pay Now
-                      </span>
-                    </Link>
-                  </td>
-                </tr>
+                        <Link>
+                          <span className="bg-green-200 text-green-800 text-md font-semibold mr-2 px-3 py-[2px] rounded">
+                            Pay Now
+                          </span>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                }
               </tbody>
             </table>
           </div>
