@@ -8,6 +8,9 @@ const customerOrderModel = require("../../models/customerOrder");
 const cartModel = require("../../models/cartModel");
 // Import custom response utility for consistent API responses
 const { responseReturn } = require("../../utils/response");
+const customerOrder = require("../../models/customerOrder");
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 // Define the orderControllers class to handle order-related operations
 class orderControllers {
@@ -163,6 +166,67 @@ class orderControllers {
     }
   };
   // End of place_order method
+
+  /**
+   * Handles retrieving customer dashboard statistics and recent order data.
+   * This method provides an overview of the customer's order history including
+   * recent orders, pending orders count, total orders count, and cancelled orders count.
+   * Used to populate the customer dashboard with relevant order statistics.
+   *
+   * @param {Object} req - Express request object, expects params:
+   *   - userId: ID of the customer whose dashboard data to retrieve (string)
+   * @param {Object} res - Express response object
+   */
+  get_customer_dashboard_data = async (req, res) => {
+    // Extract customer ID from request parameters
+    const { userId } = req.params;
+
+    try {
+      // Fetch the 5 most recent orders for this customer
+      const recentOrders = await customerOrder
+        .find({
+          customerId: new ObjectId(userId), // Match orders by customer ID
+        })
+        .limit(5); // Limit to 5 most recent orders
+
+      // Count total number of pending orders for this customer
+      const pendingOrder = await customerOrder
+        .find({
+          customerId: new ObjectId(userId), // Match orders by customer ID
+          delivery_status: "pending", // Filter for pending delivery status
+        })
+        .countDocuments(); // Get count instead of documents
+
+      // Count total number of orders (all statuses) for this customer
+      const totalOrder = await customerOrder
+        .find({
+          customerId: new ObjectId(userId), // Match orders by customer ID
+        })
+        .countDocuments(); // Get count instead of documents
+
+      // Count total number of cancelled orders for this customer
+      const cancelledOrder = await customerOrder
+        .find({
+          customerId: new ObjectId(userId), // Match orders by customer ID
+          delivery_status: "cancelled", // Filter for cancelled delivery status
+        })
+        .countDocuments(); // Get count instead of documents
+
+      // Return dashboard statistics and recent orders
+      responseReturn(res, 200, {
+        recentOrders, // Array of 5 most recent orders with full details
+        pendingOrder, // Number of orders with pending status
+        totalOrder, // Total number of orders placed by customer
+        cancelledOrder, // Number of orders that were cancelled
+      });
+    } catch (error) {
+      // Log error message for debugging purposes
+      console.log(error.message);
+      // Return error response
+      responseReturn(res, 500, { error: "Internal Server Error" });
+    }
+  };
+  // End of get_customer_dashboard_data method
 }
 
 // Export instance of orderControllers for use in routes
