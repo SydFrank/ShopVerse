@@ -57,6 +57,24 @@ export const get_orders = createAsyncThunk(
     }
   }
 );
+// End of get_orders thunk
+
+// Fetch specific order details by order ID
+export const get_orders_details = createAsyncThunk(
+  "order/get_orders_details",
+  async (orderId, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      // Request orders from API with customer ID and order ID
+      const { data } = await api.get(
+        `/home/customer/get-orders-details/${orderId}`
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of get_orders_details thunk
 
 export const orderReducer = createSlice({
   name: "order",
@@ -80,10 +98,15 @@ export const orderReducer = createSlice({
 
   // Handle async action states
   extraReducers: (builder) => {
-    // Handle successful order fetch - update myOrders with filtered results
-    builder.addCase(get_orders.fulfilled, (state, { payload }) => {
-      state.myOrders = payload.orders;
-    });
+    builder
+      // Handle successful order fetch - update myOrders with filtered results
+      .addCase(get_orders.fulfilled, (state, { payload }) => {
+        state.myOrders = payload.orders;
+      })
+      // Handle successful order details fetch - update myOrder with specific order
+      .addCase(get_orders_details.fulfilled, (state, { payload }) => {
+        state.myOrder = payload.order;
+      });
   },
 });
 
