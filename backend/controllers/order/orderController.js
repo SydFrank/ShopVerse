@@ -271,6 +271,35 @@ class orderControllers {
     }
   };
   // End of get_orders method
+
+  /**
+   * Handles retrieving detailed information for a specific customer order.
+   * This method fetches complete order details including products, shipping info,
+   * pricing, and status information for a single order. Used when customers
+   * want to view full details of a specific order from their order history.
+   *
+   * @param {Object} req - Express request object, expects params:
+   *   - orderId: ID of the specific order to retrieve details for (string)
+   * @param {Object} res - Express response object
+   */
+  get_orders_details = async (req, res) => {
+    // Extract order ID from request parameters
+    const { orderId } = req.params;
+
+    try {
+      // Find and retrieve the complete order details by order ID
+      const order = await customerOrderModel.findById(orderId);
+
+      // Return the complete order details in the response
+      responseReturn(res, 200, { order });
+    } catch (error) {
+      // Log error message for debugging purposes
+      console.log(error.message);
+      // Return error response if order retrieval fails
+      responseReturn(res, 500, { error: "Internal Server Error" });
+    }
+  };
+  // End of get_orders_details method
 }
 
 // Export instance of orderControllers for use in routes

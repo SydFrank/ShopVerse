@@ -14,5 +14,10 @@ router.get(
   orderControllers.get_orders
 );
 
+router.get(
+  "/home/customer/get-orders-details/:orderId",
+  orderControllers.get_orders_details
+);
+
 // Export the router to be used in the main server application
 module.exports = router;
