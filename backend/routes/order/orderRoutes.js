@@ -9,5 +9,10 @@ router.get(
   orderControllers.get_customer_dashboard_data
 );
 
+router.get(
+  "/home/customer/get-orders/:customerId/:status",
+  orderControllers.get_orders
+);
+
 // Export the router to be used in the main server application
 module.exports = router;

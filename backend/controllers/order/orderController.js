@@ -227,6 +227,50 @@ class orderControllers {
     }
   };
   // End of get_customer_dashboard_data method
+
+  /**
+   * Handles retrieving customer orders based on delivery status filter.
+   * This method fetches orders for a specific customer, optionally filtered by
+   * delivery status (pending, delivered, cancelled, etc.). If status is "all",
+   * it returns all orders regardless of status. Used for customer order history pages.
+   *
+   * @param {Object} req - Express request object, expects params:
+   *   - customerId: ID of the customer whose orders to retrieve (string)
+   *   - status: delivery status filter ("all", "pending", "delivered", "cancelled", etc.)
+   * @param {Object} res - Express response object
+   */
+  get_orders = async (req, res) => {
+    // Extract customer ID and status filter from request parameters
+    const { customerId, status } = req.params;
+
+    try {
+      // Initialize orders array to store query results
+      let orders = [];
+
+      // Check if status filter is applied or if fetching all orders
+      if (status !== "all") {
+        // Fetch orders filtered by specific delivery status
+        orders = await customerOrderModel.find({
+          customerId: new ObjectId(customerId), // Match orders by customer ID
+          delivery_status: status, // Filter by specific delivery status
+        });
+      } else {
+        // Fetch all orders for the customer regardless of status
+        orders = await customerOrderModel.find({
+          customerId: new ObjectId(customerId), // Match orders by customer ID
+        });
+      }
+
+      // Return the filtered orders in the response
+      responseReturn(res, 200, { orders });
+    } catch (error) {
+      // Log error message for debugging purposes
+      console.log(error.message);
+      // Return error response (should include proper error response)
+      responseReturn(res, 500, { error: "Internal Server Error" });
+    }
+  };
+  // End of get_orders method
 }
 
 // Export instance of orderControllers for use in routes
