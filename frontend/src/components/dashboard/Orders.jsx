@@ -1,13 +1,51 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { get_orders } from "../../store/reducers/orderReducer";
 
+// User orders management component with filtering
 const Orders = () => {
+  // Order status filter state
   const [state, setState] = useState("all");
+
+  // Navigation hook
+  const navigate = useNavigate();
+
+  // Redux dispatch function
+  const dispatch = useDispatch();
+
+  // Get user info from auth state
+  const { userInfo } = useSelector((state) => state.auth);
+
+  // Get orders from order state
+  const { myOrders } = useSelector((state) => state.order);
+
+  // Fetch orders when status filter changes
+  useEffect(() => {
+    dispatch(get_orders({ customerId: userInfo.id, status: state }));
+  }, [state]);
+
+  // Redirect to payment page with order details
+  const redirect = (order) => {
+    let items = 0;
+    for (let i = 0; i < order.length; i++) {
+      items = order.products[i].quantity + items;
+    }
+    navigate("/payment", {
+      state: {
+        price: order.price,
+        items: items,
+        orderId: order._id,
+      },
+    });
+  };
 
   return (
     <div className="bg-white p-4 rounded-md">
+      {/* Header with title and status filter */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-slate-600">My Orders</h2>
+        {/* Order status filter dropdown */}
         <select
           className="outline-none  px-3 py-1 border border-gray-100 rounded-md text-slate-600"
           value={state}
@@ -48,101 +86,62 @@ const Orders = () => {
 
             {/* Table body with order data */}
             <tbody>
-              {/* Order row */}
-              <tr className="bg-white border-b">
-                <td
-                  scope="row"
-                  className="px-6 py-4 font-medium whitespace-nowrap"
-                >
-                  #344
-                </td>
+              {
+                // Map through myOrders and display each order in a table row
+                myOrders.map((order, index) => (
+                  <tr className="bg-white border-b">
+                    <td
+                      scope="row"
+                      className="px-6 py-4 font-medium whitespace-nowrap"
+                    >
+                      #{order._id}
+                    </td>
 
-                <td
-                  scope="row"
-                  className="px-6 py-4 font-medium whitespace-nowrap"
-                >
-                  $300
-                </td>
+                    <td
+                      scope="row"
+                      className="px-6 py-4 font-medium whitespace-nowrap"
+                    >
+                      ${order.price}
+                    </td>
 
-                <td
-                  scope="row"
-                  className="px-6 py-4 font-medium whitespace-nowrap"
-                >
-                  Pending
-                </td>
+                    <td
+                      scope="row"
+                      className="px-6 py-4 font-medium whitespace-nowrap"
+                    >
+                      {order.payment_status}
+                    </td>
 
-                <td
-                  scope="row"
-                  className="px-6 py-4 font-medium whitespace-nowrap"
-                >
-                  Pending
-                </td>
+                    <td
+                      scope="row"
+                      className="px-6 py-4 font-medium whitespace-nowrap"
+                    >
+                      {order.delivery_status}
+                    </td>
 
-                <td
-                  scope="row"
-                  className="px-6 py-4 font-medium whitespace-nowrap"
-                >
-                  {/* Action buttons */}
-                  <Link>
-                    <span className="bg-green-200 text-green-800 text-md font-semibold mr-2 px-3 py-[2px] rounded">
-                      View
-                    </span>
-                  </Link>
+                    <td
+                      scope="row"
+                      className="px-6 py-4 font-medium whitespace-nowrap"
+                    >
+                      {/* Action buttons */}
+                      <Link to={`/dashboard/order/details/${order._id}`}>
+                        <span className="bg-green-200 text-green-800 text-md font-semibold mr-2 px-3 py-[2px] rounded">
+                          View
+                        </span>
+                      </Link>
 
-                  <Link>
-                    <span className="bg-green-200 text-green-800 text-md font-semibold mr-2 px-3 py-[2px] rounded">
-                      Pay Now
-                    </span>
-                  </Link>
-                </td>
-              </tr>
-
-              <tr className="bg-white border-b">
-                <td
-                  scope="row"
-                  className="px-6 py-4 font-medium whitespace-nowrap"
-                >
-                  #344
-                </td>
-
-                <td
-                  scope="row"
-                  className="px-6 py-4 font-medium whitespace-nowrap"
-                >
-                  $300
-                </td>
-
-                <td
-                  scope="row"
-                  className="px-6 py-4 font-medium whitespace-nowrap"
-                >
-                  Pending
-                </td>
-
-                <td
-                  scope="row"
-                  className="px-6 py-4 font-medium whitespace-nowrap"
-                >
-                  Pending
-                </td>
-
-                <td
-                  scope="row"
-                  className="px-6 py-4 font-medium whitespace-nowrap"
-                >
-                  <Link>
-                    <span className="bg-green-200 text-green-800 text-md font-semibold mr-2 px-3 py-[2px] rounded">
-                      View
-                    </span>
-                  </Link>
-
-                  <Link>
-                    <span className="bg-green-200 text-green-800 text-md font-semibold mr-2 px-3 py-[2px] rounded">
-                      Pay Now
-                    </span>
-                  </Link>
-                </td>
-              </tr>
+                      {/* Show pay now button for unpaid orders */}
+                      {order.payment_status !== "paid" && (
+                        <span
+                          onClick={() => redirect(order)}
+                          className="bg-green-200 text-green-800 text-md font-semibold mr-2 px-3 py-[2px] rounded cursor-pointer"
+                        >
+                          Pay Now
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              }
             </tbody>
           </table>
         </div>

@@ -33,9 +33,27 @@ export const place_order = createAsyncThunk(
           orderId: data.orderId,
         },
       });
-      console.log(data);
+      // console.log(data);
     } catch (error) {
       console.log(error.response);
+    }
+  }
+);
+// End of place_order thunk
+
+// Fetch user orders with optional status filtering
+export const get_orders = createAsyncThunk(
+  "order/get_orders",
+  async ({ customerId, status }, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      // Request orders from API with customer ID and status filter
+      // Status can be: 'all', 'placed', 'pending', 'cancelled', 'warehouse'
+      const { data } = await api.get(
+        `/home/customer/get-orders/${customerId}/${status}`
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
     }
   }
 );
@@ -61,7 +79,12 @@ export const orderReducer = createSlice({
   },
 
   // Handle async action states
-  extraReducers: () => {},
+  extraReducers: (builder) => {
+    // Handle successful order fetch - update myOrders with filtered results
+    builder.addCase(get_orders.fulfilled, (state, { payload }) => {
+      state.myOrders = payload.orders;
+    });
+  },
 });
 
 // Export actions for component usage
