@@ -9,7 +9,11 @@ import { LuShoppingCart } from "react-icons/lu";
 import Rating from "../Rating"; // Rating component for star display
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { add_to_cart, messageClear } from "../../store/reducers/cartReducer";
+import {
+  add_to_cart,
+  add_to_wishlist,
+  messageClear,
+} from "../../store/reducers/cartReducer";
 import toast from "react-hot-toast"; // Toast notifications
 
 const FeatureProducts = ({ products }) => {
@@ -48,7 +52,22 @@ const FeatureProducts = ({ products }) => {
       toast.error(errorMessage);
       dispatch(messageClear()); // Clear error message
     }
-  }, [successMessage, errorMessage, dispatch]);
+  }, [successMessage, errorMessage]);
+
+  const add_wishlist = (product) => {
+    dispatch(
+      add_to_wishlist({
+        userId: userInfo.id,
+        productId: product._id,
+        name: product.name,
+        price: product.price,
+        image: product.images[0],
+        discount: product.discount,
+        rating: product.rating,
+        slug: product.slug,
+      })
+    );
+  };
 
   return (
     <div className="w-[85%] flex flex-wrap mx-auto">
@@ -89,7 +108,10 @@ const FeatureProducts = ({ products }) => {
               -bottom-10 justify-center items-center gap-2 absolute  w-full group-hover:bottom-3 "
               >
                 {/* Add to Wishlist */}
-                <li className="w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-[#059473] hover:text-white hover:rotate-[720deg] transition-all">
+                <li
+                  onClick={() => add_wishlist(product)}
+                  className="w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-[#059473] hover:text-white hover:rotate-[720deg] transition-all"
+                >
                   <FaRegHeart />
                 </li>
 

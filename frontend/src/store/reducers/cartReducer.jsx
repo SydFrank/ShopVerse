@@ -154,6 +154,31 @@ export const quantity_decrement = createAsyncThunk(
 // End of quantity_decrement thunk
 
 /**
+ * Add to Wishlist - Save product to user's wishlist for later purchase
+ * Handles API call to add product to wishlist and updates wishlist count
+ *
+ * @param {Object} info - Product information including productId and userId
+ * @param {string} info.productId - Unique identifier for the product to save
+ * @param {string} info.userId - Customer's unique identifier
+ * @param {Object} thunkAPI - Redux Toolkit thunk API helpers
+ * @returns {Promise} - Resolved with success message or rejected with error
+ */
+export const add_to_wishlist = createAsyncThunk(
+  "wishlist/add_to_wishlist",
+  async (info, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      // Make API request to add product to user's wishlist
+      const { data } = await api.post("/home/product/add-to-wishlist", info);
+      return fulfillWithValue(data);
+    } catch (error) {
+      // Return error data for proper error handling in UI
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of add_to_wishlist thunk
+
+/**
  * Cart slice configuration
  * Defines initial state, reducers, and async action handlers for shopping cart
  *
@@ -232,6 +257,18 @@ export const cartReducer = createSlice({
       // Quantity decrement success state
       .addCase(quantity_decrement.fulfilled, (state, { payload }) => {
         state.successMessage = payload.message; // Display success message to user
+      })
+
+      // Add to wishlist success state
+      .addCase(add_to_wishlist.fulfilled, (state, { payload }) => {
+        state.successMessage = payload.message; // Display success message to user
+        state.wishlist_count =
+          state.wishlist_count > 0 ? state.wishlist_count + 1 : 1; // Update wishlist badge count
+      })
+
+      // Add to wishlist error state
+      .addCase(add_to_wishlist.rejected, (state, { payload }) => {
+        state.errorMessage = payload.error; // Display error message from API
       });
   },
 });

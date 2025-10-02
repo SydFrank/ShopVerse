@@ -30,7 +30,9 @@ const Header = () => {
   // Select user information from auth reducer state
   const { userInfo } = useSelector((state) => state.auth);
   // Select cart product count from cart reducer state
-  const { cart_product_count } = useSelector((state) => state.cart);
+  const { cart_product_count, wishlist_count } = useSelector(
+    (state) => state.cart
+  );
 
   // Get the current pathname from the URL
   const { pathname } = useLocation();
@@ -40,11 +42,6 @@ const Header = () => {
   const [showSidebar, setShowSidebar] = useState(true);
   // State to manage category visibility (not used in this snippet but can be implemented)
   const [categoryShow, setCategoryShow] = useState(true);
-
-  // Mock user login status (should be retrieved from state manager or API in actual project)
-  const user = false;
-
-  const wishlist_count = 3; // Mock wishlist count (should be dynamic in actual project)
 
   // State to manage search input value
   const [searchValue, setSearchValue] = useState("");
@@ -252,9 +249,12 @@ const Header = () => {
                       <span className="text-xl text-green-500">
                         <FaHeart />
                       </span>
-                      <div className="w-[20px] h-[20px] absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px]">
-                        {wishlist_count}
-                      </div>
+
+                      {wishlist_count !== 0 && (
+                        <div className="w-[20px] h-[20px] absolute bg-red-500 rounded-full text-white flex justify-center items-center -top-[3px] -right-[5px]">
+                          {wishlist_count}
+                        </div>
+                      )}
                     </div>
 
                     {/* Cart icon with count */}
