@@ -4,6 +4,7 @@ const cartModel = require("../../models/cartModel");
 const { responseReturn } = require("../../utils/response");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
+const wishlistModel = require("../../models/wishlistModel");
 
 // Define the cartControllers class to handle shopping cart related logic
 class cartControllers {
@@ -321,6 +322,47 @@ class cartControllers {
     }
   };
   // End of quantity_decrement method
+
+  /**
+   * Handles adding a product to the customer's wishlist.
+   * This method checks if the product (identified by slug) is already in the wishlist,
+   * and if not, creates a new wishlist entry. Prevents duplicate products from being
+   * added to the same wishlist.
+   *
+   * @param {Object} req - Express request object, expects body:
+   *   - slug: unique product slug identifier (string)
+   *   - other product details as needed by wishlistModel
+   * @param {Object} res - Express response object
+   */
+  add_to_wishlist = async (req, res) => {
+    // Extract product slug from request body
+    const { slug } = req.body;
+
+    try {
+      // Check if a product with this slug already exists in the wishlist
+      const product = await wishlistModel.findOne({ slug });
+
+      if (product) {
+        // Return error response if product is already in wishlist
+        responseReturn(res, 404, {
+          error: "This Product Is Already In Wishlist",
+        });
+      } else {
+        // Create a new wishlist entry with all provided product data
+        await wishlistModel.create(req.body);
+        // Return success response confirming addition to wishlist
+        responseReturn(res, 201, {
+          message: "Product Added To Wishlist Successfully",
+        });
+      }
+    } catch (error) {
+      // Log error message to console for debugging purposes
+      console.log(error.message);
+      // Return error response if operation fails
+      responseReturn(res, 500, { error: "Internal Server Error" });
+    }
+  };
+  // End of add_to_wishlist method
 }
 // Export instance of cartControllers for use in routes
 module.exports = new cartControllers();

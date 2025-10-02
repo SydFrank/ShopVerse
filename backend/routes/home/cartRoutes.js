@@ -25,5 +25,7 @@ router.put(
   cartControllers.quantity_decrement
 );
 
+router.post("/home/product/add-to-wishlist", cartControllers.add_to_wishlist);
+
 // Export the router to be used in the main server application
 module.exports = router;
