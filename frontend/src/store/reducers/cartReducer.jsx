@@ -204,6 +204,31 @@ export const get_wishlist_products = createAsyncThunk(
 // End of get_wishlist_products thunk
 
 /**
+ * Remove from Wishlist - Delete specific product from user's wishlist
+ * Handles API call to remove product from wishlist and updates wishlist count
+ *
+ * @param {string} wishlistId - Unique identifier for the wishlist item to be removed
+ * @param {Object} thunkAPI - Redux Toolkit thunk API helpers
+ * @returns {Promise} - Resolved with success message or rejected with error
+ */
+export const remove_wishlist = createAsyncThunk(
+  "wishlist/remove_wishlist",
+  async (wishlistId, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      // Make API request to remove specific product from user's wishlist
+      const { data } = await api.delete(
+        `/home/product/remove-wishlist-product/${wishlistId}`
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      // Return error data for proper error handling in UI
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of remove_wishlist thunk
+
+/**
  * Cart slice configuration
  * Defines initial state, reducers, and async action handlers for shopping cart
  *
@@ -300,6 +325,14 @@ export const cartReducer = createSlice({
       .addCase(get_wishlist_products.fulfilled, (state, { payload }) => {
         state.wishlist = payload.wishlists;
         state.wishlist_count = payload.wishlistCount; // Update wishlist products array and count
+      })
+      // Remove from wishlist success state
+      .addCase(remove_wishlist.fulfilled, (state, { payload }) => {
+        state.wishlist = state.wishlist.filter(
+          (p) => p._id !== payload.wishlistId
+        );
+        state.successMessage = payload.message;
+        state.wishlist_count = state.wishlist_count - 1; // Update wishlist products array and count
       });
   },
 });

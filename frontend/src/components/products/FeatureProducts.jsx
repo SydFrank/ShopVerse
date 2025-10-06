@@ -117,7 +117,7 @@ const FeatureProducts = ({ products }) => {
 
                 {/* View Product Details */}
                 <Link
-                  to="/product/details/new"
+                  to={`/product/details/${product.slug}`}
                   className="w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-[#059473] hover:text-white hover:rotate-[720deg] transition-all"
                 >
                   <FaEye />
