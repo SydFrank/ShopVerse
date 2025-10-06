@@ -178,11 +178,19 @@ export const add_to_wishlist = createAsyncThunk(
 );
 // End of add_to_wishlist thunk
 
+/**
+ * Get Wishlist Products - Fetch user's saved wishlist items from backend
+ * Retrieves all products in user's wishlist with product details and count
+ *
+ * @param {string} userId - Customer's unique identifier
+ * @param {Object} thunkAPI - Redux Toolkit thunk API helpers
+ * @returns {Promise} - Resolved with wishlist products array and count or rejected with error
+ */
 export const get_wishlist_products = createAsyncThunk(
   "wishlist/get_wishlist_products",
   async (userId, { fulfillWithValue, rejectWithValue }) => {
     try {
-      // Make API request to get user's wishlist products
+      // Make API request to get user's wishlist products for specific user
       const { data } = await api.get(
         `/home/product/get-wishlist-products/${userId}`
       );
@@ -286,6 +294,12 @@ export const cartReducer = createSlice({
       // Add to wishlist error state
       .addCase(add_to_wishlist.rejected, (state, { payload }) => {
         state.errorMessage = payload.error; // Display error message from API
+      })
+
+      // Get wishlist products success state
+      .addCase(get_wishlist_products.fulfilled, (state, { payload }) => {
+        state.wishlist = payload.wishlists;
+        state.wishlist_count = payload.wishlistCount; // Update wishlist products array and count
       });
   },
 });
