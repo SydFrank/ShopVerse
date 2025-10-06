@@ -1,11 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaEye, FaRegHeart } from "react-icons/fa";
 import { LuShoppingCart } from "react-icons/lu";
 import Rating from "../Rating"; // Rating component for star display
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { get_wishlist_products } from "../../store/reducers/cartReducer";
 
 // User wishlist component showing saved products
 const Wishlist = () => {
+  const dispatch = useDispatch();
+
+  const { userInfo } = useSelector((state) => state.auth);
+
+  const { errorMessage, successMessage } = useSelector((state) => state.cart);
+
+  useEffect(() => {
+    dispatch(get_wishlist_products(userInfo.id));
+  }, []);
+
   return (
     <div className="w-full grid grid-cols-4 max-lg:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1 gap-6">
       {/* Render wishlist products */}

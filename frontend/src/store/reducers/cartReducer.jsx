@@ -178,6 +178,23 @@ export const add_to_wishlist = createAsyncThunk(
 );
 // End of add_to_wishlist thunk
 
+export const get_wishlist_products = createAsyncThunk(
+  "wishlist/get_wishlist_products",
+  async (userId, { fulfillWithValue, rejectWithValue }) => {
+    try {
+      // Make API request to get user's wishlist products
+      const { data } = await api.get(
+        `/home/product/get-wishlist-products/${userId}`
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      // Return error data for proper error handling in UI
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of get_wishlist_products thunk
+
 /**
  * Cart slice configuration
  * Defines initial state, reducers, and async action handlers for shopping cart
