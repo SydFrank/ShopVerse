@@ -27,5 +27,15 @@ router.put(
 
 router.post("/home/product/add-to-wishlist", cartControllers.add_to_wishlist);
 
+router.get(
+  "/home/product/get-wishlist-products/:userId",
+  cartControllers.get_wishlist
+);
+
+router.delete(
+  "/home/product/remove-wishlist-product/:wishlistId",
+  cartControllers.remove_wishlist
+);
+
 // Export the router to be used in the main server application
 module.exports = router;

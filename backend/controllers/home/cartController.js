@@ -363,6 +363,69 @@ class cartControllers {
     }
   };
   // End of add_to_wishlist method
+
+  /**
+   * Handles retrieving all products from a customer's wishlist.
+   * This method fetches all wishlist items for a specific user and returns
+   * both the count of items and the complete wishlist data. Used to display
+   * the customer's saved products on the wishlist page.
+   *
+   * @param {Object} req - Express request object, expects params:
+   *   - userId: ID of the customer whose wishlist to retrieve (string)
+   * @param {Object} res - Express response object
+   */
+  get_wishlist = async (req, res) => {
+    // Extract customer ID from request parameters
+    const { userId } = req.params;
+
+    try {
+      // Find all wishlist items belonging to the specific user
+      const wishlists = await wishlistModel.find({ userId });
+
+      // Return wishlist data with count and complete items array
+      responseReturn(res, 200, {
+        wishlistCount: wishlists.length, // Number of items in wishlist
+        wishlists, // Complete array of wishlist items with product details
+      });
+    } catch (error) {
+      // Log error message to console for debugging purposes
+      console.log(error.message);
+      // Return error response if wishlist retrieval fails
+      responseReturn(res, 500, { error: "Internal Server Error" });
+    }
+  };
+  // End of get_wishlist method
+
+  /**
+   * Handles removing a product from the customer's wishlist.
+   * This method deletes a specific wishlist item using the wishlist item's ID.
+   * Once deleted, the product will no longer appear in the user's wishlist.
+   *
+   * @param {Object} req - Express request object, expects params:
+   *   - wishlistId: ID of the wishlist item to be deleted (string)
+   * @param {Object} res - Express response object
+   */
+  remove_wishlist = async (req, res) => {
+    // Extract wishlist item ID from request parameters
+    const { wishlistId } = req.params;
+
+    try {
+      // Find and delete the wishlist item by its ID, returning the deleted item
+      const wishlist = await wishlistModel.findByIdAndDelete(wishlistId);
+
+      // Return success response confirming deletion with deleted item details
+      responseReturn(res, 200, {
+        message: "Wishlist Product Removed",
+        wishlistId, // Include the deleted wishlist item in response
+      });
+    } catch (error) {
+      // Log error message to console for debugging purposes
+      console.log(error.message);
+      // Return error response if deletion fails
+      responseReturn(res, 500, { error: "Internal Server Error" });
+    }
+  };
+  // End of remove_wishlist method
 }
 // Export instance of cartControllers for use in routes
 module.exports = new cartControllers();
