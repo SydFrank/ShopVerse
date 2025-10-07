@@ -238,6 +238,73 @@ class homeControllers {
     }
   };
   // End of query_products method
+
+  /**
+   * Handles fetching detailed information for a specific product.
+   * This method retrieves complete product details using the product slug,
+   * along with related products from the same category and more products
+   * from the same seller. Used for product detail pages.
+   *
+   * @param {Object} req - Express request object, expects params:
+   *   - slug: unique product slug identifier (string)
+   * @param {Object} res - Express response object
+   */
+  product_details = async (req, res) => {
+    // Extract product slug from request parameters
+    const { slug } = req.params;
+
+    try {
+      // Find the main product by its unique slug
+      const product = await productModel.findOne({ slug });
+
+      // Find related products from the same category, excluding the current product
+      const relatedProducts = await productModel
+        .find({
+          $and: [
+            {
+              _id: {
+                $ne: product._id, // Exclude the current product by ID
+              },
+            },
+            {
+              category: product.category, // Match products in the same category
+            },
+          ],
+        })
+        .limit(12); // Limit to 12 related products
+
+      // Find more products from the same seller, excluding the current product
+      const moreProducts = await productModel
+        .find({
+          $and: [
+            {
+              _id: {
+                $ne: product._id, // Exclude the current product by ID
+              },
+            },
+            {
+              sellerId: {
+                $eq: product.sellerId, // Match products from the same seller
+              },
+            },
+          ],
+        })
+        .limit(3); // Limit to 3 more products from the same seller
+
+      // Return the product details along with related and more products
+      responseReturn(res, 200, {
+        product, // Main product details
+        relatedProducts, // Array of related products from same category (max 12)
+        moreProducts, // Array of more products from same seller (max 3)
+      });
+    } catch (error) {
+      // Log error message to console for debugging purposes
+      console.log(error.message);
+      // Return error response if product retrieval fails
+      responseReturn(res, 500, { error: "Internal Server Error" });
+    }
+  };
+  // End of product_details method
 }
 
 // Export instance of homeControllers for use in routes

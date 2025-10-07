@@ -13,5 +13,7 @@ router.get(
 );
 router.get("/query-products", homeControllers.query_products);
 
+router.get("/product-details/:slug", homeControllers.product_details);
+
 // Export the router to be used in the main server application
 module.exports = router;
