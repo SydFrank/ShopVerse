@@ -54,6 +54,7 @@ const FeatureProducts = ({ products }) => {
     }
   }, [successMessage, errorMessage]);
 
+  // add to wishlist handler
   const add_wishlist = (product) => {
     dispatch(
       add_to_wishlist({

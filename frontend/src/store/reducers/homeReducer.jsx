@@ -119,6 +119,19 @@ export const query_products = createAsyncThunk(
 );
 // End of query_products async thunk
 
+/**
+ * Async thunk to fetch detailed product information along with related products
+ * Used for product detail pages to display comprehensive product information
+ *
+ * @async
+ * @function product_details
+ * @param {string} slug - Product URL slug identifier for fetching specific product
+ * @returns {Promise<Object>} Promise resolving to:
+ *   - product: Detailed product information object
+ *   - relatedProducts: Array of products in the same category
+ *   - moreProducts: Array of products from the same seller
+ * @throws {Object} API error response
+ */
 export const product_details = createAsyncThunk(
   "product/product_details",
   async (slug, { fulfillWithValue }) => {
@@ -146,6 +159,9 @@ export const product_details = createAsyncThunk(
  * @property {Object} priceRange - Price filter boundaries
  * @property {number} priceRange.low - Minimum available product price
  * @property {number} priceRange.high - Maximum available product price
+ * @property {Object} product - Detailed information for currently viewed product
+ * @property {Array} relatedProducts - Products related to current product (same category)
+ * @property {Array} moreProducts - Additional products from the same seller
  */
 export const homeReducer = createSlice({
   name: "home",
