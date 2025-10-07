@@ -27,7 +27,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Rating from "../components/Rating";
 import Reviews from "../components/Reviews";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 // React Icons library for various UI elements
 import { IoIosArrowForward } from "react-icons/io";
 import { MdKeyboardArrowRight } from "react-icons/md";
@@ -46,6 +46,7 @@ import "swiper/css/pagination"; // Pagination-specific styles
 import { useDispatch, useSelector } from "react-redux";
 import { product_details } from "../store/reducers/homeReducer";
 import toast from "react-hot-toast";
+import { add_to_cart, messageClear } from "../store/reducers/cartReducer";
 
 /**
  * Details Functional Component
@@ -56,10 +57,18 @@ const Details = () => {
   const { slug } = useParams();
   // Redux dispatch function for triggering actions
   const dispatch = useDispatch();
+  // Navigation hook for programmatic routing
+  const navigate = useNavigate();
   // Select product-related state from Redux store
   const { product, relatedProducts, moreProducts } = useSelector(
     (state) => state.home
   );
+
+  // Get current user info from auth state
+  const { userInfo } = useSelector((state) => state.auth);
+
+  // Get cart operation messages from cart state
+  const { successMessage, errorMessage } = useSelector((state) => state.cart);
 
   // Fetch product details when component mounts or slug changes
   useEffect(() => {
@@ -147,6 +156,34 @@ const Details = () => {
       setQuantity(quantity - 1);
     }
   };
+
+  const add_cart = () => {
+    if (userInfo) {
+      // User is authenticated - add product to cart
+      dispatch(
+        add_to_cart({
+          userId: userInfo.id,
+          quantity: quantity,
+          productId: product._id,
+        })
+      );
+    } else {
+      // User not logged in - redirect to login page
+      navigate("/login");
+    }
+  };
+
+  // Show toast messages for cart operations and clear them
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(messageClear()); // Clear success message
+    }
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(messageClear()); // Clear error message
+    }
+  }, [successMessage, errorMessage]);
 
   return (
     <div>
@@ -271,10 +308,7 @@ const Details = () => {
 
               {/* Product description text */}
               <div className="text-slate-600 ">
-                <p>
-                  {product?.description?.substring(0, 230) ?? ""}
-                  {"..."}
-                </p>
+                <p>{product?.description}</p>
               </div>
 
               {/* Quantity selector and action buttons section */}
@@ -297,7 +331,10 @@ const Details = () => {
 
                     {/* Add to cart button with hover effects */}
                     <div>
-                      <button className="px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-green-500/40 bg-[#059473] text-white">
+                      <button
+                        onClick={add_cart}
+                        className="px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-green-500/40 bg-[#059473] text-white"
+                      >
                         Add To Cart
                       </button>
                     </div>
@@ -325,8 +362,12 @@ const Details = () => {
                 {/* Content column with stock status and social media links */}
                 <div className="flex flex-col gap-5 ">
                   {/* Dynamic stock availability display */}
-                  <span className={`text-${stock ? "green" : "red"}-500`}>
-                    {stock ? `In Stock (${stock})` : "Out of Stock"}
+                  <span
+                    className={`text-${product.stock ? "green" : "red"}-500`}
+                  >
+                    {product.stock
+                      ? `In Stock (${product.stock})`
+                      : "Out of Stock"}
                   </span>
 
                   {/* Social media sharing buttons list */}
@@ -442,38 +483,38 @@ const Details = () => {
                 {/* Seller details and statistics */}
                 <div className="flex flex-col gap-5 mt-3 border border-slate-200 p-3 ">
                   {/* Map through related products from this seller */}
-                  {[1, 2, 3].map((p) => {
+                  {moreProducts.map((p, i) => {
                     return (
-                      <Link className="block" key={p}>
+                      <Link className="block" key={i}>
                         {/* Product image container with discount badge */}
                         <div className="relative h-[270px]">
                           <img
                             className="w-full h-full"
-                            src={`/images/products/${p}.webp`}
-                            alt={`Related Product ${p}`}
+                            src={p.images[0]}
+                            alt={`Related Product ${p.name}`}
                           />
                           {/* Discount percentage badge overlay */}
-                          {discount !== 0 && (
+                          {p.discount !== 0 && (
                             <div className="flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full bg-red-500 font-semibold text-xs left-2 top-2">
-                              {discount}%
+                              {p.discount}%
                             </div>
                           )}
                         </div>
 
                         {/* Product name */}
                         <h2 className="text-slate-600 py-1 font-bold">
-                          Product Name
+                          {p.name}
                         </h2>
 
                         {/* Product price and rating */}
                         <div className="flex gap-2">
                           <h2 className="text-lg font-bold text-slate-600">
-                            $434
+                            ${p.price}
                           </h2>
 
                           {/* Star rating display */}
                           <div className="flex items-center gap-2">
-                            <Rating ratings={4.5} />
+                            <Rating ratings={p.rating} />
                           </div>
                         </div>
                       </Link>
@@ -509,7 +550,7 @@ const Details = () => {
               className="mySwiper"
             >
               {/* Map through related products array to create swiper slides */}
-              {[1, 2, 3, 4, 5, 6].map((p, i) => {
+              {relatedProducts.map((p, i) => {
                 return (
                   <SwiperSlide key={i}>
                     <Link className="block">
@@ -518,17 +559,17 @@ const Details = () => {
                         <div className="w-full h-full">
                           <img
                             className="w-full h-full"
-                            src={`/images/products/${p}.webp`}
-                            alt={`Related Product ${p}`}
+                            src={p.images[0]}
+                            alt={`Related Product ${p.name}`}
                           />
                           {/* Dark overlay with hover transition effect */}
                           <div className="absolute h-full w-full top-0 left-0 bg-[#000] opacity-25 hover:opacity-15 transition-all duration-500"></div>
                         </div>
 
                         {/* Discount percentage badge (conditional rendering) */}
-                        {discount !== 0 && (
+                        {p.discount !== 0 && (
                           <div className="flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full bg-red-500 font-semibold text-xs left-2 top-2">
-                            {discount}%
+                            {p.discount}%
                           </div>
                         )}
                       </div>
@@ -537,18 +578,18 @@ const Details = () => {
                       <div className="p-4 flex flex-col gap-1">
                         {/* Product title */}
                         <h2 className="text-slate-600 py-1 font-bold">
-                          Product Name
+                          {p.name}
                         </h2>
 
                         {/* Price and rating section */}
                         <div className="flex gap-2">
                           <h2 className="text-lg font-bold text-slate-600">
-                            $434
+                            ${p.price}
                           </h2>
 
                           {/* Product rating stars */}
                           <div className="flex ">
-                            <Rating ratings={4.5} />
+                            <Rating ratings={p.rating} />
                           </div>
                         </div>
                       </div>
