@@ -23,7 +23,7 @@
  */
 
 // React core imports for functional component with state management
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // Custom component imports for page structure and functionality
 import Header from "../components/Header"; // Website header with navigation and user info
@@ -32,7 +32,7 @@ import Rating from "../components/Rating"; // Star rating display component
 import Reviews from "../components/Reviews"; // Product reviews section component
 
 // React Router for navigation between pages
-import { Link } from "react-router-dom"; // Navigation link component for breadcrumbs
+import { Link, useParams } from "react-router-dom"; // Navigation link component for breadcrumbs
 
 // React Icons library for various UI elements
 import { IoIosArrowForward } from "react-icons/io"; // Forward arrow icon for breadcrumb navigation
@@ -51,12 +51,21 @@ import { Swiper, SwiperSlide } from "swiper/react"; // Swiper components for tou
 import { Pagination } from "swiper/modules"; // Pagination module for swiper
 import "swiper/css"; // Core Swiper styles
 import "swiper/css/pagination"; // Pagination-specific styles
+import { useDispatch } from "react-redux";
+import { product_details } from "../store/reducers/homeReducer";
 
 /**
  * Details Functional Component
  * Manages product detail display, image gallery, and user interactions
  */
 const Details = () => {
+  const { slug } = useParams();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(product_details(slug));
+  }, [slug]);
+
   // Mock product image array - represents available product images (1-6)
   // In production, this would be fetched from API based on product ID
   const images = [1, 2, 3, 4, 5, 6];

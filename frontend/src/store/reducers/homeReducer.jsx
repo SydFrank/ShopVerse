@@ -1,21 +1,18 @@
 /**
- * Home Reducer - Homepage data state management
- *
- * Core Features:
- * - Product categories for navigation
- * - Multiple product types (latest, top-rated, discount)
- * - Price range filtering for shop page
- * - Error handling for API requests
- *
- * State: categorys, products, latest_product, topRated_product, discount_product, priceRange
+ * This reducer handles all product-related state management for the homepage
+ * and shop pages, including category navigation, product filtering, and pagination.
  */
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api/api";
 
 /**
- * Get Categories - Fetch product categories for navigation
- * API: GET /home/get-categorys
+ * Async thunk to fetch product categories from the backend
+ *
+ * @async
+ * @function get_category
+ * @returns {Promise<Object>} Promise resolving to category data
+ * @throws {Object} API error response
  */
 export const get_category = createAsyncThunk(
   "product/get_category",
@@ -28,11 +25,19 @@ export const get_category = createAsyncThunk(
     }
   }
 );
+// End of get_category async thunk
 
 /**
- * Get Products - Fetch multiple product types for homepage
- * Returns: products, latest_product, topRated_product, discount_product
- * API: GET /home/get-products
+ * Async thunk to fetch various product collections for homepage display
+ *
+ * @async
+ * @function get_products
+ * @returns {Promise<Object>} Promise resolving to products data including:
+ *   - products: General product array
+ *   - latest_product: Recently added products
+ *   - topRated_product: Highest rated products
+ *   - discount_product: Products with discounts
+ * @throws {Object} API error response
  */
 export const get_products = createAsyncThunk(
   "product/get_products",
@@ -46,11 +51,18 @@ export const get_products = createAsyncThunk(
     }
   }
 );
+// End of get_products async thunk
 
 /**
- * Price Range Product - Get price boundaries and latest products
- * Returns: priceRange (min/max), latest_product array
- * API: GET /home/price-range-latest-product
+ * Async thunk to fetch price range boundaries and latest products
+ * Used for price filter slider initialization and homepage carousel
+ *
+ * @async
+ * @function price_range_product
+ * @returns {Promise<Object>} Promise resolving to:
+ *   - priceRange: {low: number, high: number} - Min/max price boundaries
+ *   - latest_product: Array of latest products
+ * @throws {Object} API error response
  */
 export const price_range_product = createAsyncThunk(
   "product/price_range_product",
@@ -64,17 +76,44 @@ export const price_range_product = createAsyncThunk(
     }
   }
 );
+// End of price_range_product async thunk
+
+export const product_details = createAsyncThunk(
+  "product/product_details",
+  async (slug, { fulfillWithValue }) => {
+    try {
+      const { data } = await api.get(`/home/product-details/${slug}`);
+      return fulfillWithValue(data);
+    } catch (error) {
+      console.log(error.response);
+    }
+  }
+);
+// End of product_details async thunk
 
 /**
- * Query Products - Filter and search products with pagination
- * Params: category, rating, price range, sort, pageNumber, searchValue
- * API: GET /home/query-products
+ * Async thunk to query products with advanced filtering and pagination
+ *
+ * @async
+ * @function query_products
+ * @param {Object} query - Filter parameters object
+ * @param {string} query.category - Product category filter
+ * @param {number} query.rating - Minimum rating filter
+ * @param {number} query.low - Minimum price filter
+ * @param {number} query.high - Maximum price filter
+ * @param {string} query.sortPrice - Price sorting order ('asc'|'desc')
+ * @param {number} query.pageNumber - Current page number for pagination
+ * @param {string} [query.searchValue] - Optional search term
+ * @returns {Promise<Object>} Promise resolving to:
+ *   - products: Filtered product array
+ *   - totalProduct: Total count of matching products
+ *   - parPage: Products per page limit
+ * @throws {Object} API error response
  */
 export const query_products = createAsyncThunk(
   "product/query_products",
   async (query, { fulfillWithValue, rejectWithValue }) => {
     try {
-      // Build query string with filters
       const { data } = await api.get(
         `/home/query-products?category=${query.category}&&rating=${
           query.rating
@@ -84,7 +123,6 @@ export const query_products = createAsyncThunk(
           query.searchValue ? query.searchValue : ""
         }`
       );
-
       return fulfillWithValue(data);
     } catch (error) {
       console.log(error.response);
@@ -92,53 +130,61 @@ export const query_products = createAsyncThunk(
     }
   }
 );
+// End of query_products async thunk
 
 /**
- * Home Redux Slice - Manages homepage and shop data state
+ * Home Redux Slice Configuration
+ *
+ * @typedef {Object} HomeState
+ * @property {Array} categorys - Product categories for navigation menu
+ * @property {Array} products - Current filtered/searched products array
+ * @property {number} totalProduct - Total count of products matching current filters
+ * @property {number} parPage - Number of products displayed per page
+ * @property {Array} latest_product - Recently added products for homepage carousel
+ * @property {Array} topRated_product - Top-rated products for homepage showcase
+ * @property {Array} discount_product - Discounted products for homepage promotions
+ * @property {Object} priceRange - Price filter boundaries
+ * @property {number} priceRange.low - Minimum available product price
+ * @property {number} priceRange.high - Maximum available product price
  */
 export const homeReducer = createSlice({
   name: "home",
 
-  // Initial state structure
   initialState: {
-    categorys: [], // Product categories for navigation
-    products: [], // Filtered products for shop page
-    totalProduct: 0, // Total count for pagination
-    parPage: 3, // Products per page
-    latest_product: [], // Homepage latest products carousel
-    topRated_product: [], // Homepage top-rated products carousel
-    discount_product: [], // Homepage discount products carousel
+    categorys: [],
+    products: [],
+    totalProduct: 0,
+    parPage: 3,
+    latest_product: [],
+    topRated_product: [],
+    discount_product: [],
     priceRange: {
-      low: 0, // Min price for filter slider
-      high: 100, // Max price for filter slider
+      low: 0,
+      high: 100,
     },
   },
 
   reducers: {},
 
-  // Handle async thunk responses
   extraReducers: (builder) => {
     builder
-      // Categories for navigation
+      // Get Product Categories
       .addCase(get_category.fulfilled, (state, { payload }) => {
         state.categorys = payload.categorys;
       })
-
-      // All product types for homepage
+      // Get Homepage Products Collections
       .addCase(get_products.fulfilled, (state, { payload }) => {
         state.products = payload.products;
         state.latest_product = payload.latest_product;
         state.topRated_product = payload.topRated_product;
         state.discount_product = payload.discount_product;
       })
-
-      // Price range and latest products
+      // Get Price Range and Latest Products
       .addCase(price_range_product.fulfilled, (state, { payload }) => {
         state.priceRange = payload.priceRange;
         state.latest_product = payload.latest_product;
       })
-
-      // Filtered products for shop page
+      // Query Products with Filters and Pagination
       .addCase(query_products.fulfilled, (state, { payload }) => {
         state.products = payload.products;
         state.totalProduct = payload.totalProduct;
