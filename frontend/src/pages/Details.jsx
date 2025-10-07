@@ -22,46 +22,46 @@
  * @returns {JSX.Element} Complete product detail page with all interactive features
  */
 
-// React core imports for functional component with state management
 import React, { useEffect, useState } from "react";
-
-// Custom component imports for page structure and functionality
-import Header from "../components/Header"; // Website header with navigation and user info
-import Footer from "../components/Footer"; // Website footer with links and company info
-import Rating from "../components/Rating"; // Star rating display component
-import Reviews from "../components/Reviews"; // Product reviews section component
-
-// React Router for navigation between pages
-import { Link, useParams } from "react-router-dom"; // Navigation link component for breadcrumbs
-
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import Rating from "../components/Rating";
+import Reviews from "../components/Reviews";
+import { Link, useParams } from "react-router-dom";
 // React Icons library for various UI elements
-import { IoIosArrowForward } from "react-icons/io"; // Forward arrow icon for breadcrumb navigation
-import { MdKeyboardArrowRight } from "react-icons/md"; // Right arrow for detailed breadcrumb
-import { FaHeart } from "react-icons/fa6"; // Heart icon for wishlist functionality
-import { FaFacebookF } from "react-icons/fa"; // Facebook icon for social sharing
-import { FaTwitter } from "react-icons/fa"; // Twitter icon for social sharing
-import { FaLinkedinIn } from "react-icons/fa"; // LinkedIn icon for social sharing
-
+import { IoIosArrowForward } from "react-icons/io";
+import { MdKeyboardArrowRight } from "react-icons/md";
+import { FaHeart } from "react-icons/fa6";
+import { FaFacebookF } from "react-icons/fa";
+import { FaTwitter } from "react-icons/fa";
+import { FaLinkedinIn } from "react-icons/fa";
 // Carousel library imports for product image gallery and related products
 import Carousel from "react-multi-carousel"; // Multi-responsive carousel component
 import "react-multi-carousel/lib/styles.css"; // Default carousel styling
-
 // Swiper library imports for advanced carousel functionality
 import { Swiper, SwiperSlide } from "swiper/react"; // Swiper components for touch-friendly carousels
 import { Pagination } from "swiper/modules"; // Pagination module for swiper
 import "swiper/css"; // Core Swiper styles
 import "swiper/css/pagination"; // Pagination-specific styles
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { product_details } from "../store/reducers/homeReducer";
+import toast from "react-hot-toast";
 
 /**
  * Details Functional Component
  * Manages product detail display, image gallery, and user interactions
  */
 const Details = () => {
+  // Extract product slug from URL parameters for fetching specific product details
   const { slug } = useParams();
+  // Redux dispatch function for triggering actions
   const dispatch = useDispatch();
+  // Select product-related state from Redux store
+  const { product, relatedProducts, moreProducts } = useSelector(
+    (state) => state.home
+  );
 
+  // Fetch product details when component mounts or slug changes
   useEffect(() => {
     dispatch(product_details(slug));
   }, [slug]);
@@ -129,6 +129,25 @@ const Details = () => {
     },
   };
 
+  // Quantity state for product purchase
+  const [quantity, setQuantity] = useState(1);
+
+  // Increment quantity function with stock limit check
+  const inc = () => {
+    if (quantity >= product.stock) {
+      toast.error("Out of stock");
+    } else {
+      setQuantity(quantity + 1);
+    }
+  };
+
+  // Decrement quantity function with minimum limit check
+  const dec = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
   return (
     <div>
       {/* Website header component with navigation and user authentication */}
@@ -165,11 +184,11 @@ const Details = () => {
               <span className="pt-1">
                 <MdKeyboardArrowRight />
               </span>
-              <Link to="/">Category</Link>
+              <Link to="/">{product.category}</Link>
               <span className="pt-1">
                 <MdKeyboardArrowRight />
               </span>
-              <span>Product Name</span>
+              <span>{product.name}</span>
             </div>
           </div>
         </div>
@@ -185,17 +204,13 @@ const Details = () => {
               <div className="p-5 border border-slate-200">
                 <img
                   className="h-[400px] w-full"
-                  src={
-                    image
-                      ? `/images/products/${image}.webp` // Show selected thumbnail image
-                      : `/images/products/${images[2]}.webp` // Default to 3rd image if none selected
-                  }
+                  src={image ? image : product.images?.[0]}
                 />
               </div>
 
               {/* Product thumbnail carousel section */}
               <div className="py-3">
-                {images && (
+                {product.images && (
                   <Carousel
                     autoPlay={true} // Automatically advance slides
                     infinite={true} // Loop back to first slide after last slide
@@ -203,11 +218,11 @@ const Details = () => {
                     transitionDuration={500} // Animation duration between slides (500ms)
                   >
                     {/* Map through available product images to create clickable thumbnails */}
-                    {images.map((img, index) => {
+                    {product.images.map((img, index) => {
                       return (
                         <div key={index} onClick={() => setImage(img)}>
                           <img
-                            src={`/images/products/${img}.webp`}
+                            src={img}
                             className=" h-[120px] cursor-pointer"
                           />
                         </div>
@@ -222,7 +237,7 @@ const Details = () => {
             <div className="flex flex-col gap-5 ">
               {/* Product title section */}
               <div className="text-3xl text-slate-600 font-bold ">
-                <h3>Product Name</h3>
+                <h3>{product.name}</h3>
               </div>
 
               {/* Product rating and review count display */}
@@ -235,43 +250,48 @@ const Details = () => {
 
               {/* Dynamic pricing section with discount calculation */}
               <div className="text-2xl text-red-500 font-bold flex gap-3">
-                {discount !== 0 ? (
+                {product.discount !== 0 ? (
                   <>
-                    Price : <h2 className="line-through">$500</h2>{" "}
+                    Price : <h2 className="line-through">${product.price}</h2>{" "}
                     {/* Original price crossed out */}
                     <h2>
-                      ${500 - Math.floor((500 * discount) / 100)} (-{discount}%){" "}
-                      {/* Discounted price */}
+                      $
+                      {product.price -
+                        Math.floor(
+                          (product.price * product.discount) / 100
+                        )}{" "}
+                      (-{product.discount}%) {/* Discounted price */}
                     </h2>
                   </>
                 ) : (
                   // Regular price when no discount
-                  <h2>Price : $200</h2>
+                  <h2>Price : ${product.price}</h2>
                 )}
               </div>
 
               {/* Product description text */}
               <div className="text-slate-600 ">
                 <p>
-                  Lorem Ipsum is simply dummy text of the printing and
-                  typesetting industry. Lorem Ipsum has been the industry's
-                  standard dummy text ever since the 1500s, when an unknown
-                  printer took a galley of type and scrambled it to make a type
-                  specimen book.{" "}
+                  {product?.description?.substring(0, 230) ?? ""}
+                  {"..."}
                 </p>
               </div>
 
               {/* Quantity selector and action buttons section */}
               <div className="flex gap-3 pb-10 border-b">
-                {stock ? ( // Only show purchase options if product is in stock
+                {product.stock ? ( // Only show purchase options if product is in stock
                   <>
                     {/* Quantity selector with increment/decrement buttons */}
                     <div className="flex bg-slate-200 h-[50px] justify-center items-center text-xl ">
-                      <div className="px-6 cursor-pointer">-</div>{" "}
+                      <div onClick={dec} className="px-6 cursor-pointer">
+                        -
+                      </div>{" "}
                       {/* Decrease quantity */}
-                      <div className="px-6 cursor-pointer">2</div>{" "}
+                      <div className="px-6 cursor-pointer">{quantity}</div>{" "}
                       {/* Current quantity */}
-                      <div className="px-6 cursor-pointer">+</div>{" "}
+                      <div onClick={inc} className="px-6 cursor-pointer">
+                        +
+                      </div>{" "}
                       {/* Increase quantity */}
                     </div>
 

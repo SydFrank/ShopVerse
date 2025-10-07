@@ -78,19 +78,6 @@ export const price_range_product = createAsyncThunk(
 );
 // End of price_range_product async thunk
 
-export const product_details = createAsyncThunk(
-  "product/product_details",
-  async (slug, { fulfillWithValue }) => {
-    try {
-      const { data } = await api.get(`/home/product-details/${slug}`);
-      return fulfillWithValue(data);
-    } catch (error) {
-      console.log(error.response);
-    }
-  }
-);
-// End of product_details async thunk
-
 /**
  * Async thunk to query products with advanced filtering and pagination
  *
@@ -132,6 +119,19 @@ export const query_products = createAsyncThunk(
 );
 // End of query_products async thunk
 
+export const product_details = createAsyncThunk(
+  "product/product_details",
+  async (slug, { fulfillWithValue }) => {
+    try {
+      const { data } = await api.get(`/home/product-details/${slug}`);
+      return fulfillWithValue(data);
+    } catch (error) {
+      console.log(error.response);
+    }
+  }
+);
+// End of product_details async thunk
+
 /**
  * Home Redux Slice Configuration
  *
@@ -162,6 +162,9 @@ export const homeReducer = createSlice({
       low: 0,
       high: 100,
     },
+    product: {},
+    relatedProducts: [],
+    moreProducts: [],
   },
 
   reducers: {},
@@ -189,6 +192,12 @@ export const homeReducer = createSlice({
         state.products = payload.products;
         state.totalProduct = payload.totalProduct;
         state.parPage = payload.parPage;
+      })
+      // Get Product Details, Related Products, and More from Same Seller
+      .addCase(product_details.fulfilled, (state, { payload }) => {
+        state.product = payload.product;
+        state.relatedProducts = payload.relatedProducts;
+        state.moreProducts = payload.moreProducts;
       });
   },
 });
