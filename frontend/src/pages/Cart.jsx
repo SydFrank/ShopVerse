@@ -26,9 +26,13 @@ import toast from "react-hot-toast"; // Toast notifications
  * @returns {JSX.Element} Complete shopping cart page with product management and checkout functionality
  */
 const Cart = () => {
+  // Redux dispatch function for triggering actions
   const dispatch = useDispatch();
 
+  // Get user info and cart state from Redux store
   const { userInfo } = useSelector((state) => state.auth);
+
+  // Destructure cart state properties
   const {
     cart_products,
     price,
@@ -41,6 +45,7 @@ const Cart = () => {
   // Initialize navigation hook
   const navigate = useNavigate();
 
+  // Fetch cart products on component mount
   useEffect(() => {
     dispatch(get_cart_products(userInfo.id));
   }, []);

@@ -79,21 +79,9 @@ const Details = () => {
     dispatch(product_details(slug));
   }, [slug]);
 
-  // Mock product image array - represents available product images (1-6)
-  // In production, this would be fetched from API based on product ID
-  const images = [1, 2, 3, 4, 5, 6];
-
   // Selected image state for main product display
   // Controls which image is currently shown in the main product view
   const [image, setImage] = useState("");
-
-  // Product discount percentage (mock data)
-  // Used for calculating discounted price display
-  const discount = 15;
-
-  // Product stock quantity (mock data)
-  // Determines availability and quantity selector visibility
-  const stock = 10;
 
   // Active tab state for product information sections
   // Controls which tab is currently displayed (reviews, description, etc.)
@@ -207,6 +195,61 @@ const Details = () => {
     } else {
       navigate("/login");
     }
+  };
+
+  /**
+   * Buy Now Handler - Direct purchase flow bypassing cart
+   * Calculates final price with discounts and platform fees, then navigates to shipping
+   *
+   * @function buyNow
+   * @description Handles immediate purchase by:
+   *   1. Calculating discounted price if applicable
+   *   2. Applying 5% platform processing fee
+   *   3. Structuring order data for shipping page
+   *   4. Navigating to shipping with product and pricing info
+   *
+   * Price Calculation Flow:
+   * - Base Price: Original product price
+   * - Apply Product Discount: Subtract percentage discount if available
+   * - Apply Platform Fee: Subtract 5% platform processing fee
+   * - Final Price: (discounted_price - 5%) * quantity
+   */
+  const buyNow = () => {
+    let price = 0;
+
+    // Calculate base price with product discount applied
+    if (product.discount !== 0) {
+      price =
+        product.price - Math.floor((product.price * product.discount) / 100);
+    } else {
+      price = product.price;
+    }
+
+    // Structure order object for shipping page with seller and product details
+    const obj = [
+      {
+        sellerId: product.sellerId,
+        shopName: product.shopName,
+        // Apply 5% platform processing fee to final price
+        price: quantity * (price - Math.floor((price * 5) / 100)),
+        products: [
+          {
+            quantity,
+            productInfo: product,
+          },
+        ],
+      },
+    ];
+
+    // Navigate to shipping page with order data and pricing breakdown
+    navigate("/shipping", {
+      state: {
+        products: obj, // Order structure with seller and product info
+        price: price * quantity, // Total price before platform fee
+        shipping_fee: 50, // Fixed shipping cost
+        items: 1, // Number of different product types
+      },
+    });
   };
 
   return (
@@ -433,8 +476,11 @@ const Details = () => {
               {/* Primary action buttons section */}
               <div className="flex gap-3">
                 {/* Buy Now button - only show if product is in stock */}
-                {stock ? (
-                  <button className="px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-green-500/40 bg-[#247462] text-white">
+                {product.stock ? (
+                  <button
+                    onClick={buyNow}
+                    className="px-8 py-3 h-[50px] cursor-pointer hover:shadow-lg hover:shadow-green-500/40 bg-[#247462] text-white"
+                  >
                     Buy Now
                   </button>
                 ) : (
