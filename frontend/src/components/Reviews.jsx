@@ -20,7 +20,7 @@
  * @returns {JSX.Element} Complete review system with rating display and submission form
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Rating from "./Rating";
 import RatingTemp from "./RatingTemp";
 import Pagination from "./Pagination";
@@ -30,7 +30,8 @@ import RatingReact from "react-rating";
 import { CiStar } from "react-icons/ci";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { customer_review } from "../store/reducers/homeReducer";
+import { customer_review, messageClear } from "../store/reducers/homeReducer";
+import toast from "react-hot-toast"; // Toast notifications
 
 /**
  * Reviews Functional Component
@@ -50,10 +51,11 @@ const Reviews = ({ product }) => {
   // const userInfo = {};
 
   const [rate, setRate] = useState(""); // Selected star rating for new review
-
   const [review, setReview] = useState(""); // Review text content (currently unused)
-
+  // Get current user info from auth state
   const { userInfo } = useSelector((state) => state.auth);
+  // Get success message from home state
+  const { successMessage } = useSelector((state) => state.home);
 
   // Handle review form submission
   const review_submit = (e) => {
@@ -66,6 +68,16 @@ const Reviews = ({ product }) => {
     };
     dispatch(customer_review(obj));
   };
+
+  // Show toast messages for cart operations and clear them
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      setRate("");
+      setReview("");
+      dispatch(messageClear()); // Clear success message
+    }
+  }, [successMessage]);
 
   return (
     <div className="mt-8">
