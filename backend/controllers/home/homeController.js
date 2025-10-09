@@ -4,6 +4,8 @@ const productModel = require("../../models/productModel");
 const { responseReturn } = require("../../utils/response");
 const queryProducts = require("../../utils/queryProducts");
 const reviewModel = require("../../models/reviewModel");
+// Import moment library for date formatting
+const moment = require("moment");
 
 // Define the homeControllers class to handle home page related logic
 class homeControllers {
