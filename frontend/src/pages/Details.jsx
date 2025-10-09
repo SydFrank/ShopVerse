@@ -536,7 +536,7 @@ const Details = () => {
                 {/* Tab content area with conditional rendering */}
                 <div>
                   {state === "reviews" ? (
-                    <Reviews /> // Render Reviews component when reviews tab is active
+                    <Reviews product={product} /> // Render Reviews component when reviews tab is active
                   ) : (
                     // Render description content when description tab is active
                     <p className="py-5 text-slate-600">No reviews yet. </p>

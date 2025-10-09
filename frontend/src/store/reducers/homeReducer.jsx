@@ -146,6 +146,29 @@ export const product_details = createAsyncThunk(
 // End of product_details async thunk
 
 /**
+ * Async thunk to submit customer product review and rating
+ * Used for customers to share their product experience and feedback
+ *
+ * @async
+ * @function customer_review
+ * @param {Object} info - Review information including rating, feedback, and customer details
+ * @returns {Promise<Object>} Promise resolving to review submission response
+ * @throws {Object} API error response
+ */
+export const customer_review = createAsyncThunk(
+  "review/customer_review",
+  async (info, { fulfillWithValue }) => {
+    try {
+      const { data } = await api.post("/home/customer/submit-review", info);
+      return fulfillWithValue(data);
+    } catch (error) {
+      console.log(error.response);
+    }
+  }
+);
+// End of customer_review async thunk
+
+/**
  * Home Redux Slice Configuration
  *
  * @typedef {Object} HomeState

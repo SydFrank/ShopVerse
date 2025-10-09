@@ -20,45 +20,52 @@
  * @returns {JSX.Element} Complete review system with rating display and submission form
  */
 
-// React core imports for functional component with state management
 import React, { useState } from "react";
-
-// Custom component imports for rating and pagination functionality
-import Rating from "./Rating"; // Star rating display component for overall ratings
-import RatingTemp from "./RatingTemp"; // Template rating component for individual star displays
-import Pagination from "./Pagination"; // Pagination component for review navigation
-
-// React Router for navigation
-import { Link } from "react-router-dom"; // Navigation link component for login redirect
-
-// External rating library for interactive star selection
-import RatingReact from "react-rating"; // Interactive rating component for user input
-
+import Rating from "./Rating";
+import RatingTemp from "./RatingTemp";
+import Pagination from "./Pagination";
+import { Link } from "react-router-dom";
+import RatingReact from "react-rating";
 // React Icons for star representations
-import { CiStar } from "react-icons/ci"; // Outlined star icon for empty rating state
-import { FaStar, FaStarHalfAlt } from "react-icons/fa"; // Filled star and half star icons for complete ratings
+import { CiStar } from "react-icons/ci";
+import { FaStar, FaStarHalfAlt } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { customer_review } from "../store/reducers/homeReducer";
 
 /**
  * Reviews Functional Component
  * Manages product review display, rating distribution, and new review submissions
  */
-const Reviews = () => {
+const Reviews = ({ product }) => {
+  // Redux dispatch function
+  const dispatch = useDispatch();
+
   // Pagination state for managing review list navigation
   const [pageNumber, setPageNumber] = useState(1);
-  // const [totalItem, setTotalItem] = useState(100); // Total number of reviews (commented out)
 
   // Reviews per page configuration
-  // eslint-disable-next-line no-unused-vars
   const [parPage, setParPage] = useState(5);
 
   // Mock user authentication object
-  // In production, this would contain actual user authentication data
-  const userInfo = {};
+  // const userInfo = {};
 
-  // New review form state management
   const [rate, setRate] = useState(""); // Selected star rating for new review
-  // eslint-disable-next-line no-unused-vars
+
   const [review, setReview] = useState(""); // Review text content (currently unused)
+
+  const { userInfo } = useSelector((state) => state.auth);
+
+  // Handle review form submission
+  const review_submit = (e) => {
+    e.preventDefault();
+    const obj = {
+      name: userInfo.name,
+      review: review,
+      rating: rate,
+      productId: product._id,
+    };
+    dispatch(customer_review(obj));
+  };
 
   return (
     <div className="mt-8">
@@ -244,9 +251,11 @@ const Reviews = () => {
             </div>
 
             {/* Review text submission form */}
-            <form>
+            <form onSubmit={review_submit}>
               {/* Multi-line text area for review content */}
               <textarea
+                value={review}
+                onChange={(e) => setReview(e.target.value)}
                 required
                 name=""
                 id=""
