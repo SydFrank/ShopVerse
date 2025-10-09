@@ -1,11 +1,9 @@
-// Import the category model for database operations
 const categoryModel = require("../../models/categoryModel");
-// Import the product model for database operations
 const productModel = require("../../models/productModel");
 // Import custom response utility for consistent API responses
 const { responseReturn } = require("../../utils/response");
-// Import the queryProducts utility class for filtering and pagination
 const queryProducts = require("../../utils/queryProducts");
+const reviewModel = require("../../models/reviewModel");
 
 // Define the homeControllers class to handle home page related logic
 class homeControllers {
@@ -305,6 +303,66 @@ class homeControllers {
     }
   };
   // End of product_details method
+
+  /**
+   * Handles submitting a customer review for a product.
+   * This method creates a new review entry, recalculates the product's average rating
+   * based on all reviews, and updates the product's rating in the database.
+   * Used when customers want to leave feedback and ratings for purchased products.
+   *
+   * @param {Object} req - Express request object, expects body:
+   *   - productId: ID of the product being reviewed (string)
+   *   - rating: numerical rating given by customer (number, typically 1-5)
+   *   - name: name of the reviewer (string)
+   *   - review: text content of the review (string)
+   * @param {Object} res - Express response object
+   */
+  submit_review = async (req, res) => {
+    // Extract review details from request body
+    const { productId, rating, name, review } = req.body;
+
+    try {
+      // Create a new review entry in the database
+      await reviewModel.create({
+        productId, // Product being reviewed
+        rating, // Numerical rating (1-5)
+        name, // Reviewer's name
+        review, // Review text content
+        date: moment(Date.now()).format("LL"), // Formatted review date
+      });
+
+      // Initialize variable to calculate total rating sum
+      let rat = 0;
+      // Fetch all reviews for this specific product
+      const reviews = await reviewModel.find({ productId });
+
+      // Calculate sum of all ratings for this product
+      for (let i = 0; i < reviews.length; i++) {
+        rat = rat + reviews[i].rating; // Add each rating to total
+      }
+
+      // Initialize variable for calculated average rating
+      let productRating = 0;
+      // Calculate average rating if reviews exist
+      if (reviews.length !== 0) {
+        productRating = (rat / reviews.length).toFixed(1); // Average rounded to 1 decimal place
+      }
+
+      // Update the product's rating in the database with the new calculated average
+      await productModel.findByIdAndUpdate(productId, {
+        rating: productRating, // Updated average rating
+      });
+
+      // Return success response confirming review submission
+      responseReturn(res, 201, { message: "Review Added Successfully" });
+    } catch (error) {
+      // Log error message to console for debugging purposes
+      console.log(error.message);
+      // Return error response if review submission fails
+      responseReturn(res, 500, { error: "Internal Server Error" });
+    }
+  };
+  // End of submit_review method
 }
 
 // Export instance of homeControllers for use in routes

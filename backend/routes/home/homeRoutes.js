@@ -15,5 +15,7 @@ router.get("/query-products", homeControllers.query_products);
 
 router.get("/product-details/:slug", homeControllers.product_details);
 
+router.post("/customer/submit-review", homeControllers.submit_review);
+
 // Export the router to be used in the main server application
 module.exports = router;
