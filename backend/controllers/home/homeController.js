@@ -6,6 +6,8 @@ const queryProducts = require("../../utils/queryProducts");
 const reviewModel = require("../../models/reviewModel");
 // Import moment library for date formatting
 const moment = require("moment");
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 // Define the homeControllers class to handle home page related logic
 class homeControllers {
@@ -365,6 +367,122 @@ class homeControllers {
     }
   };
   // End of submit_review method
+
+  /**
+   * Handles fetching product reviews with pagination and rating statistics.
+   * This method retrieves reviews for a specific product with pagination support,
+   * calculates rating distribution (how many 1-star, 2-star, etc. reviews),
+   * and returns both the paginated reviews and rating breakdown statistics.
+   * Used for product review pages and rating displays.
+   *
+   * @param {Object} req - Express request object, expects:
+   *   - params.productId: ID of the product to get reviews for (string)
+   *   - query.pageNumber: current page number for pagination (string/number)
+   * @param {Object} res - Express response object
+   */
+  get_reviews = async (req, res) => {
+    // Extract product ID from request parameters
+    const { productId } = req.params;
+    // Extract and parse page number from query parameters
+    let { pageNumber } = req.query;
+    pageNumber = parseInt(pageNumber);
+
+    // Set pagination parameters
+    const limit = 5; // Number of reviews per page
+    const skipPage = limit * (pageNumber - 1); // Calculate how many reviews to skip
+
+    try {
+      // Aggregate reviews to get rating distribution using MongoDB aggregation pipeline
+      let getRating = await reviewModel.aggregate([
+        {
+          // Match reviews for the specific product with valid ratings
+          $match: {
+            productId: {
+              $eq: new ObjectId(productId), // Convert string to ObjectId for matching
+            },
+            rating: {
+              $not: {
+                $size: 0, // Exclude reviews with empty rating arrays
+              },
+            },
+          },
+        },
+        {
+          // Unwind rating array to separate each rating value
+          $unwind: "$rating",
+        },
+        {
+          // Group by rating value and count occurrences
+          $group: {
+            _id: "$rating", // Group by rating value (1, 2, 3, 4, 5)
+            count: {
+              $sum: 1, // Count how many reviews for each rating
+            },
+          },
+        },
+      ]);
+
+      // Initialize rating distribution array with default values
+      let rating_review = [
+        {
+          rating: 5, // 5-star reviews
+          sum: 0, // Initialize count to 0
+        },
+        {
+          rating: 4, // 4-star reviews
+          sum: 0, // Initialize count to 0
+        },
+        {
+          rating: 3, // 3-star reviews
+          sum: 0, // Initialize count to 0
+        },
+        {
+          rating: 2, // 2-star reviews
+          sum: 0, // Initialize count to 0
+        },
+        {
+          rating: 1, // 1-star reviews
+          sum: 0, // Initialize count to 0
+        },
+      ];
+
+      // Map aggregation results to rating distribution array
+      for (let i = 0; i < rating_review.length; i++) {
+        for (let j = 0; j < getRating.length; j++) {
+          // If rating matches, update the count
+          if (rating_review[i].rating === getRating[j]._id) {
+            rating_review[i].sum = getRating[j].count;
+            break; // Exit inner loop once match is found
+          }
+        }
+      }
+
+      // Get total count of all reviews for this product (for pagination info)
+      const getAll = await reviewModel.find({
+        productId,
+      });
+
+      // Get paginated reviews for current page, sorted by newest first
+      const reviews = await reviewModel
+        .find({
+          productId, // Filter by product ID
+        })
+        .skip(skipPage) // Skip reviews for previous pages
+        .limit(limit) // Limit to specified number per page
+        .sort({ createdAt: -1 }); // Sort by creation date (newest first)
+
+      // Return paginated reviews and rating statistics
+      responseReturn(res, 200, {
+        reviews, // Array of reviews for current page
+        totalReview: getAll.length, // Total number of reviews (for pagination)
+        rating_review, // Rating distribution statistics
+      });
+    } catch (error) {
+      // Log error message to console for debugging purposes
+      console.log(error.message);
+    }
+  };
+  // End of get_reviews method
 }
 
 // Export instance of homeControllers for use in routes
