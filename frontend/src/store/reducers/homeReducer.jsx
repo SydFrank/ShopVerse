@@ -169,6 +169,36 @@ export const customer_review = createAsyncThunk(
 // End of customer_review async thunk
 
 /**
+ * Async thunk to fetch product reviews with pagination
+ * Used to display customer reviews and ratings for a specific product
+ *
+ * @async
+ * @function get_reviews
+ * @param {Object} params - Parameters for fetching reviews
+ * @param {string} params.productId - Unique identifier of the product
+ * @param {number} params.pageNumber - Page number for pagination
+ * @returns {Promise<Object>} Promise resolving to:
+ *   - reviews: Array of customer reviews for the product
+ *   - totalReview: Total count of reviews
+ *   - rating_review: Array of rating distribution
+ * @throws {Object} API error response
+ */
+export const get_reviews = createAsyncThunk(
+  "review/get_reviews",
+  async ({ productId, pageNumber }, { fulfillWithValue }) => {
+    try {
+      const { data } = await api.get(
+        `/home/customer/get-reviews/${productId}?pageNumber=${pageNumber}`
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      console.log(error.response);
+    }
+  }
+);
+// End of get_reviews async thunk
+
+/**
  * Home Redux Slice Configuration
  *
  * @typedef {Object} HomeState

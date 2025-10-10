@@ -30,7 +30,11 @@ import RatingReact from "react-rating";
 import { CiStar } from "react-icons/ci";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { customer_review, messageClear } from "../store/reducers/homeReducer";
+import {
+  customer_review,
+  get_reviews,
+  messageClear,
+} from "../store/reducers/homeReducer";
 import toast from "react-hot-toast"; // Toast notifications
 
 /**
@@ -45,10 +49,7 @@ const Reviews = ({ product }) => {
   const [pageNumber, setPageNumber] = useState(1);
 
   // Reviews per page configuration
-  const [parPage, setParPage] = useState(5);
-
-  // Mock user authentication object
-  // const userInfo = {};
+  const [parPage, setParPage] = useState(10);
 
   const [rate, setRate] = useState(""); // Selected star rating for new review
   const [review, setReview] = useState(""); // Review text content (currently unused)
@@ -78,6 +79,13 @@ const Reviews = ({ product }) => {
       dispatch(messageClear()); // Clear success message
     }
   }, [successMessage]);
+
+  // Fetch reviews when page number or product changes
+  useEffect(() => {
+    if (product._id) {
+      dispatch(get_reviews({ productId: product._id, pageNumber })); // Fetch reviews for current product and page
+    }
+  }, [pageNumber, product]);
 
   return (
     <div className="mt-8">
