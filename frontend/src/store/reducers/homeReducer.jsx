@@ -278,8 +278,15 @@ export const homeReducer = createSlice({
         state.relatedProducts = payload.relatedProducts;
         state.moreProducts = payload.moreProducts;
       })
+      // Handle Customer Review Submission
       .addCase(customer_review.fulfilled, (state, { payload }) => {
         state.successMessage = payload.message;
+      })
+      // Fetch Product Reviews with Pagination
+      .addCase(get_reviews.fulfilled, (state, { payload }) => {
+        state.reviews = payload.reviews;
+        state.totalReview = payload.totalReview;
+        state.rating_review = payload.rating_review;
       });
   },
 });

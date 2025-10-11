@@ -34,6 +34,7 @@ import {
   customer_review,
   get_reviews,
   messageClear,
+  product_details,
 } from "../store/reducers/homeReducer";
 import toast from "react-hot-toast"; // Toast notifications
 
@@ -55,10 +56,12 @@ const Reviews = ({ product }) => {
   const [review, setReview] = useState(""); // Review text content (currently unused)
   // Get current user info from auth state
   const { userInfo } = useSelector((state) => state.auth);
-  // Get success message from home state
-  const { successMessage } = useSelector((state) => state.home);
+  // Get review-related state from home reducer
+  const { successMessage, reviews, rating_review, totalReview } = useSelector(
+    (state) => state.home
+  );
 
-  // Handle review form submission
+  // Handle new review submission
   const review_submit = (e) => {
     e.preventDefault();
     const obj = {
@@ -74,6 +77,8 @@ const Reviews = ({ product }) => {
   useEffect(() => {
     if (successMessage) {
       toast.success(successMessage);
+      dispatch(get_reviews({ productId: product._id, pageNumber }));
+      dispatch(product_details(product.slug)); // Refresh product details to update rating
       setRate("");
       setReview("");
       dispatch(messageClear()); // Clear success message
@@ -95,15 +100,15 @@ const Reviews = ({ product }) => {
         <div className="flex flex-col gap-2 justify-start items-center py-4">
           {/* Large rating number display */}
           <div>
-            <span className="text-6xl font-semibold">4.5</span>
+            <span className="text-6xl font-semibold">{product.rating}</span>
             <span className="text-3xl font-semibold text-slate-600">/5</span>
           </div>
           {/* Star rating visual representation */}
           <div className="flex tet-3xl">
-            <Rating ratings={4.5} />
+            <Rating ratings={product.rating} />
           </div>
           {/* Total number of reviews */}
-          <p className="text-sm text-slate-600">15 Reviews</p>
+          <p className="text-sm text-slate-600">({totalReview}) Reviews</p>
         </div>
 
         {/* Right column: Rating distribution bars */}
@@ -117,10 +122,19 @@ const Reviews = ({ product }) => {
 
             {/* Progress bar showing 60% of users gave 5 stars */}
             <div className="w-[200px] h-[14px] bg-slate-200 relative">
-              <div className="h-full bg-[#Edbb0e] w-[60%]"></div>
+              <div
+                style={{
+                  width: `${Math.floor(
+                    (100 * (rating_review[0]?.sum || 0)) / totalReview
+                  )}%`,
+                }}
+                className="h-full bg-[#Edbb0e] w-[60%]"
+              ></div>
             </div>
             {/* Number of 5-star reviews */}
-            <p className="text-sm text-slate-600 w-[0%]">10</p>
+            <p className="text-sm text-slate-600 w-[0%]">
+              {rating_review[0]?.sum}
+            </p>
           </div>
 
           {/* 4-star rating distribution */}
@@ -132,10 +146,19 @@ const Reviews = ({ product }) => {
 
             {/* Progress bar showing 70% of users gave 4 stars */}
             <div className="w-[200px] h-[14px] bg-slate-200 relative">
-              <div className="h-full bg-[#Edbb0e] w-[70%]"></div>
+              <div
+                style={{
+                  width: `${Math.floor(
+                    (100 * (rating_review[1]?.sum || 0)) / totalReview
+                  )}%`,
+                }}
+                className="h-full bg-[#Edbb0e] w-[70%]"
+              ></div>
             </div>
             {/* Number of 4-star reviews */}
-            <p className="text-sm text-slate-600 w-[0%]">20</p>
+            <p className="text-sm text-slate-600 w-[0%]">
+              {rating_review[1]?.sum}
+            </p>
           </div>
 
           {/* 3-star rating distribution */}
@@ -147,10 +170,19 @@ const Reviews = ({ product }) => {
 
             {/* Progress bar showing 60% of users gave 3 stars */}
             <div className="w-[200px] h-[14px] bg-slate-200 relative">
-              <div className="h-full bg-[#Edbb0e] w-[60%]"></div>
+              <div
+                style={{
+                  width: `${Math.floor(
+                    (100 * (rating_review[2]?.sum || 0)) / totalReview
+                  )}%`,
+                }}
+                className="h-full bg-[#Edbb0e] w-[60%]"
+              ></div>
             </div>
             {/* Number of 3-star reviews */}
-            <p className="text-sm text-slate-600 w-[0%]">8</p>
+            <p className="text-sm text-slate-600 w-[0%]">
+              {rating_review[2]?.sum}
+            </p>
           </div>
 
           {/* 2-star rating distribution */}
@@ -162,10 +194,19 @@ const Reviews = ({ product }) => {
 
             {/* Progress bar showing 30% of users gave 2 stars */}
             <div className="w-[200px] h-[14px] bg-slate-200 relative">
-              <div className="h-full bg-[#Edbb0e] w-[30%]"></div>
+              <div
+                style={{
+                  width: `${Math.floor(
+                    (100 * (rating_review[3]?.sum || 0)) / totalReview
+                  )}%`,
+                }}
+                className="h-full bg-[#Edbb0e] w-[30%]"
+              ></div>
             </div>
             {/* Number of 2-star reviews */}
-            <p className="text-sm text-slate-600 w-[0%]">5</p>
+            <p className="text-sm text-slate-600 w-[0%]">
+              {rating_review[3]?.sum}
+            </p>
           </div>
 
           {/* 1-star rating distribution */}
@@ -177,10 +218,19 @@ const Reviews = ({ product }) => {
 
             {/* Progress bar showing 10% of users gave 1 star */}
             <div className="w-[200px] h-[14px] bg-slate-200 relative">
-              <div className="h-full bg-[#Edbb0e] w-[10%]"></div>
+              <div
+                style={{
+                  width: `${Math.floor(
+                    (100 * (rating_review[4]?.sum || 0)) / totalReview
+                  )}%`,
+                }}
+                className="h-full bg-[#Edbb0e] w-[10%]"
+              ></div>
             </div>
             {/* Number of 1-star reviews */}
-            <p className="text-sm text-slate-600 w-[0%]">2</p>
+            <p className="text-sm text-slate-600 w-[0%]">
+              {rating_review[4]?.sum}
+            </p>
           </div>
 
           {/* 0-star rating distribution (no ratings) */}
@@ -192,56 +242,60 @@ const Reviews = ({ product }) => {
 
             {/* Progress bar showing 0% of users gave 0 stars */}
             <div className="w-[200px] h-[14px] bg-slate-200 relative">
-              <div className="h-full bg-[#Edbb0e] w-[0%]"></div>
+              <div
+                style={{
+                  width: `${Math.floor(
+                    (100 * (rating_review[5]?.sum || 0)) / totalReview
+                  )}%`,
+                }}
+                className="h-full bg-[#Edbb0e] w-[0%]"
+              ></div>
             </div>
             {/* Number of 0-star reviews */}
-            <p className="text-sm text-slate-600 w-[0%]">0</p>
+            <p className="text-sm text-slate-600 w-[0%]">
+              {rating_review[5]?.sum}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Individual reviews section header */}
       <h2 className="text-slate-600 text-xl font-bold py-5">
-        Product Review 10
+        Product Review ({totalReview})
       </h2>
 
       {/* Individual customer reviews list with pagination */}
       <div className="flex flex-col gap-8 pb-10 pt-4">
         {/* Map through mock reviews data to display individual reviews */}
-        {[1, 2, 3, 4, 5].map((r, i) => (
+        {reviews.map((r, i) => (
           <div key={i} className="flex flex-col gap-1 ">
             {/* Review header with rating and date */}
             <div className="flex justify-between items-center">
               {/* Individual review star rating */}
               <div className="flex gap-1 text-xl">
-                <RatingTemp rating={4} />
+                <RatingTemp rating={r.rating} />
               </div>
 
               {/* Review submission date */}
-              <span className="text-slate-600 ">24 Aug 2025</span>
+              <span className="text-slate-600 ">{r.date}</span>
             </div>
             {/* Reviewer name */}
-            <span className="text-slate-600 text-md">Echo</span>
+            <span className="text-slate-600 text-md">{r.name}</span>
             {/* Review text content */}
-            <p className="text-slate-600 text-sm">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book.{" "}
-            </p>
+            <p className="text-slate-600 text-sm">{r.review}</p>
           </div>
         ))}
         {/* Pagination controls for navigating through reviews */}
         <div className="flex justify-end">
-          {
+          {totalReview > 5 && (
             <Pagination
               pageNumber={pageNumber}
               setPageNumber={setPageNumber}
               totalItem={20} // Total number of reviews
               parPage={parPage} // Reviews per page
-              showItem={Math.floor(10 / 3)} // Number of pagination buttons to show
+              showItem={Math.floor(totalReview / 3)} // Number of pagination buttons to show
             />
-          }
+          )}
         </div>
       </div>
 
