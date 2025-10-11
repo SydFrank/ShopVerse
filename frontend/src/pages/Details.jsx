@@ -376,6 +376,9 @@ const Details = () => {
               {/* Product description text */}
               <div className="text-slate-600 ">
                 <p>{product?.description}</p>
+                <p className="text-slate-600 py-1 font-bold">
+                  Shop Name: {product.shopName}
+                </p>
               </div>
 
               {/* Quantity selector and action buttons section */}
@@ -539,7 +542,7 @@ const Details = () => {
                     <Reviews product={product} /> // Render Reviews component when reviews tab is active
                   ) : (
                     // Render description content when description tab is active
-                    <p className="py-5 text-slate-600">No reviews yet. </p>
+                    <p className="py-5 text-slate-600">{product.description}</p>
                   )}
                 </div>
               </div>
@@ -550,7 +553,7 @@ const Details = () => {
               <div className="pl-4 max-lg:pl-0">
                 {/* Seller information header */}
                 <div className="px-3 py-2 text-slate-600 bg-slate-200">
-                  <h2 className="font-slate-200 ">From Easy Shop</h2>
+                  <h2 className="font-slate-200 ">From {product.shopName}</h2>
                 </div>
 
                 {/* Seller details and statistics */}
