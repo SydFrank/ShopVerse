@@ -130,7 +130,7 @@ export const authReducer = createSlice({
      * - Prevents messages from persisting across component re-renders
      * - Ensures clean slate for subsequent API operations
      */
-    messageClear: (state) => {
+    messageClear: (state, _) => {
       state.errorMessage = "";
       state.successMessage = "";
     },
