@@ -36,14 +36,47 @@ app.use(
 // Initialize a Socket.IO server instance, allowing connections from any origin
 const io = socket(server, {
   cors: {
-    origin: "*",
+    origin: "*", // Allow connections from any origin
   },
-  credentials: true,
+  credentials: true, // Allow credentials to be sent
 });
 
+// Array to store all connected customers with their socket information
+var allCustomer = [];
+
+/**
+ * Adds a new user to the connected customers array.
+ * Checks if the customer is already connected to prevent duplicates.
+ *
+ * @param {string} customerId - Unique identifier for the customer
+ * @param {string} socketId - Socket.IO connection ID
+ * @param {Object} userInfo - Additional user information
+ */
+const addUser = (customerId, socketId, userInfo) => {
+  // Check if customer is already in the connected users array
+  const checkUser = allCustomer.some((u) => u.customerId === customerId);
+
+  if (!checkUser) {
+    // Add new customer to the connected users array
+    allCustomer.push({ customerId, socketId, userInfo });
+  }
+};
+
 // Listen for incoming Socket.IO connections
-io.on("connection", (socket) => {
-  console.log("New client connected");
+io.on("connection", (soc) => {
+  // Log when a new socket connection is established
+  console.log("socket server running");
+
+  /**
+   * Handle 'add_user' event when a customer connects
+   * Adds the customer to the active users list for real-time communication
+   */
+  soc.on("add_user", (customerId, userInfo) => {
+    // Add the connected user to the active customers array
+    addUser(customerId, soc.id, userInfo);
+    // Log current connected customers for debugging
+    console.log(allCustomer);
+  });
 });
 
 // Parse incoming JSON payloads and populate req.body
@@ -80,5 +113,7 @@ dbConnect();
 // Log a message to the console once the server is running
 // app.listen(port, () => console.log(`Server is running on port ${port}`));
 
-// Initialize a Socket.IO server instance, allowing connections from the specified frontend origin
+// Start the HTTP server with Socket.IO support and have it listen on the specified port
+// Log a message to the console once the server is running
+// Note: Using server.listen() instead of app.listen() to support Socket.IO
 server.listen(port, () => console.log(`Server is running on port ${port}`));
