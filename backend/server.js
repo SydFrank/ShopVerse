@@ -4,9 +4,6 @@ const express = require("express");
 // Create an instance of the Express application
 const app = express();
 
-// Load environment variables from a .env file into process.env
-require("dotenv").config();
-
 // Import middleware for cross-origin requests, JSON parsing, and cookie handling
 const cors = require("cors");
 const bodyParser = require("body-parser");
@@ -14,6 +11,16 @@ const cookieParser = require("cookie-parser");
 
 // Import the database connection utility
 const { dbConnect } = require("./utils/db");
+
+// Import Socket.IO for real-time communication
+const socket = require("socket.io");
+// Import the built-in HTTP module to create an HTTP server
+const http = require("http");
+// Create an HTTP server using the Express app
+const server = http.createServer(app);
+
+// Load environment variables from a .env file into process.env
+require("dotenv").config();
 
 /**
  * Enable Cross-Origin Resource Sharing (CORS) for the specified frontend origin
@@ -25,6 +32,19 @@ app.use(
     credentials: true, // Required for sending cookies across domains
   })
 );
+
+// Initialize a Socket.IO server instance, allowing connections from any origin
+const io = socket(server, {
+  cors: {
+    origin: "*",
+  },
+  credentials: true,
+});
+
+// Listen for incoming Socket.IO connections
+io.on("connection", (socket) => {
+  console.log("New client connected");
+});
 
 // Parse incoming JSON payloads and populate req.body
 // Must be registered before any route handlers that need to access req.body
@@ -58,4 +78,7 @@ dbConnect();
 
 // Start the server and have it listen on the specified port
 // Log a message to the console once the server is running
-app.listen(port, () => console.log(`Server is running on port ${port}`));
+// app.listen(port, () => console.log(`Server is running on port ${port}`));
+
+// Initialize a Socket.IO server instance, allowing connections from the specified frontend origin
+server.listen(port, () => console.log(`Server is running on port ${port}`));
