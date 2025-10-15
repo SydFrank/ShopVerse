@@ -1,11 +1,8 @@
-// Import the seller model for database operations
 const sellerModel = require("../../models/sellerModel");
-// Import the customer model for database operations
 const customerModel = require("../../models/customerModel");
-// Import the seller-customer relationship model for chat functionality
 const sellerCustomerModel = require("../../models/chat/sellerCustomerModel");
-// Import custom response utility for consistent API responses
 const { responseReturn } = require("../../utils/response");
+const sellerCustomerMessage = require("../../models/chat/sellerCustomerMessage");
 
 // Define the ChatController class to handle chat-related operations
 class ChatController {
@@ -13,11 +10,11 @@ class ChatController {
    * Handles establishing a chat relationship between a customer and a seller.
    * This method creates bidirectional friend connections in the chat system,
    * allowing both the customer and seller to communicate with each other.
-   * It checks for existing relationships to prevent duplicates and updates
-   * both parties' friend lists if the relationship doesn't already exist.
+   * It also retrieves existing chat messages between the parties and returns
+   * the customer's friend list with current conversation data.
    *
    * @param {Object} req - Express request object, expects body:
-   *   - sellerId: ID of the seller to establish chat relationship with (string)
+   *   - sellerId: ID of the seller to establish chat relationship with (string, optional)
    *   - userId: ID of the customer initiating the chat (string)
    * @param {Object} res - Express response object
    */
@@ -102,6 +99,64 @@ class ChatController {
             }
           );
         }
+
+        // Retrieve all messages between the customer and seller
+        // Uses MongoDB $or operator to find messages in both directions
+        const messages = await sellerCustomerMessage.find({
+          $or: [
+            {
+              // Messages from customer to seller
+              $and: [
+                {
+                  receiverId: {
+                    $eq: sellerId, // Seller is the receiver
+                  },
+                },
+                {
+                  senderId: { $eq: userId }, // Customer is the sender
+                },
+              ],
+            },
+            {
+              // Messages from seller to customer
+              $and: [
+                {
+                  receiverId: {
+                    $eq: userId, // Customer is the receiver
+                  },
+                },
+                {
+                  senderId: { $eq: sellerId }, // Seller is the sender
+                },
+              ],
+            },
+          ],
+        });
+
+        // Get the customer's complete friends list
+        const MyFriends = await sellerCustomerModel.findOne({ myId: userId });
+
+        // Find the specific friend (seller) that the customer is currently chatting with
+        const currentFriend = MyFriends.myFriends.find(
+          (friend) => friend.fdId === sellerId
+        );
+
+        // Return success response with friends list, current friend, and messages
+        responseReturn(res, 200, {
+          MyFriends: MyFriends.myFriends, // Complete list of customer's friends
+          currentFriend, // Details of the seller currently being chatted with
+          messages, // All messages between customer and seller
+        });
+      } else {
+        // If no sellerId provided, just return the customer's friends list
+        // This is used when loading the chat interface without selecting a specific seller
+        const MyFriends = await sellerCustomerModel.findOne({ myId: userId });
+
+        // Return response with only the friends list (no current friend or messages)
+        responseReturn(res, 200, {
+          MyFriends: MyFriends.myFriends, // Complete list of customer's friends
+          messages: [], // Empty messages array since no specific conversation is selected
+        });
       }
     } catch (error) {
       console.log(error);

@@ -1,7 +1,7 @@
 // Import the required Schema and model constructors from Mongoose
 const { Schema, model } = require("mongoose");
 
-// Define the schema for the "admins" collection
+// Define the schema for cart products
 const cartSchema = new Schema(
   {
     userId: {
