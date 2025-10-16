@@ -9,10 +9,10 @@ router.post(
   ChatController.add_customer_friend
 );
 
-// router.post(
-//   "/chat/customer/send-message-to-seller",
-//   ChatController.send_message_to_seller
-// );
+router.post(
+  "/chat/customer/send-message-to-seller",
+  ChatController.send_message_to_seller
+);
 
 // Export the router to be used in the main server application
 module.exports = router;

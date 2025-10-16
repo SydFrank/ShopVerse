@@ -163,6 +163,103 @@ class ChatController {
     }
   }
   // End of add_customer_friend method
+
+  /**
+   * Handles sending a message from a customer to a seller.
+   * This method creates a new message entry in the database and updates
+   * both the customer's and seller's friend lists to move the current
+   * conversation to the top (most recent activity first). This ensures
+   * that active conversations appear at the top of the chat list.
+   *
+   * @param {Object} req - Express request object, expects body:
+   *   - userId: ID of the customer sending the message (string)
+   *   - text: content of the message being sent (string)
+   *   - sellerId: ID of the seller receiving the message (string)
+   *   - name: name of the customer sending the message (string)
+   * @param {Object} res - Express response object
+   */
+  async send_message_to_seller(req, res) {
+    // Extract message details from request body
+    const { userId, text, sellerId, name } = req.body;
+
+    try {
+      // Create a new message record in the database
+      const message = await sellerCustomerMessage.create({
+        senderId: userId, // Customer who is sending the message
+        senderName: name, // Name of the customer sender
+        receiverId: sellerId, // Seller who will receive the message
+        message: text, // Message content
+      });
+
+      // Update customer's friend list to move this seller to top (most recent conversation)
+      // Get the customer's current friend list data
+      const data = await sellerCustomerModel.findOne({
+        myId: userId,
+      });
+
+      // Extract the friends array for manipulation
+      let myFriends = data.myFriends;
+
+      // Find the index of the seller in the customer's friend list
+      let index = myFriends.findIndex((f) => f.fdId === sellerId);
+
+      // Move the seller to the top of the friend list using bubble sort approach
+      // This ensures the most recent conversation appears at the top
+      while (index > 0) {
+        let temp = myFriends[index]; // Store current friend
+        myFriends[index] = myFriends[index - 1]; // Move previous friend down
+        myFriends[index - 1] = temp; // Move current friend up
+        index--; // Continue moving toward top
+      }
+
+      // Update the customer's friend list in the database with new order
+      await sellerCustomerModel.updateOne(
+        {
+          myId: userId,
+        },
+        {
+          myFriends, // Updated friend list with seller moved to top
+        }
+      );
+
+      // Update seller's friend list to move this customer to top (most recent conversation)
+      // Get the seller's current friend list data
+      const data1 = await sellerCustomerModel.findOne({
+        myId: sellerId,
+      });
+
+      // Extract the friends array for manipulation
+      let myFriends1 = data1.myFriends;
+
+      // Find the index of the customer in the seller's friend list
+      let index1 = myFriends1.findIndex((f) => f.fdId === userId);
+
+      // Move the customer to the top of the seller's friend list using bubble sort approach
+      // This ensures the most recent conversation appears at the top for both parties
+      while (index1 > 0) {
+        let temp1 = myFriends1[index1]; // Store current friend
+        myFriends1[index1] = myFriends1[index1 - 1]; // Move previous friend down
+        myFriends1[index1 - 1] = temp1; // Move current friend up
+        index1--; // Continue moving toward top
+      }
+
+      // Update the seller's friend list in the database with new order
+      await sellerCustomerModel.updateOne(
+        {
+          myId: sellerId,
+        },
+        {
+          myFriends: myFriends1, // Updated friend list with customer moved to top
+        }
+      );
+
+      // Return success response with the created message
+      responseReturn(res, 201, { message });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  // End of send_message_to_seller method
 }
 
 // Export instance of ChatController for use in routes
