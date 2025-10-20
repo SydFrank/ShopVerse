@@ -28,7 +28,7 @@ require("dotenv").config();
  */
 app.use(
   cors({
-    origin: ["http://localhost:5173"], // Frontend development server origin
+    origin: ["http://localhost:5173", "http://localhost:5174"], // Frontend development server origin
     credentials: true, // Required for sending cookies across domains
   })
 );
@@ -43,6 +43,8 @@ const io = socket(server, {
 
 // Array to store all connected customers with their socket information
 var allCustomer = [];
+// Array to store all connected sellers with their socket information
+var allSeller = [];
 
 /**
  * Adds a new user to the connected customers array.
@@ -62,6 +64,24 @@ const addUser = (customerId, socketId, userInfo) => {
   }
 };
 
+/**
+ * Adds a new seller to the connected sellers array.
+ * Checks if the seller is already connected to prevent duplicates.
+ *
+ * @param {string} sellerId - Unique identifier for the seller
+ * @param {string} socketId - Socket.IO connection ID
+ * @param {Object} userInfo - Additional user information
+ */
+const addSeller = (sellerId, socketId, userInfo) => {
+  // Check if seller is already in the connected users array
+  const checkSeller = allSeller.some((u) => u.sellerId === sellerId);
+
+  if (!checkSeller) {
+    // Add new seller to the connected users array
+    allSeller.push({ sellerId, socketId, userInfo });
+  }
+};
+
 // Listen for incoming Socket.IO connections
 io.on("connection", (soc) => {
   // Log when a new socket connection is established
@@ -76,6 +96,14 @@ io.on("connection", (soc) => {
     addUser(customerId, soc.id, userInfo);
     // Log current connected customers for debugging
     // console.log(allCustomer);
+  });
+
+  /**
+   * Handle 'add_seller' event when a seller connects
+   * Adds the seller to the active users list for real-time communication
+   */
+  soc.on("add_seller", (sellerId, userInfo) => {
+    addSeller(sellerId, soc.id, userInfo);
   });
 });
 
