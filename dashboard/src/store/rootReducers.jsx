@@ -15,6 +15,8 @@ import authReducer from "./Reducers/authReducer";
 import categoryReducer from "./Reducers/categoryReducer";
 import productReducer from "./Reducers/productReducer";
 import sellerReducer from "./Reducers/sellerReducer";
+import chatReducer from "./Reducers/chatReducer";
+
 /**
  * Combines all feature slice reducers into a single root reducer object.
  *
@@ -28,6 +30,7 @@ const rootReducer = {
   category: categoryReducer,
   product: productReducer,
   seller: sellerReducer,
+  chat: chatReducer,
 };
 // const rootReducer = combineReducers({
 //   auth: authReducer,
