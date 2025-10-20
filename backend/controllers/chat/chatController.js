@@ -260,6 +260,34 @@ class ChatController {
     }
   }
   // End of send_message_to_seller method
+
+  /**
+   * Handles retrieving all customers that have chat relationships with a specific seller.
+   * This method fetches the seller's friend list which contains all customers
+   * who have initiated conversations with the seller. Used to display the
+   * seller's chat list showing all customers they can communicate with.
+   *
+   * @param {Object} req - Express request object, expects params:
+   *   - sellerId: ID of the seller whose customer list to retrieve (string)
+   * @param {Object} res - Express response object
+   */
+  async get_customers(req, res) {
+    // Extract seller ID from request parameters
+    const { sellerId } = req.params;
+
+    try {
+      // Find the seller's chat relationship record containing their friend list
+      const data = await sellerCustomerModel.findOne({ myId: sellerId });
+
+      // Return the seller's customer friend list
+      responseReturn(res, 200, {
+        customers: data.myFriends, // Array of customers who have chat relationships with this seller
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  // End of get_customers method
 }
 
 // Export instance of ChatController for use in routes
