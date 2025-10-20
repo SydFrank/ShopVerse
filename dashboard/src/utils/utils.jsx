@@ -1,3 +1,5 @@
+import io from "socket.io-client";
+
 // Styles for loading spinner
 export const overrideStyle = {
   display: "flex",
@@ -6,3 +8,6 @@ export const overrideStyle = {
   justifyContent: "center",
   alignItems: "center",
 };
+
+// Initialize socket connection
+export const socket = io("http://localhost:5000");

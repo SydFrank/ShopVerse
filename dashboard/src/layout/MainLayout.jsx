@@ -1,7 +1,9 @@
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { socket } from "../utils/utils";
+import { useSelector } from "react-redux";
 
 /**
  * MainLayout Component
@@ -29,6 +31,18 @@ import React, { useState } from "react";
  */
 
 const MainLayout = () => {
+  // Retrieve user information from Redux store
+  const { userInfo } = useSelector((state) => state.auth);
+
+  // Establish socket connection based on user role
+  useEffect(() => {
+    if (userInfo && userInfo.role === "seller") {
+      socket.emit("add_seller", userInfo._id, userInfo);
+    } else {
+      socket.emit("add_admin", userInfo);
+    }
+  }, [userInfo]);
+
   const [showSidebar, setShowSidebar] = useState(false);
 
   return (

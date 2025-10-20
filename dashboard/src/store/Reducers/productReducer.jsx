@@ -24,7 +24,7 @@ export const add_product = createAsyncThunk(
       const { data } = await api.post("/product-add", product, {
         withCredentials: true,
       });
-      console.log(data); // Log the response data for debugging
+      // console.log(data); // Log the response data for debugging
       // On success, dispatch the fulfilled action with the server's response data
       return fulfillWithValue(data);
     } catch (error) {
