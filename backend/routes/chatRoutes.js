@@ -11,7 +11,7 @@ router.post(
 
 router.post(
   "/chat/customer/send-message-to-seller",
-  ChatController.send_message_to_seller
+  ChatController.customer_message_add
 );
 
 router.get(
@@ -24,5 +24,12 @@ router.get(
   authMiddleware,
   ChatController.get_customers_seller_message
 );
+
+router.post(
+  "/chat/seller/send-message-to-customer",
+  authMiddleware,
+  ChatController.seller_message_add
+);
+
 // Export the router to be used in the main server application
 module.exports = router;
