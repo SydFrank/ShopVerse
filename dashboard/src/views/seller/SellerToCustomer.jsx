@@ -5,8 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   get_customer_message,
   get_customers,
+  messageClear,
+  send_message,
 } from "../../store/Reducers/chatReducer";
 import { Link, useParams } from "react-router-dom";
+import { socket } from "../../utils/utils";
 
 /**
  * SellerToCustomer Component
@@ -37,11 +40,13 @@ const SellerToCustomer = () => {
   // Retrieve user information from Redux store
   const { userInfo } = useSelector((state) => state.auth);
   // Retrieve customers from Redux store
-  const { customers, messages, currentCustomer } = useSelector(
+  const { customers, messages, currentCustomer, successMessage } = useSelector(
     (state) => state.chat
   );
   // Get customerId from URL parameters
   const { customerId } = useParams();
+  // Local state for chat input text
+  const [text, setText] = useState("");
 
   // Fetch customers on component mount
   useEffect(() => {
@@ -54,6 +59,27 @@ const SellerToCustomer = () => {
       dispatch(get_customer_message(customerId));
     }
   }, [customerId]);
+
+  // Function to handle sending messages
+  const send = (e) => {
+    e.preventDefault();
+    dispatch(
+      send_message({
+        senderId: userInfo._id,
+        receiverId: customerId,
+        text,
+        name: userInfo?.shopInfo?.shopName,
+      })
+    );
+    setText("");
+  };
+
+  // useEffect(() => {
+  //   if (successMessage) {
+  //     socket.emit("send_seller_message", messages[messages.length - 1]);
+  //     dispatch(messageClear());
+  //   }
+  // }, [successMessage]);
 
   return (
     <div className="px-2 lg:px-7 py-5">
@@ -111,7 +137,7 @@ const SellerToCustomer = () => {
                       className="w-[45px] h-[45px] border-green-500 border-2 max-w-[45px] p-[2px] rounded-full"
                       src="/images/demo.jpg"
                     />
-                    1{/* Online Indicator */}
+                    {/* Online Indicator */}
                     <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
                   </div>
                   <h2 className="text-base text-white font-semibold">
@@ -176,8 +202,10 @@ const SellerToCustomer = () => {
               </div>
             </div>
             {/* Chat Input Form */}
-            <form className="flex gap-3">
+            <form onSubmit={send} className="flex gap-3">
               <input
+                value={text}
+                onChange={(e) => setText(e.target.value)}
                 className="w-full flex justify-between px-2 border border-slate-700 items-center py-[5px] focus:border-blue-500 rounded-md outline-none bg-transparent text-[#d0d2d6]"
                 type="text"
                 placeholder="Input Your Message"
