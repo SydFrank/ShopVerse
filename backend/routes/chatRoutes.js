@@ -18,5 +18,11 @@ router.get(
   "/chat/seller/get-customers/:sellerId",
   ChatController.get_customers
 );
+
+router.get(
+  "/chat/seller/get-customer-message/:customerId",
+  authMiddleware,
+  ChatController.get_customers_seller_message
+);
 // Export the router to be used in the main server application
 module.exports = router;

@@ -18,7 +18,7 @@ class ChatController {
    *   - userId: ID of the customer initiating the chat (string)
    * @param {Object} res - Express response object
    */
-  async add_customer_friend(req, res) {
+  add_customer_friend = async (req, res) => {
     // Extract seller and customer IDs from request body
     const { sellerId, userId } = req.body;
 
@@ -161,7 +161,7 @@ class ChatController {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
   // End of add_customer_friend method
 
   /**
@@ -178,7 +178,7 @@ class ChatController {
    *   - name: name of the customer sending the message (string)
    * @param {Object} res - Express response object
    */
-  async send_message_to_seller(req, res) {
+  send_message_to_seller = async (req, res) => {
     // Extract message details from request body
     const { userId, text, sellerId, name } = req.body;
 
@@ -258,7 +258,7 @@ class ChatController {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
   // End of send_message_to_seller method
 
   /**
@@ -271,7 +271,7 @@ class ChatController {
    *   - sellerId: ID of the seller whose customer list to retrieve (string)
    * @param {Object} res - Express response object
    */
-  async get_customers(req, res) {
+  get_customers = async (req, res) => {
     // Extract seller ID from request parameters
     const { sellerId } = req.params;
 
@@ -286,8 +286,74 @@ class ChatController {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
   // End of get_customers method
+
+  /**
+   * Handles retrieving messages between a seller and a specific customer.
+   * This method fetches all chat messages exchanged between a seller and
+   * a particular customer, along with the customer's information. Used when
+   * a seller clicks on a customer in their chat list to view the conversation
+   * history and customer details.
+   *
+   * @param {Object} req - Express request object, expects:
+   *   - params.customerId: ID of the customer whose messages to retrieve (string)
+   *   - id: ID of the seller (from authentication middleware) (string)
+   * @param {Object} res - Express response object
+   */
+  get_customers_seller_message = async (req, res) => {
+    // Extract customer ID from request parameters
+    const { customerId } = req.params;
+    // Extract seller ID from authenticated request (set by auth middleware)
+    const { id } = req;
+
+    try {
+      // Retrieve all messages between the seller and specific customer
+      // Uses MongoDB $or operator to find messages in both directions
+      const messages = await sellerCustomerMessage.find({
+        $or: [
+          {
+            // Messages from seller to customer
+            $and: [
+              {
+                receiverId: {
+                  $eq: customerId, // Customer is the receiver
+                },
+              },
+              {
+                senderId: { $eq: id }, // Seller is the sender
+              },
+            ],
+          },
+          {
+            // Messages from customer to seller
+            $and: [
+              {
+                receiverId: {
+                  $eq: id, // Seller is the receiver
+                },
+              },
+              {
+                senderId: { $eq: customerId }, // Customer is the sender
+              },
+            ],
+          },
+        ],
+      });
+
+      // Get customer information for display in chat interface
+      const currentCustomer = await customerModel.findById(customerId);
+
+      // Return the conversation messages and customer details
+      responseReturn(res, 200, {
+        currentCustomer, // Customer information (name, profile, etc.)
+        messages, // Array of all messages between seller and customer
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // End of get_customers_seller_message method
 }
 
 // Export instance of ChatController for use in routes
