@@ -30,6 +30,25 @@ export const get_customers = createAsyncThunk(
 );
 // End of get_customers thunk
 
+export const get_customer_message = createAsyncThunk(
+  "chat/get_customer_message",
+  async (customerId, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      // Make a GET request to fetch customers for the specified seller
+      const { data } = await api.get(
+        `/chat/seller/get-customer-message/${customerId}`,
+        {
+          withCredentials: true, // Include cookies for authentication/session
+        }
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of get_customer_message thunk
+
 /**
  * Chat Redux Slice
  * ----------------
@@ -68,6 +87,11 @@ const chatReducer = createSlice({
       // Handle get_customers fulfilled action
       .addCase(get_customers.fulfilled, (state, { payload }) => {
         state.customers = payload.customers; // Update customers list with fetched data
+      })
+      // Handle get_customer_message fulfilled action
+      .addCase(get_customer_message.fulfilled, (state, { payload }) => {
+        state.messages = payload.messages;
+        state.currentCustomer = payload.currentCustomer;
       });
   },
 });

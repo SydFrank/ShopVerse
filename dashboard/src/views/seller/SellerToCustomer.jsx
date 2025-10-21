@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { FaList } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { get_customers } from "../../store/Reducers/chatReducer";
-import { Link } from "react-router-dom";
+import {
+  get_customer_message,
+  get_customers,
+} from "../../store/Reducers/chatReducer";
+import { Link, useParams } from "react-router-dom";
 
 /**
  * SellerToCustomer Component
@@ -34,12 +37,23 @@ const SellerToCustomer = () => {
   // Retrieve user information from Redux store
   const { userInfo } = useSelector((state) => state.auth);
   // Retrieve customers from Redux store
-  const { customers } = useSelector((state) => state.chat);
+  const { customers, messages, currentCustomer } = useSelector(
+    (state) => state.chat
+  );
+  // Get customerId from URL parameters
+  const { customerId } = useParams();
 
-  // Fetch customers when component mounts or sellerId changes
+  // Fetch customers on component mount
   useEffect(() => {
     dispatch(get_customers(userInfo._id));
   }, []);
+
+  // Fetch customer messages when customerId changes
+  useEffect(() => {
+    if (customerId) {
+      dispatch(get_customer_message(customerId));
+    }
+  }, [customerId]);
 
   return (
     <div className="px-2 lg:px-7 py-5">
@@ -97,10 +111,12 @@ const SellerToCustomer = () => {
                       className="w-[45px] h-[45px] border-green-500 border-2 max-w-[45px] p-[2px] rounded-full"
                       src="/images/demo.jpg"
                     />
-                    {/* Online Indicator */}
+                    1{/* Online Indicator */}
                     <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
                   </div>
-                  <h2 className="text-base text-white font-semibold">Allen</h2>
+                  <h2 className="text-base text-white font-semibold">
+                    {currentCustomer.name}
+                  </h2>
                 </div>
               )}
 
@@ -116,50 +132,47 @@ const SellerToCustomer = () => {
             </div>
             <div className="py-4">
               <div className="bg-[#475569] h-[calc(100vh-290px)] rounded-md p-3 overflow-y-auto">
-                {/* Example Incoming Message */}
-                <div className="w-full flex justify-start items-center ">
-                  <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
-                    <div>
-                      <img
-                        className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
-                        src="/images/demo.jpg"
-                      />
-                    </div>
-                    <div className="flex justify-center items-start flex-col w-full bg-blue-500 shadow-lg shadow-blue-500/50 text-white py-1 px-2 rounded-sm">
-                      <span>How are you ?</span>
-                    </div>
+                {customerId ? (
+                  messages.map((m, i) => {
+                    if (m.senderId === customerId) {
+                      return (
+                        <div className="w-full flex justify-start items-center ">
+                          <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
+                            <div>
+                              <img
+                                className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
+                                src="/images/demo.jpg"
+                              />
+                            </div>
+                            <div className="flex justify-center items-start flex-col w-full bg-blue-500 shadow-lg shadow-blue-500/50 text-white py-1 px-2 rounded-sm">
+                              <span>{m.message}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div className="w-full flex justify-end items-center ">
+                          <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
+                            <div className="flex justify-center items-start flex-col w-full bg-red-500 shadow-lg shadow-red-500/50 text-white py-1 px-2 rounded-sm">
+                              <span>{m.message}</span>
+                            </div>
+                            <div>
+                              <img
+                                className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
+                                src="/images/admin.jpg"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                  })
+                ) : (
+                  <div className="w-full h-full flex justify-center items-center text-white gap-2 flex-col">
+                    <span>Select Customer</span>
                   </div>
-                </div>
-
-                {/* Example Outgoing Message */}
-                <div className="w-full flex justify-end items-center ">
-                  <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
-                    <div className="flex justify-center items-start flex-col w-full bg-red-500 shadow-lg shadow-red-500/50 text-white py-1 px-2 rounded-sm">
-                      <span>How are you ?</span>
-                    </div>
-                    <div>
-                      <img
-                        className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
-                        src="/images/admin.jpg"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Example Incoming Message */}
-                <div className="w-full flex justify-start items-center ">
-                  <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
-                    <div>
-                      <img
-                        className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
-                        src="/images/demo.jpg"
-                      />
-                    </div>
-                    <div className="flex justify-center items-start flex-col w-full bg-blue-500 shadow-lg shadow-blue-500/50 text-white py-1 px-2 rounded-sm">
-                      <span>I need some help</span>
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
             {/* Chat Input Form */}
