@@ -82,6 +82,16 @@ const addSeller = (sellerId, socketId, userInfo) => {
   }
 };
 
+/**
+ * Finds a customer in the connected customers array.
+ *
+ * @param {string} customerId - Unique identifier for the customer
+ * @returns {Object|undefined} - The customer object if found, otherwise undefined
+ */
+const findCustomer = (customerId) => {
+  return allCustomer.find((u) => u.customerId === customerId);
+};
+
 // Listen for incoming Socket.IO connections
 io.on("connection", (soc) => {
   // Log when a new socket connection is established
@@ -104,6 +114,14 @@ io.on("connection", (soc) => {
    */
   soc.on("add_seller", (sellerId, userInfo) => {
     addSeller(sellerId, soc.id, userInfo);
+  });
+
+  /* Handle 'send_customer_message' event when a customer sends a message to a seller */
+  soc.on("send_seller_message", (msg) => {
+    const customer = findCustomer(msg.receiverId);
+    if (customer !== undefined) {
+      socket.to(customer.socketId).emit("seller_message", msg);
+    }
   });
 });
 

@@ -355,6 +355,20 @@ class ChatController {
   };
   // End of get_customers_seller_message method
 
+  /**
+   * Handles sending a message from a seller to a customer.
+   * This method creates a new message entry in the database and updates
+   * both the seller's and customer's friend lists to move the current
+   * conversation to the top (most recent activity first). This ensures
+   * that active conversations appear at the top of the chat list for both parties.
+   *
+   * @param {Object} req - Express request object, expects body:
+   *   - senderId: ID of the seller sending the message (string)
+   *   - receiverId: ID of the customer receiving the message (string)
+   *   - text: content of the message being sent (string)
+   *   - name: name of the seller sending the message (string)
+   * @param {Object} res - Express response object
+   */
   seller_message_add = async (req, res) => {
     const { senderId, receiverId, text, name } = req.body;
 
