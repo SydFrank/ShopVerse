@@ -92,6 +92,15 @@ const findCustomer = (customerId) => {
   return allCustomer.find((u) => u.customerId === customerId);
 };
 
+/**
+ * Removes a user from the connected customers array.
+ *
+ * @param {string} socketId - Socket.IO connection ID
+ */
+const remove = (socketId) => {
+  allCustomer = allCustomer.filter((u) => u.socketId !== socketId);
+};
+
 // Listen for incoming Socket.IO connections
 io.on("connection", (soc) => {
   // Log when a new socket connection is established
@@ -104,8 +113,8 @@ io.on("connection", (soc) => {
   soc.on("add_user", (customerId, userInfo) => {
     // Add the connected user to the active customers array
     addUser(customerId, soc.id, userInfo);
-    // Log current connected customers for debugging
-    // console.log(allCustomer);
+    // Emit the updated list of active sellers to all connected clients
+    io.emit("activeSeller", allSeller);
   });
 
   /**
@@ -114,6 +123,8 @@ io.on("connection", (soc) => {
    */
   soc.on("add_seller", (sellerId, userInfo) => {
     addSeller(sellerId, soc.id, userInfo);
+    // Emit the updated list of active sellers to all connected clients
+    io.emit("activeSeller", allSeller);
   });
 
   /* Handle 'send_customer_message' event when a customer sends a message to a seller */
@@ -122,6 +133,15 @@ io.on("connection", (soc) => {
     if (customer !== undefined) {
       socket.to(customer.socketId).emit("seller_message", msg);
     }
+  });
+
+  // Handle socket disconnection event
+  soc.on("disconnect", () => {
+    console.log("user disconnect");
+    // Remove the disconnected user from the active customers array
+    remove(soc.id);
+    // Emit the updated list of active sellers to all connected clients
+    io.emit("activeSeller", allSeller);
   });
 });
 
