@@ -74,12 +74,13 @@ const SellerToCustomer = () => {
     setText("");
   };
 
-  // useEffect(() => {
-  //   if (successMessage) {
-  //     socket.emit("send_seller_message", messages[messages.length - 1]);
-  //     dispatch(messageClear());
-  //   }
-  // }, [successMessage]);
+  // Emit socket event when a message is successfully sent
+  useEffect(() => {
+    if (successMessage) {
+      socket.emit("send_seller_message", messages[messages.length - 1]);
+      dispatch(messageClear());
+    }
+  }, [successMessage]);
 
   return (
     <div className="px-2 lg:px-7 py-5">
