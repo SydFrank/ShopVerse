@@ -4,9 +4,14 @@ import { GrEmoji } from "react-icons/gr";
 import { IoSend } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
+import {
+  add_friend,
+  messageClear,
+  send_message,
+  updateMessage,
+} from "../../store/reducers/chatReducer";
+import toast from "react-hot-toast";
 import io from "socket.io-client";
-import { add_friend, send_message } from "../../store/reducers/chatReducer";
-
 // const SOCKET_URL = "http://localhost:5000";
 const socket = io("http://localhost:5000");
 
@@ -70,6 +75,21 @@ const Chat = () => {
       setActiveSeller(sellers);
     });
   }, []);
+
+  // Effect to update messages when a new receiver message is received
+  useEffect(() => {
+    if (receiverMessage) {
+      if (
+        sellerId === receiverMessage.senderId &&
+        userInfo.id === receiverMessage.receiverId
+      ) {
+        dispatch(updateMessage(receiverMessage));
+      } else {
+        toast.success(receiverMessage.senderName + " " + "Send A Message");
+        dispatch(messageClear());
+      }
+    }
+  }, [receiverMessage]);
 
   return (
     <div className="bg-white p-3 rounded-md">
