@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { AiOutlineMessage, AiOutlinePlus } from "react-icons/ai";
 import { GrEmoji } from "react-icons/gr";
 import { IoSend } from "react-icons/io5";
@@ -16,6 +16,8 @@ import io from "socket.io-client";
 const socket = io("http://localhost:5000");
 
 const Chat = () => {
+  // Reference for scrolling to the latest message within chat container
+  const scrollRef = useRef();
   // Redux Toolkit dispatch function
   const dispatch = useDispatch();
   // Extracting sellerId from URL parameters
@@ -76,6 +78,14 @@ const Chat = () => {
     });
   }, []);
 
+  // Effect to emit sent message to socket server when successMessage changes
+  useEffect(() => {
+    if (successMessage) {
+      socket.emit("send_customer_message", fb_messages[fb_messages.length - 1]);
+      dispatch(messageClear());
+    }
+  }, [successMessage]);
+
   // Effect to update messages when a new receiver message is received
   useEffect(() => {
     if (receiverMessage) {
@@ -90,6 +100,18 @@ const Chat = () => {
       }
     }
   }, [receiverMessage]);
+
+  // Effect to scroll to the latest message within chat container only
+  useEffect(() => {
+    if (scrollRef.current) {
+      // Use scrollIntoView with block: 'nearest' to prevent page scrolling
+      scrollRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "nearest",
+      });
+    }
+  }, [fb_messages]);
 
   return (
     <div className="bg-white p-3 rounded-md">
@@ -140,6 +162,7 @@ const Chat = () => {
                       return (
                         <div
                           key={i}
+                          ref={scrollRef}
                           className="w-full flex gap-2 justify-start items-center text-[14px]"
                         >
                           <img
@@ -156,6 +179,7 @@ const Chat = () => {
                       return (
                         <div
                           key={i}
+                          ref={scrollRef}
                           className="w-full flex gap-2 justify-end items-center text-[14px]"
                         >
                           <img
