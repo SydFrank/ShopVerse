@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaList } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,8 +7,10 @@ import {
   get_customers,
   messageClear,
   send_message,
+  updateMessage,
 } from "../../store/Reducers/chatReducer";
 import { Link, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 import { socket } from "../../utils/utils";
 
 /**
@@ -32,6 +34,9 @@ import { socket } from "../../utils/utils";
  * - Replace static values (e.g., sellerId, seller names, images) with dynamic data as needed.
  */
 const SellerToCustomer = () => {
+  // Reference for scrolling chat messages
+  const scrollRef = useRef();
+
   const [show, setShow] = useState(false);
   const sellerId = 65; // Example seller ID, replace with actual logic to get seller ID
 
@@ -47,6 +52,8 @@ const SellerToCustomer = () => {
   const { customerId } = useParams();
   // Local state for chat input text
   const [text, setText] = useState("");
+  // Local state for managing received messages
+  const [receiverMessage, setReceiverMessage] = useState("");
 
   // Fetch customers on component mount
   useEffect(() => {
@@ -81,6 +88,34 @@ const SellerToCustomer = () => {
       dispatch(messageClear());
     }
   }, [successMessage]);
+
+  // Effect to listen for incoming messages from the socket server
+  useEffect(() => {
+    // Listen for 'customer_message' event from the socket server
+    socket.on("customer_message", (msg) => {
+      setReceiverMessage(msg);
+    });
+  }, []);
+
+  // Effect to update messages when a new receiver message is received
+  useEffect(() => {
+    if (receiverMessage) {
+      if (
+        customerId === receiverMessage.senderId &&
+        userInfo._id === receiverMessage.receiverId
+      ) {
+        dispatch(updateMessage(receiverMessage));
+      } else {
+        toast.success(receiverMessage.senderName + " " + "Send A Message");
+        dispatch(messageClear());
+      }
+    }
+  }, [receiverMessage]);
+
+  // Effect to scroll to the latest message whenever messages change
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
     <div className="px-2 lg:px-7 py-5">
@@ -163,7 +198,11 @@ const SellerToCustomer = () => {
                   messages.map((m, i) => {
                     if (m.senderId === customerId) {
                       return (
-                        <div className="w-full flex justify-start items-center ">
+                        <div
+                          key={i}
+                          ref={scrollRef}
+                          className="w-full flex justify-start items-center "
+                        >
                           <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
                             <div>
                               <img
@@ -179,7 +218,11 @@ const SellerToCustomer = () => {
                       );
                     } else {
                       return (
-                        <div className="w-full flex justify-end items-center ">
+                        <div
+                          key={i}
+                          ref={scrollRef}
+                          className="w-full flex justify-end items-center "
+                        >
                           <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
                             <div className="flex justify-center items-start flex-col w-full bg-red-500 shadow-lg shadow-red-500/50 text-white py-1 px-2 rounded-sm">
                               <span>{m.message}</span>

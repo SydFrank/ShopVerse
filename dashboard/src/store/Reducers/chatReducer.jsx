@@ -133,6 +133,10 @@ const chatReducer = createSlice({
       state.errorMessage = "";
       state.successMessage = "";
     },
+    // New reducer to update messages with incoming message
+    updateMessage: (state, { payload }) => {
+      state.messages = [...state.messages, payload];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -165,5 +169,5 @@ const chatReducer = createSlice({
   },
 });
 
-export const { messageClear } = chatReducer.actions;
+export const { messageClear, updateMessage } = chatReducer.actions;
 export default chatReducer.reducer;
