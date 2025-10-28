@@ -131,7 +131,7 @@ io.on("connection", (soc) => {
   soc.on("send_seller_message", (msg) => {
     const customer = findCustomer(msg.receiverId);
     if (customer !== undefined) {
-      socket.to(customer.socketId).emit("seller_message", msg);
+      soc.to(customer.socketId).emit("seller_message", msg);
     }
   });
 
