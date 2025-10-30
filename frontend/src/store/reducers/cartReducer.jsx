@@ -265,9 +265,22 @@ export const cartReducer = createSlice({
      * - Prevents messages from persisting across component re-renders
      * - Ensures clean slate for subsequent cart API operations
      */
-    messageClear: (state) => {
+    messageClear: (state, _) => {
       state.errorMessage = "";
       state.successMessage = "";
+    },
+
+    /**
+     * Reset Count Action
+     * Resets cart product count and wishlist count to zero
+     *
+     * Usage:
+     * - Called during user logout to clear cart/wishlist indicators
+     * - Ensures accurate counts when a new user logs in
+     */
+    reset_count: (state, _) => {
+      state.cart_product_count = 0;
+      state.wishlist_count = 0;
     },
   },
 
@@ -341,7 +354,7 @@ export const cartReducer = createSlice({
  * Exported Action Creators
  * Available for use in React components via useDispatch hook
  */
-export const { messageClear } = cartReducer.actions;
+export const { messageClear, reset_count } = cartReducer.actions;
 
 /**
  * Default Export - Reducer Function

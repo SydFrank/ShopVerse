@@ -2,18 +2,44 @@ import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { FaList } from "react-icons/fa";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { IoIosHome } from "react-icons/io";
 import { FaBorderAll } from "react-icons/fa6";
 import { FaHeart } from "react-icons/fa";
 import { IoChatbubbleEllipses } from "react-icons/io5";
 import { TbLogout2 } from "react-icons/tb";
 import { TbLockPassword } from "react-icons/tb";
+import api from "../api/api";
+import { useDispatch } from "react-redux";
+import { user_reset } from "../store/reducers/authReducer";
+import { reset_count } from "../store/reducers/cartReducer";
 
 // User dashboard with sidebar navigation
 const Dashboard = () => {
   // Control sidebar visibility on mobile
   const [filterShow, setFilterShow] = useState(false);
+
+  // Redux navigate function
+  const navigate = useNavigate();
+
+  // Redux dispatch function
+  const dispatch = useDispatch();
+
+  /* Logout Function
+   * Handles user logout by calling the logout API endpoint,
+   * clearing local storage, resetting Redux state, and navigating to login page.
+   */
+  const logout = async () => {
+    try {
+      const { data } = await api.get("/customer/logout");
+      localStorage.removeItem("customerToken");
+      dispatch(user_reset());
+      dispatch(reset_count());
+      navigate("/login");
+    } catch (error) {
+      console.log(error.response.data);
+    }
+  };
 
   return (
     <div>
@@ -87,13 +113,14 @@ const Dashboard = () => {
                   </Link>
                 </li>
 
-                <li className="flex justify-start items-center gap-2 py-2">
+                <li
+                  onClick={logout}
+                  className="flex justify-start items-center gap-2 py-2 cursor-pointer"
+                >
                   <span className="text-xl">
                     <TbLogout2 />
                   </span>
-                  <Link to="/dashboard" className="block ">
-                    Logout
-                  </Link>
+                  <div className="block ">Logout</div>
                 </li>
               </ul>
             </div>

@@ -134,6 +134,18 @@ export const authReducer = createSlice({
       state.errorMessage = "";
       state.successMessage = "";
     },
+
+    /**
+     * User Reset Action
+     * Resets user information to initial state
+     *
+     * Usage:
+     * - Called during user logout to clear sensitive data
+     * - Ensures no residual user data persists across sessions
+     */
+    user_reset: (state, _) => {
+      state.userInfo = "";
+    },
   },
 
   // Handle async action states (pending, fulfilled, rejected)
@@ -192,7 +204,7 @@ export const authReducer = createSlice({
  * - customer_register: Async thunk for user registration
  * - customer_login: Async thunk for user authentication
  */
-export const { messageClear } = authReducer.actions;
+export const { messageClear, user_reset } = authReducer.actions;
 
 /**
  * Default Export - Reducer Function
