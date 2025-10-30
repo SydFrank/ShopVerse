@@ -10,5 +10,7 @@ router.post(
 
 router.post("/customer/customer-login", customerAuthControllers.customer_login);
 
+router.get("/customer/logout", customerAuthControllers.customer_logout);
+
 // Export the router to be used in the main server application
 module.exports = router;

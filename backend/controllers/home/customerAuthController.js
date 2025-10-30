@@ -135,6 +135,20 @@ class customerAuthControllers {
     }
   };
   // End of customer_login method
+
+  /**
+   * Handles customer logout.
+   * This method clears the authentication token cookie to log the customer out.
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   */
+  customer_logout = async (req, res) => {
+    res.cookie("customerToken", "", {
+      expires: new Date(Date.now()), // Expire the cookie immediately
+    });
+    responseReturn(res, 200, { message: "Logged Out Successfully" });
+  };
+  // End of customer_logout method
 }
 
 // Export instance of customerAuthControllers for use in routes

@@ -93,12 +93,22 @@ const findCustomer = (customerId) => {
 };
 
 /**
+ * Finds a seller in the connected sellers array.
+ * @param {string} sellerId - Unique identifier for the seller
+ * @returns {Object|undefined} - The seller object if found, otherwise undefined
+ */
+const findSeller = (sellerId) => {
+  return allSeller.find((u) => u.sellerId === sellerId);
+};
+
+/**
  * Removes a user from the connected customers array.
- *
+ * Also removes from the connected sellers array if present.
  * @param {string} socketId - Socket.IO connection ID
  */
 const remove = (socketId) => {
   allCustomer = allCustomer.filter((u) => u.socketId !== socketId);
+  allSeller = allSeller.filter((u) => u.socketId !== socketId);
 };
 
 // Listen for incoming Socket.IO connections
@@ -127,11 +137,19 @@ io.on("connection", (soc) => {
     io.emit("activeSeller", allSeller);
   });
 
-  /* Handle 'send_customer_message' event when a customer sends a message to a seller */
+  /* Handle 'send_seller_message' event when a seller sends a message to a customer */
   soc.on("send_seller_message", (msg) => {
     const customer = findCustomer(msg.receiverId);
     if (customer !== undefined) {
       soc.to(customer.socketId).emit("seller_message", msg);
+    }
+  });
+
+  /* Handle 'send_customer_message' event when a customer sends a message to a seller */
+  soc.on("send_customer_message", (msg) => {
+    const seller = findSeller(msg.receiverId);
+    if (seller !== undefined) {
+      soc.to(seller.socketId).emit("customer_message", msg);
     }
   });
 
