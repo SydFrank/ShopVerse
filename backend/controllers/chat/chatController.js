@@ -450,6 +450,23 @@ class ChatController {
     }
   };
   // End of seller_message_add method
+
+  /**
+   * Handles retrieving all sellers in the system.
+   * This method fetches all seller records from the database.
+   * Used by admin to view the list of all sellers.
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   */
+  get_sellers = async (req, res) => {
+    try {
+      const sellers = await sellerModel.find({});
+      responseReturn(res, 200, { sellers });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // End of get_sellers method
 }
 
 // Export instance of ChatController for use in routes

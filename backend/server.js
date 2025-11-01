@@ -45,6 +45,8 @@ const io = socket(server, {
 var allCustomer = [];
 // Array to store all connected sellers with their socket information
 var allSeller = [];
+// Object to store all connected admins with their socket information
+var admin = {};
 
 /**
  * Adds a new user to the connected customers array.
@@ -134,6 +136,19 @@ io.on("connection", (soc) => {
   soc.on("add_seller", (sellerId, userInfo) => {
     addSeller(sellerId, soc.id, userInfo);
     // Emit the updated list of active sellers to all connected clients
+    io.emit("activeSeller", allSeller);
+  });
+
+  /**
+   * Handle 'add_admin' event when an admin connects
+   * Adds the admin to the active admins list for real-time communication
+   * @param {Object} adminInfo - Information about the admin user
+   */
+  soc.on("add_admin", (adminInfo) => {
+    delete adminInfo.email;
+    delete adminInfo.password;
+    admin = adminInfo;
+    admin.socketId = soc.id;
     io.emit("activeSeller", allSeller);
   });
 

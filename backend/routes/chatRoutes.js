@@ -31,5 +31,11 @@ router.post(
   ChatController.seller_message_add
 );
 
+router.get(
+  "/chat/admin/get-sellers",
+  authMiddleware,
+  ChatController.get_sellers
+);
+
 // Export the router to be used in the main server application
 module.exports = router;
