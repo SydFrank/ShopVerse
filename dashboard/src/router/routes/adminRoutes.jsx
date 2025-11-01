@@ -70,6 +70,11 @@ export const adminRoutes = [
     role: "admin", // Accessible by admin role only
   },
   {
+    path: "/admin/dashboard/chat-sellers/:sellerId", // Admin chat seller management path
+    element: <ChatSeller />, // Admin chat seller component
+    role: "admin", // Accessible by admin role only
+  },
+  {
     path: "/admin/dashboard/order/details/:orderId", // Admin order details management path
     element: <OrderDetails />, // Admin order details component
     role: "admin", // Accessible by admin role only

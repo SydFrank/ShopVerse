@@ -3,6 +3,8 @@ import { FaList } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { get_sellers } from "../../store/Reducers/chatReducer";
+import { Link, useParams } from "react-router-dom";
+import { FaRegFaceGrinHearts } from "react-icons/fa6";
 
 /**
  * ChatSeller Component
@@ -26,7 +28,8 @@ import { get_sellers } from "../../store/Reducers/chatReducer";
  */
 const ChatSeller = () => {
   const [show, setShow] = useState(false);
-  const sellerId = 65; // Example seller ID, replace with actual logic to get seller ID
+  // Get seller ID from URL parameters
+  const { sellerId } = useParams();
   const { sellers, activeSeller } = useSelector((state) => state.chat);
   // Fetch sellers when component mounts
   const dispatch = useDispatch();
@@ -59,7 +62,9 @@ const ChatSeller = () => {
               </div>
 
               {sellers.map((s, i) => (
-                <div
+                <Link
+                  to={`/admin/dashboard/chat-sellers/${s._id}`}
+                  key={i}
                   className={`h-[60px] flex justify-start gap-2 items-center text-white px-2 py-2 rounded-md cursor-pointer bg-[#8288ed]`}
                 >
                   <div className="relative">
@@ -78,7 +83,7 @@ const ChatSeller = () => {
                       <h2 className="text-base font-semibold">{s.name}</h2>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -111,50 +116,50 @@ const ChatSeller = () => {
             </div>
             <div className="py-4">
               <div className="bg-[#475569] h-[calc(100vh-290px)] rounded-md p-3 overflow-y-auto">
-                {/* Example Incoming Message */}
-                <div className="w-full flex justify-start items-center ">
-                  <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
-                    <div>
-                      <img
-                        className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
-                        src="/images/demo.jpg"
-                      />
-                    </div>
-                    <div className="flex justify-center items-start flex-col w-full bg-blue-500 shadow-lg shadow-blue-500/50 text-white py-1 px-2 rounded-sm">
-                      <span>How are you ?</span>
-                    </div>
+                {sellerId ? (
+                  [1, 2, 3].map((m, i) => {
+                    if (m.senderId === "sellerId") {
+                      return (
+                        <div className="w-full flex justify-start items-center ">
+                          <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
+                            <div>
+                              <img
+                                className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
+                                src="/images/demo.jpg"
+                              />
+                            </div>
+                            <div className="flex justify-center items-start flex-col w-full bg-blue-500 shadow-lg shadow-blue-500/50 text-white py-1 px-2 rounded-sm">
+                              <span>How are you ?</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div className="w-full flex justify-end items-center ">
+                          <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
+                            <div className="flex justify-center items-start flex-col w-full bg-red-500 shadow-lg shadow-red-500/50 text-white py-1 px-2 rounded-sm">
+                              <span>How are you .....?</span>
+                            </div>
+                            <div>
+                              <img
+                                className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
+                                src="/images/admin.jpg"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                  })
+                ) : (
+                  <div className="w-full h-full flex justify-center items-center flex-col gap-2 text-white">
+                    <span>
+                      <FaRegFaceGrinHearts />
+                    </span>
+                    <span>Select Seller</span>
                   </div>
-                </div>
-
-                {/* Example Outgoing Message */}
-                <div className="w-full flex justify-end items-center ">
-                  <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
-                    <div className="flex justify-center items-start flex-col w-full bg-red-500 shadow-lg shadow-red-500/50 text-white py-1 px-2 rounded-sm">
-                      <span>How are you ?</span>
-                    </div>
-                    <div>
-                      <img
-                        className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
-                        src="/images/admin.jpg"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Example Incoming Message */}
-                <div className="w-full flex justify-start items-center ">
-                  <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
-                    <div>
-                      <img
-                        className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
-                        src="/images/demo.jpg"
-                      />
-                    </div>
-                    <div className="flex justify-center items-start flex-col w-full bg-blue-500 shadow-lg shadow-blue-500/50 text-white py-1 px-2 rounded-sm">
-                      <span>I need some help</span>
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
             {/* Chat Input Form */}
