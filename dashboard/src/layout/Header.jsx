@@ -1,5 +1,5 @@
 import { FaList } from "react-icons/fa6";
-
+import { useSelector } from "react-redux";
 /**
  * Header Component
  *
@@ -17,6 +17,9 @@ import { FaList } from "react-icons/fa6";
  */
 
 const Header = ({ showSidebar, setShowSidebar }) => {
+  // Retrieve user information from Redux store
+  const { userInfo } = useSelector((state) => state.auth);
+
   return (
     // Outer wrapper: fixed at top, spans full width, with padding and high z-index to stay above other elements
     <div className="fixed top-0 left-0 w-full py-5 px-2 lg:px-7 z-40">
@@ -25,7 +28,7 @@ const Header = ({ showSidebar, setShowSidebar }) => {
         {/* Sidebar toggle button (only visible on small screens) */}
         <div
           onClick={() => setShowSidebar(!showSidebar)}
-          className="w-[35px] flex lg:hidden h-[35px] round-sm bg-indigo-500 shadow-lg hover: shadow-indigo-500/50 justify-center items-center cursor-pointer"
+          className="w-[35px] flex lg:hidden h-[35px] round-sm bg-indigo-500 shadow-lg hover:shadow-indigo-500/50 justify-center items-center cursor-pointer"
         >
           <span>
             <FaList />
@@ -35,7 +38,7 @@ const Header = ({ showSidebar, setShowSidebar }) => {
         <div className="hidden md:block">
           <input
             className="px-3 py-2 outline-none border bg-transparent border-slate-700 rounded-md text-[#423d72] 
-            focus: border-indigo-300 overflow-hidden"
+            focus:border-indigo-300 overflow-hidden"
             type="text"
             name="search"
             placeholder="Search"
@@ -46,13 +49,21 @@ const Header = ({ showSidebar, setShowSidebar }) => {
           <div className="flex justify-center items-center">
             <div className="flex justify-center items-center gap-3">
               <div className="flex justify-center items-center flex-col text-end">
-                <h2 className="text-md font-bold ">Frank Xu</h2>
-                <span className="text-[14px] font-normal">Admin</span>
+                <h2 className="text-md font-bold ">{userInfo.name}</h2>
+                <span className="text-[14px] font-normal">{userInfo.role}</span>
               </div>
-              <img
-                className="w-[45px] h-[45px] rounded-full overflow-hidden"
-                src="/images/admin.jpg"
-              />
+
+              {userInfo.role === "admin" ? (
+                <img
+                  className="w-[45px] h-[45px] rounded-full overflow-hidden"
+                  src="/images/admin.jpg"
+                />
+              ) : (
+                <img
+                  className="w-[45px] h-[45px] rounded-full overflow-hidden"
+                  src={userInfo.image}
+                />
+              )}
             </div>
           </div>
         </div>

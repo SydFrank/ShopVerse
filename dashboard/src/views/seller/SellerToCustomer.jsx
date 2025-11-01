@@ -16,22 +16,33 @@ import { socket } from "../../utils/utils";
 /**
  * SellerToCustomer Component
  *
- * This component renders a responsive chat interface for seller communication.
- * It features a collapsible sidebar listing sellers and a main chat area for messaging.
+ * This component renders a responsive chat interface that allows sellers to communicate
+ * with their customers. It features a collapsible sidebar listing customers and a main
+ * chat area for real-time messaging.
  *
  * Features:
- * - Responsive sidebar with seller list and toggle functionality for mobile views.
- * - Displays a list of sellers with online status indicators.
- * - Main chat area shows sample chat messages between user and sellers.
- * - Chat input form for message entry (UI only, no send logic implemented).
+ * - Responsive sidebar with customer list and toggle functionality for mobile views
+ * - Displays a list of customers with online status indicators
+ * - Real-time chat messaging between seller and selected customer
+ * - Message input form with send functionality
+ * - Socket.io integration for real-time message updates
+ * - Auto-scroll to latest messages
+ * - Toast notifications for message status
  *
  * Props: None
  * State:
- *  - show (boolean): Controls the visibility of the sidebar on mobile devices.
+ *  - show (boolean): Controls the visibility of the customer sidebar on mobile devices
+ *  - text (string): Current message text being typed
+ *  - receiverMessage (string): Message received from customer
  *
- * Note:
- * - Seller and chat data are currently hardcoded for demonstration.
- * - Replace static values (e.g., sellerId, seller names, images) with dynamic data as needed.
+ * URL Parameters:
+ *  - customerId (optional): ID of the customer to chat with
+ *
+ * Redux State:
+ *  - customers: List of customers available for chat
+ *  - messages: Chat messages for current conversation
+ *  - currentCustomer: Currently selected customer information
+ *  - userInfo: Current seller's information
  */
 const SellerToCustomer = () => {
   // Reference for scrolling chat messages

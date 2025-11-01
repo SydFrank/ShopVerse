@@ -102,6 +102,31 @@ export const send_message = createAsyncThunk(
 // End of send_message thunk
 
 /**
+ * Async Thunk: Get Sellers
+ * Fetches the list of sellers for the admin from the backend.
+ * Used in chat functionality to get sellers that the admin can communicate with.
+ *
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload
+ * @returns {Object} Response data or error
+ */
+export const get_sellers = createAsyncThunk(
+  "chat/get_sellers",
+  async (_, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      // Make a GET request to fetch sellers for the specified customer
+      const { data } = await api.get(`/chat/admin/get-sellers`, {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of get_sellers thunk
+
+/**
  * Chat Redux Slice
  * ----------------
  * Manages the chat state including customers, messages, active users, and sellers.
@@ -137,6 +162,14 @@ const chatReducer = createSlice({
     updateMessage: (state, { payload }) => {
       state.messages = [...state.messages, payload];
     },
+    // New reducer to update sellers list
+    updateSellers: (state, { payload }) => {
+      state.activeSeller = payload;
+    },
+    // New reducer to update customers list
+    updateCustomer: (state, { payload }) => {
+      state.activeCustomer = payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -165,9 +198,14 @@ const chatReducer = createSlice({
         state.customers = tempFriends;
         state.messages = [...state.messages, payload.message];
         state.successMessage = "Message Sent Successfully"; // Display success message
+      })
+      // Handle get_sellers fulfilled action
+      .addCase(get_sellers.fulfilled, (state, { payload }) => {
+        state.sellers = payload.sellers;
       });
   },
 });
 
-export const { messageClear, updateMessage } = chatReducer.actions;
+export const { messageClear, updateMessage, updateSellers, updateCustomer } =
+  chatReducer.actions;
 export default chatReducer.reducer;

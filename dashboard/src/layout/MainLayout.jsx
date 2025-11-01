@@ -3,7 +3,8 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import React, { useEffect, useState } from "react";
 import { socket } from "../utils/utils";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { updateSellers, updateCustomer } from "../store/Reducers/chatReducer";
 
 /**
  * MainLayout Component
@@ -33,6 +34,8 @@ import { useSelector } from "react-redux";
 const MainLayout = () => {
   // Retrieve user information from Redux store
   const { userInfo } = useSelector((state) => state.auth);
+  // Initialize Redux dispatch function
+  const dispatch = useDispatch();
 
   // Establish socket connection based on user role
   useEffect(() => {
@@ -42,6 +45,15 @@ const MainLayout = () => {
       socket.emit("add_admin", userInfo);
     }
   }, [userInfo]);
+
+  useEffect(() => {
+    socket.on("activeCustomer", (customers) => {
+      dispatch(updateCustomer(customers));
+    });
+    socket.on("activeSeller", (sellers) => {
+      dispatch(updateSellers(sellers));
+    });
+  });
 
   const [showSidebar, setShowSidebar] = useState(false);
 
