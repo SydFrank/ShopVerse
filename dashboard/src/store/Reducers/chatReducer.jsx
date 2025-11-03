@@ -157,6 +157,57 @@ export const send_message_seller_admin = createAsyncThunk(
 // End of send_message_seller_admin thunk
 
 /**
+ * Async Thunk: Get Admin Message
+ * ------------------------
+ * Fetches chat messages between admin and a specific seller from the backend.
+ * Used to load the conversation history when an admin clicks on a seller in the chat interface.
+ * @param {string} receiverId - The ID of the seller to get messages for
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload
+ * @returns {Object} Response data containing messages and seller info, or error
+ */
+export const get_admin_message = createAsyncThunk(
+  "chat/get_admin_message",
+  async (receiverId, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      // Make a GET request to fetch chat messages between seller and admin
+      const { data } = await api.get(`/chat/get-admin-messages/${receiverId}`, {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of get_admin_message thunk
+
+/**
+ * Async Thunk: Get Seller Message
+ * ------------------------
+ * Fetches chat messages between seller and admin from the backend.
+ * Used to load the conversation history for the seller in the chat interface.
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload
+ * @returns {Object} Response data containing messages, or error
+ */
+export const get_seller_message = createAsyncThunk(
+  "chat/get_seller_message",
+  async (receiverId, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      // Make a GET request to fetch chat messages between seller and admin
+      const { data } = await api.get(`/chat/get-seller-messages`, {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of get_seller_message thunk
+
+/**
  * Chat Redux Slice
  * ----------------
  * Manages the chat state including customers, messages, active users, and sellers.
@@ -233,12 +284,22 @@ const chatReducer = createSlice({
       .addCase(get_sellers.fulfilled, (state, { payload }) => {
         state.sellers = payload.sellers;
       })
+      // Handle send_message_seller_admin fulfilled action
       .addCase(send_message_seller_admin.fulfilled, (state, { payload }) => {
         state.seller_admin_message = [
           ...state.seller_admin_message,
           payload.message,
         ];
         state.successMessage = "Message Sent Successfully"; // Display success message
+      })
+      // Handle get_admin_message fulfilled action
+      .addCase(get_admin_message.fulfilled, (state, { payload }) => {
+        state.seller_admin_message = payload.messages;
+        state.currentSeller = payload.currentSeller;
+      })
+      // Handle get_seller_message fulfilled action
+      .addCase(get_seller_message.fulfilled, (state, { payload }) => {
+        state.seller_admin_message = payload.messages;
       });
   },
 });

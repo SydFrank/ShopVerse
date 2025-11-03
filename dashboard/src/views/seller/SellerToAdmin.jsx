@@ -1,4 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  get_admin_message,
+  get_seller_message,
+  get_sellers,
+  send_message_seller_admin,
+} from "../../store/Reducers/chatReducer";
 
 /**
  * SellerToAdmin Component
@@ -19,6 +26,38 @@ import React from "react";
  */
 
 const SellerToAdmin = () => {
+  // Fetch sellers when component mounts
+  const dispatch = useDispatch();
+
+  // Local state for chat input text
+  const [text, setText] = useState("");
+
+  // Access chat-related state from Redux store
+  const { sellers, activeSeller, seller_admin_message, currentSeller } =
+    useSelector((state) => state.chat);
+
+  // Access user information from Redux store
+  const { userInfo } = useSelector((state) => state.auth);
+
+  // Fetch seller messages on component mount
+  useEffect(() => {
+    dispatch(get_seller_message());
+  }, []);
+
+  // Function to handle sending messages
+  const send = (e) => {
+    e.preventDefault();
+    dispatch(
+      send_message_seller_admin({
+        senderId: userInfo._id,
+        receiverId: "",
+        message: text,
+        senderName: userInfo.name,
+      })
+    );
+    setText("");
+  };
+
   return (
     <div className="px-2 lg:px-7 py-5">
       <div className="w-full bg-[#6a5fdf] px-4 py-4 rounded-md h-[calc(100vh-140px)]">
@@ -30,7 +69,7 @@ const SellerToAdmin = () => {
                 <div className="relative">
                   <img
                     className="w-[45px] h-[45px] border-green-500 border-2 max-w-[45px] p-[2px] rounded-full"
-                    src="/images/demo.jpg"
+                    src="/images/admin.jpg"
                   />
                   {/* Online Indicator */}
                   <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
@@ -41,55 +80,54 @@ const SellerToAdmin = () => {
 
             <div className="py-4">
               <div className="bg-[#475569] h-[calc(100vh-290px)] rounded-md p-3 overflow-y-auto">
-                {/* Example Incoming Message */}
-                <div className="w-full flex justify-start items-center ">
-                  <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
-                    <div>
-                      <img
-                        className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
-                        src="/images/demo.jpg"
-                      />
-                    </div>
-                    <div className="flex justify-center items-start flex-col w-full bg-blue-500 shadow-lg shadow-blue-500/50 text-white py-1 px-2 rounded-sm">
-                      <span>How are you ?</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Example Outgoing Message */}
-                <div className="w-full flex justify-end items-center ">
-                  <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
-                    <div className="flex justify-center items-start flex-col w-full bg-red-500 shadow-lg shadow-red-500/50 text-white py-1 px-2 rounded-sm">
-                      <span>How are you ?</span>
-                    </div>
-                    <div>
-                      <img
-                        className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
-                        src="/images/admin.jpg"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Example Incoming Message */}
-                <div className="w-full flex justify-start items-center ">
-                  <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
-                    <div>
-                      <img
-                        className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
-                        src="/images/demo.jpg"
-                      />
-                    </div>
-                    <div className="flex justify-center items-start flex-col w-full bg-blue-500 shadow-lg shadow-blue-500/50 text-white py-1 px-2 rounded-sm">
-                      <span>I need some help</span>
-                    </div>
-                  </div>
-                </div>
+                {seller_admin_message.map((m, i) => {
+                  if (userInfo._id !== m.senderId) {
+                    return (
+                      <div
+                        key={i}
+                        className="w-full flex justify-start items-center "
+                      >
+                        <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
+                          <div>
+                            <img
+                              className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
+                              src="/images/admin.jpg"
+                            />
+                          </div>
+                          <div className="flex justify-center items-start flex-col w-full bg-blue-500 shadow-lg shadow-blue-500/50 text-white py-1 px-2 rounded-sm">
+                            <span>{m.message}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div
+                        key={i}
+                        className="w-full flex justify-end items-center "
+                      >
+                        <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
+                          <div className="flex justify-center items-start flex-col w-full bg-red-500 shadow-lg shadow-red-500/50 text-white py-1 px-2 rounded-sm">
+                            <span>{m.message}</span>
+                          </div>
+                          <div>
+                            <img
+                              className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
+                              src={userInfo.image}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                })}
               </div>
             </div>
             {/* Chat Input Form */}
-            <form className="flex gap-3">
+            <form onSubmit={send} className="flex gap-3">
               <input
+                value={text}
+                onChange={(e) => setText(e.target.value)}
                 className="w-full flex justify-between px-2 border border-slate-700 items-center py-[5px] focus:border-blue-500 rounded-md outline-none bg-transparent text-[#d0d2d6]"
                 type="text"
                 placeholder="Input Your Message"

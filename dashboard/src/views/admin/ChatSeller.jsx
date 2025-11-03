@@ -3,6 +3,7 @@ import { FaList } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  get_admin_message,
   get_sellers,
   send_message_seller_admin,
 } from "../../store/Reducers/chatReducer";
@@ -35,9 +36,9 @@ const ChatSeller = () => {
   const { sellerId } = useParams();
   // Local state for chat input text
   const [text, setText] = useState("");
-  const { sellers, activeSeller, seller_admin_message } = useSelector(
-    (state) => state.chat
-  );
+  // Access chat-related state from Redux store
+  const { sellers, activeSeller, seller_admin_message, currentSeller } =
+    useSelector((state) => state.chat);
 
   // Fetch sellers when component mounts
   const dispatch = useDispatch();
@@ -60,6 +61,13 @@ const ChatSeller = () => {
     );
     setText("");
   };
+
+  // Fetch messages for the selected seller when sellerId changes
+  useEffect(() => {
+    if (sellerId) {
+      dispatch(get_admin_message(sellerId));
+    }
+  }, [sellerId]);
 
   return (
     <div className="px-2 lg:px-7 py-5">
@@ -87,7 +95,9 @@ const ChatSeller = () => {
                 <Link
                   to={`/admin/dashboard/chat-sellers/${s._id}`}
                   key={i}
-                  className={`h-[60px] flex justify-start gap-2 items-center text-white px-2 py-2 rounded-md cursor-pointer bg-[#8288ed]`}
+                  className={`h-[60px] flex justify-start gap-2 items-center text-white px-2 py-2 rounded-md cursor-pointer ${
+                    sellerId === s._id ? "bg-[#8288ed]" : ""
+                  }`}
                 >
                   <div className="relative">
                     <img
@@ -118,11 +128,12 @@ const ChatSeller = () => {
                   <div className="relative">
                     <img
                       className="w-[45px] h-[45px] border-green-500 border-2 max-w-[45px] p-[2px] rounded-full"
-                      src="/images/demo.jpg"
+                      src={currentSeller?.image}
                     />
                     {/* Online Indicator */}
                     <div className="w-[10px] h-[10px] bg-green-500 rounded-full absolute right-0 bottom-0"></div>
                   </div>
+                  <span className="text-white">{currentSeller?.name}</span>
                 </div>
               )}
 
@@ -140,14 +151,14 @@ const ChatSeller = () => {
               <div className="bg-[#475569] h-[calc(100vh-290px)] rounded-md p-3 overflow-y-auto">
                 {sellerId ? (
                   seller_admin_message.map((m, i) => {
-                    if (m.senderId === "sellerId") {
+                    if (m.senderId === sellerId) {
                       return (
                         <div className="w-full flex justify-start items-center ">
                           <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
                             <div>
                               <img
                                 className="w-[38px] border-2 border-white rounded-full max-w-[38px] p-[3px]"
-                                src="/images/demo.jpg"
+                                src={currentSeller?.image}
                               />
                             </div>
                             <div className="flex justify-center items-start flex-col w-full bg-blue-500 shadow-lg shadow-blue-500/50 text-white py-1 px-2 rounded-sm">
