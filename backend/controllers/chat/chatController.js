@@ -3,6 +3,7 @@ const customerModel = require("../../models/customerModel");
 const sellerCustomerModel = require("../../models/chat/sellerCustomerModel");
 const { responseReturn } = require("../../utils/response");
 const sellerCustomerMessage = require("../../models/chat/sellerCustomerMessage");
+const adminSellerMessage = require("../../models/chat/adminSellerMessage");
 
 // Define the ChatController class to handle chat-related operations
 class ChatController {
@@ -467,6 +468,32 @@ class ChatController {
     }
   };
   // End of get_sellers method
+
+  /**
+   * Handles sending a message from a seller to an admin.
+   * This method creates a new admin-seller message entry in the database.
+   *
+   * @param {Object} req - Express request object, expects body:
+   *   - senderId: ID of the seller sending the message (string)
+   *   - receiverId: ID of the admin receiving the message (string)
+   *   - message: Content of the message being sent (string)
+   *   - senderName: Name of the seller sending the message (string)
+   */
+  seller_admin_message_insert = async (req, res) => {
+    const { senderId, receiverId, message, senderName } = req.body;
+    try {
+      const messageData = await adminSellerMessage.create({
+        senderId,
+        receiverId,
+        message,
+        senderName,
+      });
+      responseReturn(res, 200, { message: messageData });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // End of seller_admin_message_insert method
 }
 
 // Export instance of ChatController for use in routes
