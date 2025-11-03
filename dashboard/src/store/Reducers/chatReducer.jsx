@@ -127,6 +127,36 @@ export const get_sellers = createAsyncThunk(
 // End of get_sellers thunk
 
 /**
+ * Async Thunk: Send Message Seller Admin
+ * ------------------------
+ * Sends a chat message from admin to a seller through the backend API.
+ * Used when an admin types and sends a message in the chat interface.
+ * @param {Object} info - Message information object containing:
+ *  - senderId: ID of the admin sending the message
+ * - receiverId: ID of the seller receiving the message
+ * - message: The message content/text
+ * - senderName: Name of the admin
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload
+ * @returns {Object} Response data containing the sent message, or error
+ */
+export const send_message_seller_admin = createAsyncThunk(
+  "chat/send_message_seller_admin",
+  async (info, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      // Make a POST request to send a message from seller to admin
+      const { data } = await api.post(`/chat/message-send-seller-admin`, info, {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of send_message_seller_admin thunk
+
+/**
  * Chat Redux Slice
  * ----------------
  * Manages the chat state including customers, messages, active users, and sellers.
@@ -202,6 +232,13 @@ const chatReducer = createSlice({
       // Handle get_sellers fulfilled action
       .addCase(get_sellers.fulfilled, (state, { payload }) => {
         state.sellers = payload.sellers;
+      })
+      .addCase(send_message_seller_admin.fulfilled, (state, { payload }) => {
+        state.seller_admin_message = [
+          ...state.seller_admin_message,
+          payload.message,
+        ];
+        state.successMessage = "Message Sent Successfully"; // Display success message
       });
   },
 });
