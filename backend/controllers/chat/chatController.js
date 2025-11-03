@@ -494,7 +494,112 @@ class ChatController {
     }
   };
   // End of seller_admin_message_insert method
-}
 
+  /**
+   * Handles retrieving messages between an admin and a specific seller.
+   * This method fetches all chat messages exchanged between an admin and a seller.
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   */
+  get_admin_messages = async (req, res) => {
+    const { receiverId } = req.params;
+    const id = "";
+
+    try {
+      const messages = await adminSellerMessage.find({
+        $or: [
+          {
+            $and: [
+              {
+                receiverId: {
+                  $eq: receiverId,
+                },
+              },
+              {
+                senderId: { $eq: id },
+              },
+            ],
+          },
+          {
+            $and: [
+              {
+                receiverId: {
+                  $eq: id,
+                },
+              },
+              {
+                senderId: { $eq: receiverId },
+              },
+            ],
+          },
+        ],
+      });
+
+      let currentSeller = {};
+      if (receiverId) {
+        currentSeller = await sellerModel.findById(receiverId);
+      }
+
+      // Return the conversation messages and seller details
+      responseReturn(res, 200, {
+        currentSeller, // Seller information (name, profile, etc.)
+        messages, // Array of all messages between admin and seller
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // End of get_admin_messages method
+
+  /**
+   * Handles retrieving messages between a seller and admin.
+   * This method fetches all chat messages exchanged between a seller and admin.
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   */
+  get_seller_messages = async (req, res) => {
+    const receiverId = "";
+    const { id } = req;
+
+    try {
+      const messages = await adminSellerMessage.find({
+        $or: [
+          {
+            $and: [
+              {
+                receiverId: {
+                  $eq: receiverId,
+                },
+              },
+              {
+                senderId: { $eq: id },
+              },
+            ],
+          },
+          {
+            $and: [
+              {
+                receiverId: {
+                  $eq: id,
+                },
+              },
+              {
+                senderId: { $eq: receiverId },
+              },
+            ],
+          },
+        ],
+      });
+
+      // Return the conversation messages and seller details
+      responseReturn(res, 200, {
+        messages, // Array of all messages between admin and seller
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // End of get_seller_messages method
+}
 // Export instance of ChatController for use in routes
 module.exports = new ChatController();
