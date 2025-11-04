@@ -168,6 +168,21 @@ io.on("connection", (soc) => {
     }
   });
 
+  /* Handle 'send_message_admin_to_seller' event when an admin sends a message to a seller */
+  soc.on("send_message_admin_to_seller", (msg) => {
+    const seller = findSeller(msg.receiverId);
+    if (seller !== undefined) {
+      soc.to(seller.socketId).emit("receive_admin_message", msg);
+    }
+  });
+
+  /* Handle 'send_message_seller_to_admin' event when a seller sends a message to admin */
+  soc.on("send_message_seller_to_admin", (msg) => {
+    if (admin.socketId) {
+      soc.to(admin.socketId).emit("receive_seller_message", msg);
+    }
+  });
+
   // Handle socket disconnection event
   soc.on("disconnect", () => {
     console.log("user disconnect");
