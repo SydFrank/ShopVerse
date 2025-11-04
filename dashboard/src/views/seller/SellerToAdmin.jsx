@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   get_admin_message,
   get_seller_message,
   get_sellers,
   send_message_seller_admin,
+  updateAdminMessage,
+  messageClear,
 } from "../../store/Reducers/chatReducer";
+import { socket } from "../../utils/utils";
 
 /**
  * SellerToAdmin Component
@@ -26,6 +29,8 @@ import {
  */
 
 const SellerToAdmin = () => {
+  // Reference for scrolling chat to bottom
+  const scrollRef = useRef();
   // Fetch sellers when component mounts
   const dispatch = useDispatch();
 
@@ -33,8 +38,13 @@ const SellerToAdmin = () => {
   const [text, setText] = useState("");
 
   // Access chat-related state from Redux store
-  const { sellers, activeSeller, seller_admin_message, currentSeller } =
-    useSelector((state) => state.chat);
+  const {
+    sellers,
+    activeSeller,
+    seller_admin_message,
+    currentSeller,
+    successMessage,
+  } = useSelector((state) => state.chat);
 
   // Access user information from Redux store
   const { userInfo } = useSelector((state) => state.auth);
@@ -57,6 +67,33 @@ const SellerToAdmin = () => {
     );
     setText("");
   };
+
+  // Effect to listen for incoming messages from the socket server
+  useEffect(() => {
+    // Listen for 'receive_admin_message' event from the socket server
+    socket.on("receive_admin_message", (msg) => {
+      dispatch(updateAdminMessage(msg));
+    });
+  }, []);
+
+  /**
+   * Emit socket event when a message is successfully sent
+   * This allows the admin to receive the message in real-time.
+   */
+  useEffect(() => {
+    if (successMessage) {
+      socket.emit(
+        "send_message_seller_to_admin",
+        seller_admin_message[seller_admin_message.length - 1]
+      );
+      dispatch(messageClear());
+    }
+  }, [successMessage]);
+
+  // Effect to scroll to the latest message whenever messages change
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [seller_admin_message]);
 
   return (
     <div className="px-2 lg:px-7 py-5">
@@ -85,6 +122,7 @@ const SellerToAdmin = () => {
                     return (
                       <div
                         key={i}
+                        ref={scrollRef}
                         className="w-full flex justify-start items-center "
                       >
                         <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
@@ -104,6 +142,7 @@ const SellerToAdmin = () => {
                     return (
                       <div
                         key={i}
+                        ref={scrollRef}
                         className="w-full flex justify-end items-center "
                       >
                         <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">

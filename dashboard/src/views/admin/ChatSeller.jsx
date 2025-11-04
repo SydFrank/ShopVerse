@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaList } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,9 +6,13 @@ import {
   get_admin_message,
   get_sellers,
   send_message_seller_admin,
+  messageClear,
+  updateSellerMessage,
 } from "../../store/Reducers/chatReducer";
 import { Link, useParams } from "react-router-dom";
 import { FaRegFaceGrinHearts } from "react-icons/fa6";
+import toast from "react-hot-toast";
+import { socket } from "../../utils/utils";
 
 /**
  * ChatSeller Component
@@ -31,17 +35,28 @@ import { FaRegFaceGrinHearts } from "react-icons/fa6";
  * - Replace static values (e.g., sellerId, seller names, images) with dynamic data as needed.
  */
 const ChatSeller = () => {
+  // Reference for scrolling chat to bottom
+  const scrollRef = useRef();
+  // Local state for sidebar visibility
   const [show, setShow] = useState(false);
   // Get seller ID from URL parameters
   const { sellerId } = useParams();
   // Local state for chat input text
   const [text, setText] = useState("");
   // Access chat-related state from Redux store
-  const { sellers, activeSeller, seller_admin_message, currentSeller } =
-    useSelector((state) => state.chat);
+  const {
+    sellers,
+    activeSeller,
+    seller_admin_message,
+    currentSeller,
+    successMessage,
+  } = useSelector((state) => state.chat);
 
   // Fetch sellers when component mounts
   const dispatch = useDispatch();
+
+  // Local state for managing received messages
+  const [receiverMessage, setReceiverMessage] = useState("");
 
   // Fetch sellers on component mount
   useEffect(() => {
@@ -68,6 +83,50 @@ const ChatSeller = () => {
       dispatch(get_admin_message(sellerId));
     }
   }, [sellerId]);
+
+  /**
+   * Effect to listen for incoming messages from the socket server
+   * ------------------------
+   * Listens for 'receive_admin_message' events and updates the chat messages in the Redux store.
+   * This allows real-time updates to the chat interface when new messages are received.
+   */
+  useEffect(() => {
+    if (successMessage) {
+      socket.emit(
+        "send_message_admin_to_seller",
+        seller_admin_message[seller_admin_message.length - 1]
+      );
+      dispatch(messageClear());
+    }
+  }, [successMessage]);
+
+  // Effect to listen for incoming messages from the socket server
+  useEffect(() => {
+    // Listen for 'receive_seller_message' event from the socket server
+    socket.on("receive_seller_message", (msg) => {
+      setReceiverMessage(msg);
+    });
+  }, []);
+
+  // Effect to update messages when a new receiver message is received
+  useEffect(() => {
+    if (receiverMessage) {
+      if (
+        receiverMessage.senderId === sellerId &&
+        receiverMessage.receiverId === ""
+      ) {
+        dispatch(updateSellerMessage(receiverMessage));
+      } else {
+        toast.success(receiverMessage.senderName + " " + "Send A Message");
+        dispatch(messageClear());
+      }
+    }
+  }, [receiverMessage]);
+
+  // Effect to scroll to the latest message whenever messages change
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [seller_admin_message]);
 
   return (
     <div className="px-2 lg:px-7 py-5">
@@ -153,7 +212,11 @@ const ChatSeller = () => {
                   seller_admin_message.map((m, i) => {
                     if (m.senderId === sellerId) {
                       return (
-                        <div className="w-full flex justify-start items-center ">
+                        <div
+                          ref={scrollRef}
+                          key={i}
+                          className="w-full flex justify-start items-center "
+                        >
                           <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
                             <div>
                               <img
@@ -169,7 +232,11 @@ const ChatSeller = () => {
                       );
                     } else {
                       return (
-                        <div className="w-full flex justify-end items-center ">
+                        <div
+                          ref={scrollRef}
+                          key={i}
+                          className="w-full flex justify-end items-center "
+                        >
                           <div className="flex justify-start items-start gap-2 md:px-2 py-2 max-w-full lg:max-w-[85%]">
                             <div className="flex justify-center items-start flex-col w-full bg-red-500 shadow-lg shadow-red-500/50 text-white py-1 px-2 rounded-sm">
                               <span>{m.message}</span>
