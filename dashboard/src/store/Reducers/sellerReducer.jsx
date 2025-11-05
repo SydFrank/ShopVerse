@@ -29,13 +29,8 @@ export const get_seller_request = createAsyncThunk(
           withCredentials: true, // Include cookies for authentication/session
         }
       );
-      console.log(data); // Log the response data for debugging
-      // On success, dispatch the fulfilled action with the server's response data
       return fulfillWithValue(data);
     } catch (error) {
-      // On error, dispatch the rejected action with the backend error message
-      // error.response.data contains the error details sent from the server
-      // console.log(error.response.data); // Uncomment for error debugging
       return rejectWithValue(error.response.data);
     }
   }
@@ -64,13 +59,8 @@ export const get_seller = createAsyncThunk(
       const { data } = await api.get(`/get-seller/${sellerId}`, {
         withCredentials: true, // Include cookies for authentication/session
       });
-      console.log(data); // Log the response data for debugging
-      // On success, dispatch the fulfilled action with the server's response data
       return fulfillWithValue(data);
     } catch (error) {
-      // On error, dispatch the rejected action with the backend error message
-      // error.response.data contains the error details sent from the server
-      // console.log(error.response.data); // Uncomment for error debugging
       return rejectWithValue(error.response.data);
     }
   }
@@ -100,18 +90,80 @@ export const seller_status_update = createAsyncThunk(
       const { data } = await api.post(`/seller-status-update`, info, {
         withCredentials: true, // Include cookies for authentication/session
       });
-      console.log(data); // Log the response data for debugging
-      // On success, dispatch the fulfilled action with the server's response data
       return fulfillWithValue(data);
     } catch (error) {
-      // On error, dispatch the rejected action with the backend error message
-      // error.response.data contains the error details sent from the server
-      // console.log(error.response.data); // Uncomment for error debugging
       return rejectWithValue(error.response.data);
     }
   }
 );
 //End of seller_status_update async thunk
+
+/**
+ * Async Thunk: Get Active Sellers
+ * ------------------------
+ * Sends a request to the backend to fetch active seller data.
+ * Uses axios (via `api`) to get active seller data.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ * @param {Object} info - Seller payload (e.g. { name, image }).
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error.
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload.
+ * @returns {Object} Response data or error.
+ */
+export const get_active_sellers = createAsyncThunk(
+  "seller/get_active_sellers",
+  // This thunk asynchronously fetches seller data from the backend.
+  async (
+    { page, searchValue, parPage },
+    { rejectWithValue, fulfillWithValue }
+  ) => {
+    try {
+      const { data } = await api.get(
+        `/get-sellers?page=${page}&&searchValue=${searchValue}&&parPage=${parPage}`,
+        {
+          withCredentials: true, // Include cookies for authentication/session
+        }
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of get_active_sellers async thunk
+
+/**
+ * Async Thunk: Get Deactive Sellers
+ * ------------------------
+ * Sends a request to the backend to fetch deactive seller data.
+ * Uses axios (via `api`) to get deactive seller data.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ * @param {Object} info - Seller payload (e.g. { name, image }).
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error.
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload.
+ * @returns {Object} Response data or error.
+ */
+
+export const get_deactive_sellers = createAsyncThunk(
+  "seller/get_deactive_sellers",
+  // This thunk asynchronously fetches seller data from the backend.
+  async (
+    { page, searchValue, parPage },
+    { rejectWithValue, fulfillWithValue }
+  ) => {
+    try {
+      const { data } = await api.get(
+        `/get-deactive-sellers?page=${page}&&searchValue=${searchValue}&&parPage=${parPage}`,
+        {
+          withCredentials: true, // Include cookies for authentication/session
+        }
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of get_deactive_sellers async thunk
 
 /**
  * The `seller` slice of the global Redux state.
@@ -158,6 +210,15 @@ const sellerSlice = createSlice({
       .addCase(seller_status_update.fulfilled, (state, { payload }) => {
         state.seller = payload.seller; // Update seller with fetched data
         state.successMessage = payload.message; // Store success message
+      })
+      // Handle the pending state of the get_active_sellers action
+      .addCase(get_active_sellers.fulfilled, (state, { payload }) => {
+        state.sellers = payload.sellers;
+        state.totalSeller = payload.totalSeller;
+      })
+      .addCase(get_deactive_sellers.fulfilled, (state, { payload }) => {
+        state.sellers = payload.sellers;
+        state.totalSeller = payload.totalSeller;
       });
   },
 });

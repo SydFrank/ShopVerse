@@ -82,11 +82,7 @@ const SellerDetails = () => {
           <div className="w-3/12 flex justify-center items-center py-3">
             <div>
               {seller?.image ? (
-                <img
-                  className="w-full h-[230px]"
-                  src="/images/demo.jpg"
-                  alt="Seller"
-                />
+                <img className="w-full h-[230px]" src={seller?.image} />
               ) : (
                 <span>Image Not Upload</span>
               )}

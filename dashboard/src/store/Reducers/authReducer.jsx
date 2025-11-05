@@ -17,7 +17,6 @@ import { jwtDecode } from "jwt-decode";
 export const admin_login = createAsyncThunk(
   "auth/admin_login",
   async (info, { rejectWithValue, fulfillWithValue }) => {
-    console.log(info);
     try {
       const { data } = await api.post("/admin-login", info, {
         withCredentials: true, // Include cookies for authentication/session
@@ -50,7 +49,6 @@ export const admin_login = createAsyncThunk(
 export const seller_login = createAsyncThunk(
   "auth/seller_login",
   async (info, { rejectWithValue, fulfillWithValue }) => {
-    console.log(info);
     try {
       const { data } = await api.post("/seller-login", info, {
         withCredentials: true, // Include cookies for authentication/session
@@ -83,7 +81,6 @@ export const seller_login = createAsyncThunk(
 export const seller_register = createAsyncThunk(
   "auth/seller_register",
   async (info, { rejectWithValue, fulfillWithValue }) => {
-    console.log(info);
     try {
       const { data } = await api.post("/seller-register", info, {
         withCredentials: true, // Include cookies for authentication/session
@@ -217,6 +214,39 @@ const returnRole = (token) => {
   }
 };
 // End of returnRole function
+
+/**
+ * Async Thunk: Logout
+ * ------------------------
+ * Logs out the user by calling the backend logout endpoint.
+ * Uses axios (via `api`) to get the logout request.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ * @param {Object} navigate - Navigation function to redirect user after logout.
+ * @param {string} role - User role to determine redirect path.
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error.
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload.
+ * @returns {Object} Response data or error.
+ */
+export const logout = createAsyncThunk(
+  "auth/logout",
+  async ({ navigate, role }, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.get("/logout", {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      localStorage.removeItem("accessToken");
+      if (role === "admin") {
+        navigate("/admin/login");
+      } else {
+        navigate("/login");
+      }
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of logout async thunk
 
 /**
  * The `auth` slice of the global Redux state.

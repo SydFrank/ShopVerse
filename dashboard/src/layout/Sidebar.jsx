@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getNav } from "../navigation/index";
 import { RiLogoutBoxLine } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux"; // Redux hooks for state access and dispatch
+import { logout } from "../store/Reducers/authReducer";
 /**
  * Sidebar Component
  * ------------------
@@ -29,13 +30,16 @@ import { useDispatch, useSelector } from "react-redux"; // Redux hooks for state
  */
 
 const Sidebar = ({ showSidebar, setShowSidebar }) => {
-  const dispatch = useDispatch(); // For dispatching actions to the Redux store
+  // Initialize Redux dispatch function
+  const dispatch = useDispatch();
+  //  Initialize navigation function
+  const navigate = useNavigate();
 
   // Destructure authentication-related state from Redux
   const { role } = useSelector((state) => state.auth);
-
+  // Get current pathname for active link highlighting
   const { pathname } = useLocation();
-
+  // State to hold all navigation items
   const [allNav, setAllNav] = useState([]);
 
   // Fetch navigation items for the admin role on initial render
@@ -87,8 +91,9 @@ const Sidebar = ({ showSidebar, setShowSidebar }) => {
             ))}
             <li>
               <button
+                onClick={() => dispatch(logout({ navigate, role }))}
                 className="text-[#030811] font-bold duration-200
-                  px-[12px] py-[9px] round-sm flex justify-start items-center gap-[12px] hover:pl-4 transition-all w-full mb-1"
+                  px-[12px] py-[9px] round-sm flex justify-start items-center gap-[12px] hover:pl-4 transition-all w-full mb-1 cursor-pointer"
               >
                 <span>
                   <RiLogoutBoxLine />

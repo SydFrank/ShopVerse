@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Pagination from "../Pagination";
 import { FaEye } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { get_deactive_sellers } from "../../store/Reducers/sellerReducer";
 
 /**
  * DeactiveSellers component displays a paginated table of inactive sellers.
@@ -16,17 +18,32 @@ import { FaEye } from "react-icons/fa";
  */
 
 const DeactiveSellers = () => {
+  // Redux dispatch function
+  const dispatch = useDispatch();
   // State: current page number for pagination
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // State: search keyword entered by the user (functionality not yet implemented)
-  const [searchValue, setSearchValue] = React.useState("");
+  const [searchValue, setSearchValue] = useState("");
 
   // State: number of sellers displayed per page
-  const [parPage, setParPage] = React.useState(5);
+  const [parPage, setParPage] = useState(5);
 
   // State: controls modal or popup visibility (currently unused)
   const [show, setShow] = useState(false);
+
+  // Extract sellers and totalSeller from Redux store
+  const { sellers, totalSeller } = useSelector((state) => state.seller);
+
+  // Fetch active sellers whenever pagination or search parameters change
+  useEffect(() => {
+    const obj = {
+      parPage: parseInt(parPage),
+      page: parseInt(currentPage),
+      searchValue,
+    };
+    dispatch(get_deactive_sellers(obj));
+  }, [parPage, currentPage, searchValue]);
 
   return (
     <div className="px-2 lg:px-7 pt-5">
@@ -46,6 +63,8 @@ const DeactiveSellers = () => {
           </select>
           {/* Search input (does not filter the table yet) */}
           <input
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
             type="text"
             placeholder="Search"
             className="px-4 py-2 focus:border-indigo-500 outline-none bg-[#6a5fdf] border border-slate-700 rounded-md text-[#d0d2d6]"
@@ -67,13 +86,19 @@ const DeactiveSellers = () => {
                   Name
                 </th>
                 <th scope="col" className="py-3 px-4">
-                  Email
+                  Shop Name
                 </th>
                 <th scope="col" className="py-3 px-4">
                   Payment Status
                 </th>
                 <th scope="col" className="py-3 px-4">
+                  Email
+                </th>
+                <th scope="col" className="py-3 px-4">
                   Status
+                </th>
+                <th scope="col" className="py-3 px-4">
+                  District
                 </th>
                 <th scope="col" className="py-3 px-4">
                   Action
@@ -81,62 +106,74 @@ const DeactiveSellers = () => {
               </tr>
             </thead>
             <tbody>
-              {/* Static demo data for sellers */}
-              {[1, 2, 3, 4, 5].map((curVal, index) => (
-                <tr key={index}>
+              {sellers.map((d, i) => (
+                <tr key={i}>
                   {/* Serial number */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    {curVal}
+                    {i + 1}
                   </td>
                   {/* Seller image */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    <img
-                      className="w-[45px] h-[45px]"
-                      src={`/images/category/${curVal}.jpg`}
-                    />
+                    <img className="w-[45px] h-[45px]" src={d.image} />
                   </td>
                   {/* Seller name */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    Frank Xu
+                    {d.name}
+                  </td>
+                  {/* Shop name */}
+                  <td
+                    scope="row"
+                    className="py-1 px-4 font-medium whitespace-nowrap"
+                  >
+                    {d.shopInfo?.shopName}
+                  </td>
+                  {/* Payment status */}
+                  <td
+                    scope="row"
+                    className="py-1 px-4 font-medium whitespace-nowrap"
+                  >
+                    <span>{d.payment}</span>
                   </td>
                   {/* Seller email */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    frankzhsy@gmail.com
+                    {d.email}
                   </td>
-                  {/* Payment status  */}
+                  {/* Seller division (region) */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    Active
+                    {d.status}
                   </td>
-                  {/* Status  */}
+                  {/* Seller district (sub-region) */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    Deactive
+                    {d.shopInfo?.district}
                   </td>
-
                   {/* Action buttons (e.g., view details) */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
                     <div className="flex justify-start items-center gap-4">
-                      <Link className="p-[6px] bg-green-500 rounded hover:shadow-lg hover:shadow-green-500/50">
+                      <Link
+                        to={`/admin/dashboard/seller/details/${d._id}`}
+                        className="p-[6px] bg-green-500 rounded hover:shadow-lg hover:shadow-green-500/50"
+                      >
                         <FaEye />
                       </Link>
                     </div>
@@ -147,15 +184,20 @@ const DeactiveSellers = () => {
           </table>
         </div>
         {/* Pagination footer */}
-        <div className="w-full flex justify-end mt-4 bottom-4 right-4">
-          <Pagination
-            pageNumber={currentPage}
-            setPageNumber={setCurrentPage}
-            totalItem={50}
-            parPage={parPage}
-            showItem={3}
-          />
-        </div>
+
+        {totalSeller <= parPage ? (
+          <div className="w-full flex justify-end mt-4 bottom-4 right-4">
+            <Pagination
+              pageNumber={currentPage}
+              setPageNumber={setCurrentPage}
+              totalItem={totalSeller}
+              parPage={parPage}
+              showItem={4}
+            />
+          </div>
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );
