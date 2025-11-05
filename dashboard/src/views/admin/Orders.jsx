@@ -1,55 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BsArrowDownSquare } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import Pagination from "../Pagination";
+import { useDispatch } from "react-redux";
+import { get_admin_orders } from "./../../store/Reducers/orderReducer";
 
 /**
  * Orders Component
- * ----------------
- * This React component displays a list of customer orders in a styled, paginated interface.
  *
- * Features:
- * 1. Pagination Size Selector:
- *    - Allows the user to select how many orders to show per page (5, 10, or 15).
- *
- * 2. Search Bar:
- *    - Search input is present but currently non-functional (placeholder for future filtering).
- *
- * 3. Order Table Display:
- *    - Orders are displayed in a responsive table-like layout using Flexbox.
- *    - Columns include: Order ID, Price, Payment Status, Order Status, Action.
- *
- * 4. Row Expansion:
- *    - Clicking the arrow icon toggles the visibility of additional (nested) order rows.
- *    - NOTE: The `show` state is shared across all rows; toggling one affects all.
- *      Consider improving this with per-row expansion state (e.g., using an array of IDs).
- *
- * 5. Pagination Component:
- *    - Includes a reusable Pagination component with dynamic `parPage` and `currentPage`.
- *
- * 6. Styling:
- *    - Tailwind CSS is used for styling.
- *    - Table supports horizontal scrolling (`overflow-x-auto`) for smaller screens.
- *
- * TODO (Enhancements):
- * - Connect search functionality to `searchValue`.
- * - Slice data based on `currentPage` and `parPage`.
- * - Load order data from API/backend.
- * - Make row expansion per-item instead of global.
+ * Displays a paginated list of customer orders with search functionality.
+ * Features expandable order details and responsive table layout.
  */
 
 const Orders = () => {
+  // Redux dispatch function
+  const dispatch = useDispatch();
+
   // Pagination state: current page number
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Search keyword entered by the user
-  const [searchValue, setSearchValue] = React.useState("");
+  const [searchValue, setSearchValue] = useState("");
 
   // Number of orders to display per page
-  const [parPage, setParPage] = React.useState(5);
+  const [parPage, setParPage] = useState(5);
 
   // Controls whether the additional order details are shown or hidden
-  const [show, setShow] = React.useState(false);
+  const [show, setShow] = useState(false);
+
+  // Fetch active sellers whenever pagination or search parameters change
+  useEffect(() => {
+    const obj = {
+      parPage: parseInt(parPage),
+      page: parseInt(currentPage),
+      searchValue,
+    };
+    dispatch(get_admin_orders(obj));
+  }, [parPage, currentPage, searchValue]);
 
   return (
     <div className="px-2 lg:px-7 pt-5">
@@ -64,6 +51,8 @@ const Orders = () => {
             <option value="15">15</option>
           </select>
           <input
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
             type="text"
             placeholder="Search"
             className="px-4 py-2 focus:border-indigo-500 outline-none bg-[#6a5fdf] border border-slate-700 rounded-md text-[#d0d2d6]"
