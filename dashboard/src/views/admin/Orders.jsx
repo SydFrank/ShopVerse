@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BsArrowDownSquare } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import Pagination from "../Pagination";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { get_admin_orders } from "./../../store/Reducers/orderReducer";
 
 /**
@@ -26,7 +26,10 @@ const Orders = () => {
   const [parPage, setParPage] = useState(5);
 
   // Controls whether the additional order details are shown or hidden
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(null);
+
+  // Extract orders and total order count from Redux state
+  const { myOrders, totalOrder } = useSelector((state) => state.order);
 
   // Fetch active sellers whenever pagination or search parameters change
   useEffect(() => {
@@ -60,209 +63,108 @@ const Orders = () => {
         </div>
 
         <div className="relative mt-5 overflow-x-auto">
-          {/* Table Header */}
-          <div className="w-full text-sm text-left text-[#d0d2d6]">
-            <div className="text-sm text-[#d0d2d6] uppercase border-b border-slate-700">
-              <div className="flex justify-between items-center">
-                <div className="py-3 w-[25%] font-bold">Order id</div>
-                <div className="py-3 w-[13%] font-bold">Price</div>
-                <div className="py-3 w-[18%] font-bold">Payment Status</div>
-                <div className="py-3 w-[18%] font-bold">Order Status</div>
-                <div className="py-3 w-[18%] font-bold">Action</div>
-                <div className="py-3 w-[8%] font-bold text-xl">
-                  <BsArrowDownSquare />
+          <div className="min-w-[1100px]">
+            {/* Table Header */}
+            <div className="w-full text-sm text-left text-[#d0d2d6]">
+              <div className="text-sm text-[#d0d2d6] uppercase border-b border-slate-700">
+                {/* ✅ 去掉 justify-between，改为紧密排列 */}
+                <div className="flex items-center">
+                  <div className="py-3 w-[25%] shrink-0 font-bold">
+                    Order id
+                  </div>
+                  <div className="py-3 w-[13%] shrink-0 font-bold">Price</div>
+                  <div className="py-3 w-[18%] shrink-0 font-bold">
+                    Payment Status
+                  </div>
+                  <div className="py-3 w-[18%] shrink-0 font-bold">
+                    Order Status
+                  </div>
+                  <div className="py-3 w-[18%] shrink-0 font-bold">Action</div>
+                  <div className="py-3 w-[8%] shrink-0 font-bold text-xl">
+                    <BsArrowDownSquare />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="text-[#d0d2d6] ">
-            {/* Example Order Row */}
-            <div className="flex justify-between items-start border-b border-slate-700">
-              <div className="py-3 w-[25%] font-medium whitespace-nowrap">
-                #6449556
-              </div>
-              <div className="py-3 w-[13%] font-medium">$660</div>
-              <div className="py-3 w-[18%] font-medium">Pending</div>
-              <div className="py-3 w-[18%] font-medium">Pending</div>
-              <div className="py-3 w-[18%] font-medium">
-                <Link to={"/admin/dashboard/order/details/3"}>View</Link>
-              </div>
-              {/* Expand/Collapse toggle icon */}
-              <div
-                onClick={(e) => setShow(!show)}
-                className="py-3 w-[8%] font-medium text-xl"
-              >
-                <BsArrowDownSquare />
-              </div>
-            </div>
 
-            {/* Nested/Expanded Order Rows — shown when `show` is true */}
-            <div
-              className={
-                show ? "block border-b border-slate-700 bg-[#8288ed]" : "hidden"
-              }
-            >
-              {/* Example nested row */}
-              <div className="flex justify-satrt items-start border-b border-slate-700">
-                <div className="py-3 w-[25%] font-medium whitespace-nowrap pl-3">
-                  #25000
+            {myOrders.map((o, i) => (
+              <div className="text-[#d0d2d6]" key={i}>
+                <div className="flex items-start border-b border-slate-700">
+                  <div className="py-3 w-[25%] shrink-0 font-medium whitespace-nowrap">
+                    #{o._id}
+                  </div>
+                  <div className="py-3 w-[13%] shrink-0 font-medium">
+                    ${o.price}
+                  </div>
+                  <div className="py-3 w-[18%] shrink-0 font-medium">
+                    {o.payment_status}
+                  </div>
+                  <div className="py-3 w-[18%] shrink-0 font-medium">
+                    {o.delivery_status}
+                  </div>
+                  <div className="py-3 w-[18%] shrink-0 font-medium">
+                    <Link to={`/admin/dashboard/order/details/${o._id}`}>
+                      View
+                    </Link>
+                  </div>
+                  {/* Expand/Collapse toggle icon */}
+                  <div
+                    // onClick={() => setShow(o._id)}
+                    onClick={() => setShow(show === o._id ? null : o._id)}
+                    className="py-3 w-[8%] shrink-0 font-medium text-xl cursor-pointer"
+                  >
+                    <BsArrowDownSquare />
+                  </div>
                 </div>
-                <div className="py-3 w-[13%] font-medium">$50</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
-              </div>
 
-              <div className="flex justify-satrt items-start border-b border-slate-700">
-                <div className="py-3 w-[25%] font-medium whitespace-nowrap pl-3">
-                  #66000
+                {/* Nested/Expanded Order Rows — shown when `show` is true */}
+                <div
+                  className={
+                    show === o._id
+                      ? "block border-b border-slate-700 bg-[#8288ed]"
+                      : "hidden"
+                  }
+                >
+                  {o.suborder.map((so, i) => (
+                    <div
+                      key={i}
+                      className="flex items-start border-b border-slate-700"
+                    >
+                      <div className="py-3 w-[25%] shrink-0 font-medium whitespace-nowrap pl-3">
+                        #{so._id}
+                      </div>
+                      <div className="py-3 w-[13%] shrink-0 font-medium">
+                        ${so.price}
+                      </div>
+                      <div className="py-3 w-[18%] shrink-0 font-medium">
+                        {so.payment_status}
+                      </div>
+                      <div className="py-3 w-[18%] shrink-0 font-medium">
+                        {so.delivery_status}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="py-3 w-[13%] font-medium">$50</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
               </div>
-            </div>
-          </div>
-          <div className="text-[#d0d2d6] ">
-            <div className="flex justify-between items-start border-b border-slate-700">
-              <div className="py-3 w-[25%] font-medium whitespace-nowrap">
-                #34335
-              </div>
-              <div className="py-3 w-[13%] font-medium">$660</div>
-              <div className="py-3 w-[18%] font-medium">Pending</div>
-              <div className="py-3 w-[18%] font-medium">Pending</div>
-              <div className="py-3 w-[18%] font-medium">
-                <Link>View</Link>
-              </div>
-              <div
-                onClick={(e) => setShow(!show)}
-                className="py-3 w-[8%] font-medium text-xl"
-              >
-                <BsArrowDownSquare />
-              </div>
-            </div>
-
-            <div
-              className={
-                show ? "block border-b border-slate-700 bg-[#8288ed]" : "hidden"
-              }
-            >
-              <div className="flex justify-satrt items-start border-b border-slate-700">
-                <div className="py-3 w-[25%] font-medium whitespace-nowrap pl-3">
-                  #66000
-                </div>
-                <div className="py-3 w-[13%] font-medium">$50</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
-              </div>
-
-              <div className="flex justify-satrt items-start border-b border-slate-700">
-                <div className="py-3 w-[25%] font-medium whitespace-nowrap pl-3">
-                  #66000
-                </div>
-                <div className="py-3 w-[13%] font-medium">$50</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-[#d0d2d6] ">
-            <div className="flex justify-between items-start border-b border-slate-700">
-              <div className="py-3 w-[25%] font-medium whitespace-nowrap">
-                #34335
-              </div>
-              <div className="py-3 w-[13%] font-medium">$660</div>
-              <div className="py-3 w-[18%] font-medium">Pending</div>
-              <div className="py-3 w-[18%] font-medium">Pending</div>
-              <div className="py-3 w-[18%] font-medium">
-                <Link>View</Link>
-              </div>
-              <div
-                onClick={(e) => setShow(!show)}
-                className="py-3 w-[8%] font-medium text-xl"
-              >
-                <BsArrowDownSquare />
-              </div>
-            </div>
-
-            <div
-              className={
-                show ? "block border-b border-slate-700 bg-[#8288ed]" : "hidden"
-              }
-            >
-              <div className="flex justify-satrt items-start border-b border-slate-700">
-                <div className="py-3 w-[25%] font-medium whitespace-nowrap pl-3">
-                  #66000
-                </div>
-                <div className="py-3 w-[13%] font-medium">$50</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
-              </div>
-
-              <div className="flex justify-satrt items-start border-b border-slate-700">
-                <div className="py-3 w-[25%] font-medium whitespace-nowrap pl-3">
-                  #66000
-                </div>
-                <div className="py-3 w-[13%] font-medium">$50</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
-              </div>
-            </div>
-          </div>
-          <div className="text-[#d0d2d6] ">
-            <div className="flex justify-between items-start border-b border-slate-700">
-              <div className="py-3 w-[25%] font-medium whitespace-nowrap">
-                #34335
-              </div>
-              <div className="py-3 w-[13%] font-medium">$660</div>
-              <div className="py-3 w-[18%] font-medium">Pending</div>
-              <div className="py-3 w-[18%] font-medium">Pending</div>
-              <div className="py-3 w-[18%] font-medium">
-                <Link>View</Link>
-              </div>
-              <div
-                onClick={(e) => setShow(!show)}
-                className="py-3 w-[8%] font-medium text-xl"
-              >
-                <BsArrowDownSquare />
-              </div>
-            </div>
-
-            <div
-              className={
-                show ? "block border-b border-slate-700 bg-[#8288ed]" : "hidden"
-              }
-            >
-              <div className="flex justify-satrt items-start border-b border-slate-700">
-                <div className="py-3 w-[25%] font-medium whitespace-nowrap pl-3">
-                  #66000
-                </div>
-                <div className="py-3 w-[13%] font-medium">$50</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
-              </div>
-
-              <div className="flex justify-satrt items-start border-b border-slate-700">
-                <div className="py-3 w-[25%] font-medium whitespace-nowrap pl-3">
-                  #66000
-                </div>
-                <div className="py-3 w-[13%] font-medium">$50</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
-                <div className="py-3 w-[18%] font-medium">Pending</div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
+
         {/* Pagination footer */}
-        <div className="w-full flex justify-end mt-4 bottom-4 right-4">
-          <Pagination
-            pageNumber={currentPage}
-            setPageNumber={setCurrentPage}
-            totalItem={50}
-            parPage={parPage}
-            showItem={3}
-          />
-        </div>
+
+        {totalOrder <= parPage ? (
+          ""
+        ) : (
+          <div className="w-full flex justify-end mt-4 bottom-4 right-4">
+            <Pagination
+              pageNumber={currentPage}
+              setPageNumber={setCurrentPage}
+              totalItem={totalOrder}
+              parPage={parPage}
+              showItem={4}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

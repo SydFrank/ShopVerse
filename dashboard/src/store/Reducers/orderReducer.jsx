@@ -53,14 +53,15 @@ const orderReducer = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder;
-
-    // .addCase(get_deactive_sellers.fulfilled, (state, { payload }) => {
-    //   state.sellers = payload.sellers;
-    //   state.totalSeller = payload.totalSeller;
-    // });
+    builder
+      // Handle fulfilled state of get_admin_orders thunk
+      .addCase(get_admin_orders.fulfilled, (state, { payload }) => {
+        state.myOrders = payload.orders;
+        state.totalOrder = payload.totalOrder;
+      });
   },
 });
 
+// export const orderReducer = orderReducer.reducer;
 export const { messageClear } = orderReducer.actions;
-export default orderReducer;
+export default orderReducer.reducer;
