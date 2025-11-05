@@ -1,10 +1,7 @@
 // Import moment library for date formatting
 const moment = require("moment");
-// Import authentication order model for seller order records
 const authOrderModel = require("../../models/authOrder");
-// Import customer order model for customer order records
 const customerOrderModel = require("../../models/customerOrder");
-// Import cart model for removing items from cart after order placement
 const cartModel = require("../../models/cartModel");
 // Import custom response utility for consistent API responses
 const { responseReturn } = require("../../utils/response");
@@ -300,6 +297,76 @@ class orderControllers {
     }
   };
   // End of get_orders_details method
+
+  /**
+   * Handles retrieving all orders for admin view with pagination and search.
+   * This method fetches orders across all customers, supporting pagination
+   * and optional search functionality. Used for admin dashboards to monitor
+   * all customer orders and their statuses with associated seller order details.
+   *
+   * @param {Object} req - Express request object, expects query params:
+   *   - page: current page number for pagination (string/number)
+   *   - parPage: number of orders per page (string/number)
+   *   - searchValue: optional search term to filter orders (string)
+   * @param {Object} res - Express response object
+   */
+  get_admin_orders = async (req, res) => {
+    // Extract and parse pagination and search parameters from query
+    let { page, searchValue, parPage } = req.query;
+    page = parseInt(page); // Convert page to integer
+    parPage = parseInt(parPage); // Convert items per page to integer
+
+    // Calculate how many orders to skip based on current page
+    const skipPage = parPage * (page - 1);
+
+    try {
+      // Check if search functionality is being used
+      if (searchValue) {
+        // TODO: Implement search functionality when searchValue is provided
+        // This would typically search by order ID, customer name, or other criteria
+      } else {
+        // Fetch paginated orders with associated seller order details using aggregation
+        const orders = await customerOrder
+          .aggregate([
+            {
+              // Join customer orders with corresponding seller orders (auth orders)
+              $lookup: {
+                from: "authororders", // Collection name for seller orders
+                localField: "_id", // Customer order ID
+                foreignField: "orderId", // Reference field in seller orders
+                as: "suborder", // Alias for joined seller order data
+              },
+            },
+          ])
+          .skip(skipPage) // Skip orders for previous pages
+          .limit(parPage) // Limit to specified number per page
+          .sort({ createdAt: -1 }); // Sort by creation date (newest first)
+
+        // Get total count of all orders for pagination calculation
+        const totalOrder = await customerOrder.aggregate([
+          {
+            // Join customer orders with seller orders to get complete count
+            $lookup: {
+              from: "authororders", // Collection name for seller orders
+              localField: "_id", // Customer order ID
+              foreignField: "orderId", // Reference field in seller orders
+              as: "suborder", // Alias for joined seller order data
+            },
+          },
+        ]);
+
+        // Return paginated orders and total count
+        responseReturn(res, 200, {
+          orders, // Array of orders for current page with seller details
+          totalOrder: totalOrder.length, // Total number of orders for pagination
+        });
+      }
+    } catch (error) {
+      // Log error message for debugging purposes
+      console.log(error.message);
+    }
+  };
+  // End of get_admin_orders method
 }
 
 // Export instance of orderControllers for use in routes

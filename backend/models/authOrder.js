@@ -48,5 +48,5 @@ const authSchema = new Schema(
 ); // Enable timestamps to automatically add createdAt and updatedAt fields
 
 // Export the model based on the defined schema
-// This will create or use the "customerOrders" collection in MongoDB
+// The model is named "authorOrders" and uses the authSchema
 module.exports = model("authorOrders", authSchema);
