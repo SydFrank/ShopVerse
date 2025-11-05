@@ -310,6 +310,26 @@ class authControllers {
     }
   };
   // End of profile_info_add
+
+  /**
+   * Logs out the user by clearing the access token cookie.
+   *
+   * @param {import('express').Request} req
+   * @param {import('express').Response} res
+   * @returns {Promise<void>}
+   */
+  logout = async (req, res) => {
+    try {
+      res.cookie("accessToken", null, {
+        expires: new Date(Date.now()),
+        httpOnly: true,
+      });
+      return responseReturn(res, 200, { message: "Logged out successfully" });
+    } catch (error) {
+      return responseReturn(res, 500, { error: error.message });
+    }
+  };
+  // End of logout method
 }
 
 // Export instance of authControllers for use in routes

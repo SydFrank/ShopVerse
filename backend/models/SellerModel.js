@@ -45,6 +45,19 @@ const sellerSchema = new Schema(
   { timestamps: true }
 ); // Enable timestamps to automatically add createdAt and updatedAt fields
 
+sellerSchema.index(
+  {
+    name: "text", // Seller name
+    email: "text", // Seller email
+  },
+  {
+    weights: {
+      name: 5, // Highest priority in search
+      email: 4, // Medium priority
+    },
+  }
+);
+
 // Export the model based on the defined schema
 // This will create or use the "sellers" collection in MongoDB
 module.exports = model("sellers", sellerSchema);

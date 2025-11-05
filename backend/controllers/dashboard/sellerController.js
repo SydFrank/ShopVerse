@@ -120,6 +120,122 @@ class sellerController {
     }
   };
   // End of seller_status_update method
+
+  /**
+   * Handles fetching active sellers with pagination and optional search functionality.
+   * - If 'searchValue' is provided in the query, performs a text search on active sellers.
+   * - Returns the paginated list of sellers and the total count.
+   *
+   * @param {Object} req - Express request object, expects query:
+   *   - page: current page number (number)
+   *   - searchValue: optional search term for filtering sellers (string)
+   *   - parPage: number of sellers per page (number)
+   * @param {Object} res - Express response object
+   */
+  get_active_sellers = async (req, res) => {
+    let { page, searchValue, parPage } = req.query;
+    page = parseInt(page);
+    parPage = parseInt(parPage);
+    const skipPage = parPage * (page - 1);
+
+    try {
+      if (searchValue) {
+        const sellers = await sellerModel
+          .find({
+            $text: { $search: searchValue },
+            status: "active",
+          })
+          .skip(skipPage)
+          .limit(parPage)
+          .sort({ createdAt: -1 });
+
+        const totalSeller = await sellerModel
+          .find({
+            $text: { $search: searchValue },
+            status: "active",
+          })
+          .countDocuments();
+        responseReturn(res, 200, { sellers, totalSeller });
+      } else {
+        const sellers = await sellerModel
+          .find({
+            status: "active",
+          })
+          .skip(skipPage)
+          .limit(parPage)
+          .sort({ createdAt: -1 });
+
+        const totalSeller = await sellerModel
+          .find({
+            status: "active",
+          })
+          .countDocuments();
+        responseReturn(res, 200, { sellers, totalSeller });
+      }
+    } catch (error) {
+      console.error("active seller get " + error.message);
+      // responseReturn(res, 500, { error: error.message });
+    }
+  };
+  // End of get_active_sellers method
+
+  /**
+   * Handles fetching deactive sellers with pagination and optional search functionality.
+   * - If 'searchValue' is provided in the query, performs a text search on deactive sellers.
+   * - Returns the paginated list of sellers and the total count.
+   *
+   * @param {Object} req - Express request object, expects query:
+   *   - page: current page number (number)
+   *   - searchValue: optional search term for filtering sellers (string)
+   *   - parPage: number of sellers per page (number)
+   * @param {Object} res - Express response object
+   */
+  get_deactive_sellers = async (req, res) => {
+    let { page, searchValue, parPage } = req.query;
+    page = parseInt(page);
+    parPage = parseInt(parPage);
+    const skipPage = parPage * (page - 1);
+
+    try {
+      if (searchValue) {
+        const sellers = await sellerModel
+          .find({
+            $text: { $search: searchValue },
+            status: "deactive",
+          })
+          .skip(skipPage)
+          .limit(parPage)
+          .sort({ createdAt: -1 });
+
+        const totalSeller = await sellerModel
+          .find({
+            $text: { $search: searchValue },
+            status: "deactive",
+          })
+          .countDocuments();
+        responseReturn(res, 200, { sellers, totalSeller });
+      } else {
+        const sellers = await sellerModel
+          .find({
+            status: "deactive",
+          })
+          .skip(skipPage)
+          .limit(parPage)
+          .sort({ createdAt: -1 });
+
+        const totalSeller = await sellerModel
+          .find({
+            status: "deactive",
+          })
+          .countDocuments();
+        responseReturn(res, 200, { sellers, totalSeller });
+      }
+    } catch (error) {
+      console.error("active seller get " + error.message);
+      // responseReturn(res, 500, { error: error.message });
+    }
+  };
+  // End of get_deactive_sellers method
 }
 
 // Export instance of sellerController for use in routes

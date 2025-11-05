@@ -26,5 +26,13 @@ router.post(
   sellerController.seller_status_update
 );
 
+router.get("/get-sellers", authMiddleware, sellerController.get_active_sellers);
+
+router.get(
+  "/get-deactive-sellers",
+  authMiddleware,
+  sellerController.get_deactive_sellers
+);
+
 // Export the router to be used in the main server application
 module.exports = router;

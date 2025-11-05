@@ -31,5 +31,6 @@ router.post(
   authControllers.profile_info_add
 );
 
+router.get("/logout", authMiddleware, authControllers.logout);
 // Export the router to be used in the main server application
 module.exports = router;
