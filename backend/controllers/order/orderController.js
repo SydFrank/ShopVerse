@@ -484,6 +484,54 @@ class orderControllers {
     }
   };
   // End of get_seller_orders method
+
+  /**
+   * Handles retrieving detailed information for a specific order for seller view.
+   * This method fetches complete order details including products, shipping info, and customer details.
+   * Used by sellers to view full details of orders assigned to them.
+   *
+   * @param {Object} req - Express request object, expects params:
+   *   - orderId: ID of the specific order to retrieve details for (string)
+   * @param {Object} res - Express response object
+   */
+  get_seller_order = async (req, res) => {
+    const { orderId } = req.params;
+
+    try {
+      const order = await authOrderModel.findById(orderId);
+      responseReturn(res, 200, { order });
+    } catch (error) {
+      console.log(error.message);
+      responseReturn(res, 500, { message: "Internal Server Error" });
+    }
+  };
+  // End of get_seller_order method
+
+  /**
+   * Handles updating the delivery status of a specific order by seller.
+   * This method allows sellers to change the delivery status of their assigned orders, ensuring accurate tracking and management.
+   *
+   * @param {Object} req - Express request object, expects params and body:
+   *   - orderId: ID of the specific order to update (string)
+   * @param {Object} res - Express response object
+   */
+  seller_order_status_update = async (req, res) => {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    try {
+      await authOrderModel.findByIdAndUpdate(orderId, {
+        delivery_status: status,
+      });
+      responseReturn(res, 200, {
+        message: "Order Status Updated Successfully",
+      });
+    } catch (error) {
+      console.log(error.message);
+      responseReturn(res, 500, { message: "Internal Server Error" });
+    }
+  };
+  // End of seller_order_status_update method
 }
 
 // Export instance of orderControllers for use in routes
