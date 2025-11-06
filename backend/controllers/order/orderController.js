@@ -367,6 +367,71 @@ class orderControllers {
     }
   };
   // End of get_admin_orders method
+
+  /**
+   * Handles retrieving detailed information for a specific order for admin view.
+   * This method fetches complete order details including products, shipping info,
+   * pricing, and status information for a single order, along with associated
+   * seller order details. Used by admins to view full details of any customer order.
+   *
+   * @param {Object} req - Express request object, expects params:
+   *   - orderId: ID of the specific order to retrieve details for (string)
+   * @param {Object} res - Express response object
+   */
+  get_admin_order = async (req, res) => {
+    const { orderId } = req.params;
+
+    try {
+      const order = await customerOrder.aggregate([
+        {
+          $match: {
+            _id: new ObjectId(orderId),
+          },
+        },
+        {
+          $lookup: {
+            from: "authororders",
+            localField: "_id",
+            foreignField: "orderId",
+            as: "suborder",
+          },
+        },
+      ]);
+      responseReturn(res, 200, { order: order[0] });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  // End of get_admin_order method
+
+  /**
+   * Handles updating the delivery status of a specific order by admin.
+   * This method allows admins to change the delivery status of a customer order,
+   * including marking it as shipped, delivered, or canceled.
+   * Also updates all associated seller orders to maintain consistency.
+   *
+   * @param {Object} req - Express request object, expects params and body:
+   *  - orderId: ID of the specific order to update (string)
+   * - status: new delivery status to set (string)
+   * @param {Object} res - Express response object
+   */
+  admin_order_status_update = async (req, res) => {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    try {
+      await customerOrder.findByIdAndUpdate(orderId, {
+        delivery_status: status,
+      });
+      responseReturn(res, 200, {
+        message: "Order Status Updated Successfully",
+      });
+    } catch (error) {
+      console.log(error.message);
+      responseReturn(res, 500, { message: "Internal Server Error" });
+    }
+  };
+  // End of admin_order_status_update method
 }
 
 // Export instance of orderControllers for use in routes
