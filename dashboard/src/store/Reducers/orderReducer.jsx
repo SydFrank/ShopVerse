@@ -53,6 +53,13 @@ export const get_admin_order = createAsyncThunk(
 );
 // End of get_admin_order async thunk
 
+/**
+ * Asynchronous thunk action to update the status of a specific admin order.
+ * @param {Object} params - The parameters for updating the order status.
+ * @param {string} params.orderId - The ID of the order to update.
+ * @param {Object} params.info - The information containing the new status.
+ * @returns {Object} The fulfilled value containing the update confirmation message.
+ */
 export const admin_order_status_update = createAsyncThunk(
   "order/admin_order_status_update",
   async ({ orderId, info }, { rejectWithValue, fulfillWithValue }) => {
@@ -71,6 +78,11 @@ export const admin_order_status_update = createAsyncThunk(
   }
 );
 
+/**
+ * Order Reducer
+ * Manages the state related to orders, including fetching order lists,
+ * fetching individual order details, and updating order statuses.
+ */
 const orderReducer = createSlice({
   name: "order",
   initialState: {
@@ -98,12 +110,15 @@ const orderReducer = createSlice({
         state.myOrders = payload.orders;
         state.totalOrder = payload.totalOrder;
       })
+      // Handle fulfilled state of get_admin_order thunk
       .addCase(get_admin_order.fulfilled, (state, { payload }) => {
         state.order = payload.order;
       })
+      // Handle fulfilled state of admin_order_status_update thunk
       .addCase(admin_order_status_update.fulfilled, (state, { payload }) => {
         state.successMessage = payload.message;
       })
+      // Handle rejected state of admin_order_status_update thunk
       .addCase(admin_order_status_update.rejected, (state, { payload }) => {
         state.errorMessage = payload.message;
       });
