@@ -26,6 +26,7 @@ router.put(
 );
 
 // Seller
+router.get("/seller/orders/:sellerId", orderControllers.get_seller_orders);
 
 // Export the router to be used in the main server application
 module.exports = router;

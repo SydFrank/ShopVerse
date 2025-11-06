@@ -432,6 +432,58 @@ class orderControllers {
     }
   };
   // End of admin_order_status_update method
+
+  /**
+   * Handles retrieving all orders for a specific seller with pagination and search.
+   * This method fetches orders assigned to a particular seller, supporting pagination and search functionality.
+   * Used for seller dashboards to monitor their orders and statuses.
+   *
+   * @param {Object} req - Express request object, expects params and query:
+   * - sellerId: ID of the seller whose orders to retrieve (string)
+   * - page: current page number for pagination (string/number)
+   * - parPage: number of orders per page (string/number)
+   * - searchValue: optional search term to filter orders (string)
+   * @param {Object} res - Express response object
+   */
+  get_seller_orders = async (req, res) => {
+    // Get seller ID from request parameters
+    const { sellerId } = req.params;
+    // Extract and parse pagination and search parameters from query
+    let { page, searchValue, parPage } = req.query;
+    page = parseInt(page); // Convert page to integer
+    parPage = parseInt(parPage); // Convert items per page to integer
+
+    // Calculate how many orders to skip based on current page
+    const skipPage = parPage * (page - 1);
+
+    try {
+      if (searchValue) {
+      } else {
+        const orders = await authOrderModel
+          .find({
+            sellerId: sellerId,
+          })
+          .skip(skipPage)
+          .limit(parPage)
+          .sort({ createdAt: -1 });
+
+        const totalOrder = await authOrderModel
+          .find({
+            sellerId: sellerId,
+          })
+          .countDocuments();
+
+        responseReturn(res, 200, {
+          orders,
+          totalOrder,
+        });
+      }
+    } catch (error) {
+      console.log(error.message);
+      responseReturn(res, 500, { message: "Internal Server Error" });
+    }
+  };
+  // End of get_seller_orders method
 }
 
 // Export instance of orderControllers for use in routes
