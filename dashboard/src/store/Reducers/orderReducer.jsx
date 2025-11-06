@@ -32,6 +32,45 @@ export const get_admin_orders = createAsyncThunk(
 );
 // End of get_admin_orders async thunk
 
+/**
+ * Asynchronous thunk action to fetch details of a specific admin order by ID.
+ * @param {Object} params - The parameters for fetching the order.
+ * @param {string} params.orderId - The ID of the order to fetch.
+ * @returns {Object} The fulfilled value containing the fetched order details.
+ */
+export const get_admin_order = createAsyncThunk(
+  "order/get_admin_order",
+  async (orderId, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.get(`/admin/order/${orderId}`, {
+        withCredentials: true,
+      });
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of get_admin_order async thunk
+
+export const admin_order_status_update = createAsyncThunk(
+  "order/admin_order_status_update",
+  async ({ orderId, info }, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.put(
+        `/admin/order-status/update/${orderId}`,
+        info,
+        {
+          withCredentials: true,
+        }
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const orderReducer = createSlice({
   name: "order",
   initialState: {
@@ -58,6 +97,15 @@ const orderReducer = createSlice({
       .addCase(get_admin_orders.fulfilled, (state, { payload }) => {
         state.myOrders = payload.orders;
         state.totalOrder = payload.totalOrder;
+      })
+      .addCase(get_admin_order.fulfilled, (state, { payload }) => {
+        state.order = payload.order;
+      })
+      .addCase(admin_order_status_update.fulfilled, (state, { payload }) => {
+        state.successMessage = payload.message;
+      })
+      .addCase(admin_order_status_update.rejected, (state, { payload }) => {
+        state.errorMessage = payload.message;
       });
   },
 });
