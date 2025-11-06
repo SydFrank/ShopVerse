@@ -77,6 +77,7 @@ export const admin_order_status_update = createAsyncThunk(
     }
   }
 );
+// End of admin_order_status_update async thunk
 
 /** Asynchronous thunk action to fetch seller orders with pagination and search functionality.
  *
@@ -107,6 +108,52 @@ export const get_seller_orders = createAsyncThunk(
     }
   }
 );
+// End of get_seller_orders async thunk
+
+/** Asynchronous thunk action to fetch details of a specific seller order by ID.
+ * @param {Object} params - The parameters for fetching the order.
+ * @param {string} params.orderId - The ID of the order to fetch.
+ * @returns {Object} The fulfilled value containing the fetched order details.
+ */
+export const get_seller_order = createAsyncThunk(
+  "order/get_seller_order",
+  async (orderId, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.get(`/seller/order/${orderId}`, {
+        withCredentials: true,
+      });
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of get_seller_order async thunk
+
+/** Asynchronous thunk action to update the status of a specific seller order.
+ * @param {Object} params - The parameters for updating the order status.
+ * @param {string} params.orderId - The ID of the order to update.
+ * @param {Object} params.info - The information containing the new status.
+ * @returns {Object} The fulfilled value containing the update confirmation message.
+ */
+export const seller_order_status_update = createAsyncThunk(
+  "order/seller_order_status_update",
+  async ({ orderId, info }, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.put(
+        `/seller/order-status/update/${orderId}`,
+        info,
+        {
+          withCredentials: true,
+        }
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of seller_order_status_update async thunk
 
 /**
  * Order Reducer
@@ -156,6 +203,16 @@ const orderReducer = createSlice({
       .addCase(get_seller_orders.fulfilled, (state, { payload }) => {
         state.myOrders = payload.orders;
         state.totalOrder = payload.totalOrder;
+      })
+      // Handle fulfilled state of get_seller_order thunk
+      .addCase(get_seller_order.fulfilled, (state, { payload }) => {
+        state.order = payload.order;
+      })
+      .addCase(seller_order_status_update.fulfilled, (state, { payload }) => {
+        state.successMessage = payload.message;
+      })
+      .addCase(seller_order_status_update.rejected, (state, { payload }) => {
+        state.errorMessage = payload.message;
       });
   },
 });
