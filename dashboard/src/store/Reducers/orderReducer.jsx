@@ -19,7 +19,7 @@ export const get_admin_orders = createAsyncThunk(
   ) => {
     try {
       const { data } = await api.get(
-        `/admin/orders?page=${page}&&searchValue=${searchValue}&&parPage=${parPage}`,
+        `/admin/orders?page=${page}&searchValue=${searchValue}&parPage=${parPage}`,
         {
           withCredentials: true,
         }
@@ -78,6 +78,36 @@ export const admin_order_status_update = createAsyncThunk(
   }
 );
 
+/** Asynchronous thunk action to fetch seller orders with pagination and search functionality.
+ *
+ * This thunk makes an API call to retrieve a list of orders for a specific seller, supporting pagination and search filtering.
+ * @param {Object} params - The parameters for fetching orders.
+ * @param {number} params.parPage - Number of orders to fetch per page.
+ * @param {number} params.page - The current page number.
+ * @param {string} params.searchValue - The search keyword to filter orders.
+ * @param {string} params.sellerId - The ID of the seller whose orders are to be fetched.
+ * @returns {Object} The fulfilled value containing the fetched orders data.
+ */
+export const get_seller_orders = createAsyncThunk(
+  "order/get_seller_orders",
+  async (
+    { parPage, page, searchValue, sellerId },
+    { rejectWithValue, fulfillWithValue }
+  ) => {
+    try {
+      const { data } = await api.get(
+        `/seller/orders/${sellerId}?page=${page}&searchValue=${searchValue}&parPage=${parPage}`,
+        {
+          withCredentials: true,
+        }
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 /**
  * Order Reducer
  * Manages the state related to orders, including fetching order lists,
@@ -121,6 +151,11 @@ const orderReducer = createSlice({
       // Handle rejected state of admin_order_status_update thunk
       .addCase(admin_order_status_update.rejected, (state, { payload }) => {
         state.errorMessage = payload.message;
+      })
+      // Handle fulfilled state of get_seller_orders thunk
+      .addCase(get_seller_orders.fulfilled, (state, { payload }) => {
+        state.myOrders = payload.orders;
+        state.totalOrder = payload.totalOrder;
       });
   },
 });

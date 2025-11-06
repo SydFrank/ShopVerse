@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Search from "../components/Search";
 import { Link } from "react-router-dom";
 import Pagination from "../Pagination";
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { get_seller_orders } from "../../store/Reducers/orderReducer";
 
 /**
  * Orders component displays a paginated table of order entries (using static demo data).
@@ -20,6 +22,14 @@ import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
  * - Pagination control.
  */
 const Orders = () => {
+  // Redux dispatch function
+  const dispatch = useDispatch();
+  // Get userInfo from Redux state
+  const { userInfo } = useSelector((state) => state.auth);
+
+  // Extract orders and total order count from Redux state
+  const { myOrders, totalOrder } = useSelector((state) => state.order);
+
   // State: current page number for pagination
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -28,6 +38,17 @@ const Orders = () => {
 
   // State: number of orders to display per page
   const [parPage, setParPage] = useState(5);
+
+  // Fetch active sellers whenever pagination or search parameters change
+  useEffect(() => {
+    const obj = {
+      parPage: parseInt(parPage),
+      page: parseInt(currentPage),
+      searchValue,
+      sellerId: userInfo._id,
+    };
+    dispatch(get_seller_orders(obj));
+  }, [parPage, currentPage, searchValue]);
 
   return (
     <div className="px-2 lg:px-7 pt-5">
@@ -62,35 +83,35 @@ const Orders = () => {
             </thead>
             <tbody>
               {/* Static demo data for orders */}
-              {[1, 2, 3, 4, 5].map((curVal, index) => (
-                <tr key={index}>
+              {myOrders.map((d, i) => (
+                <tr key={i}>
                   {/* Order Id */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    {curVal}
+                    {d._id}
                   </td>
                   {/* Price */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    $50
+                    ${d.price}
                   </td>
                   {/* Payment Status */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    Pending
+                    {d.payment_status}
                   </td>
                   {/* Order Status */}
                   <td
                     scope="row"
                     className="py-1 px-4 font-medium whitespace-nowrap"
                   >
-                    Pending
+                    {d.delivery_status}
                   </td>
                   {/* View action */}
                   <td
@@ -99,7 +120,7 @@ const Orders = () => {
                   >
                     <div className="flex justify-start items-center gap-4">
                       <Link
-                        to={`/seller/dashboard/orders/details/34`}
+                        to={`/seller/dashboard/orders/details/${d._id}`}
                         className="p-[6px] bg-green-500 rounded hover:shadow-lg hover:shadow-green-500/50"
                       >
                         <FaEye />
@@ -112,15 +133,20 @@ const Orders = () => {
           </table>
         </div>
         {/* Pagination footer */}
-        <div className="w-full flex justify-end mt-4 bottom-4 right-4">
-          <Pagination
-            pageNumber={currentPage}
-            setPageNumber={setCurrentPage}
-            totalItem={50}
-            parPage={parPage}
-            showItem={3}
-          />
-        </div>
+
+        {totalOrder <= parPage ? (
+          ""
+        ) : (
+          <div className="w-full flex justify-end mt-4 bottom-4 right-4">
+            <Pagination
+              pageNumber={currentPage}
+              setPageNumber={setCurrentPage}
+              totalItem={totalOrder}
+              parPage={parPage}
+              showItem={3}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
