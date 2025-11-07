@@ -4,9 +4,7 @@ const sellerModel = require("../../models/sellerModel");
 const { v4: uuidv4 } = require("uuid");
 const { responseReturn } = require("../../utils/response");
 // Stripe library initialization with secret key
-const stripe = require("stripe")(
-  "sk_test_51SQZG9QqqlV3jHnTvxEbcBW0Y7aGFjLTf0Ou0BEIfDmWGMAY2afeFKyowvqP83yMQLIilArylgPZlnDlQ7aPDpiN00Izy5VP2g"
-);
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 class paymentController {
   /**
