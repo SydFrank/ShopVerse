@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FaEdit, FaImages } from "react-icons/fa";
 import { FadeLoader } from "react-spinners";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,6 +10,7 @@ import {
 import toast from "react-hot-toast"; // For displaying toast messages
 import { overrideStyle } from "../../utils/utils"; // Custom spinner style
 import { PropagateLoader } from "react-spinners"; // Spinner for loading state
+import { create_stripe_connect_account } from "../../store/Reducers/sellerReducer";
 
 /**
  * Profile Component
@@ -31,7 +32,7 @@ import { PropagateLoader } from "react-spinners"; // Spinner for loading state
 
 const Profile = () => {
   // State to manage form inputs for shop information
-  const [state, setState] = React.useState({
+  const [state, setState] = useState({
     shopName: "", // Shop name input
     division: "", // Division input
     district: "", // District input
@@ -45,9 +46,6 @@ const Profile = () => {
   const { userInfo, loader, successMessage, errorMessage } = useSelector(
     (state) => state.auth
   );
-
-  // Hardcoded status for demonstration (could be dynamic)
-  const status = "active";
 
   /**
    * Handles profile image upload.
@@ -180,12 +178,17 @@ const Profile = () => {
                 <div className="flex gap-2">
                   <span>Payment Account: </span>
                   <p>
-                    {status === "active" ? (
+                    {userInfo.payment === "active" ? (
                       <span className="bg-red-500 text-white text-xs cursor-pointer font-normal ml-2 px-2 py-0.5 rounded">
                         {userInfo.payment}
                       </span>
                     ) : (
-                      <span className="bg-blue-500 text-white text-xs cursor-pointer font-normal ml-2 px-2 py-0.5 rounded">
+                      <span
+                        onClick={() =>
+                          dispatch(create_stripe_connect_account())
+                        }
+                        className="bg-blue-500 text-white text-xs cursor-pointer font-normal ml-2 px-2 py-0.5 rounded"
+                      >
                         Click Active
                       </span>
                     )}

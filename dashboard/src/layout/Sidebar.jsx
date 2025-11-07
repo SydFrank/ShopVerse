@@ -4,6 +4,7 @@ import { getNav } from "../navigation/index";
 import { RiLogoutBoxLine } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux"; // Redux hooks for state access and dispatch
 import { logout } from "../store/Reducers/authReducer";
+import logo from "../assets/logo.png";
 /**
  * Sidebar Component
  * ------------------
@@ -68,7 +69,7 @@ const Sidebar = ({ showSidebar, setShowSidebar }) => {
         {/* Logo */}
         <div className="h-[70px] flex justify-center items-center">
           <Link to="/" className="w-[180px] h-[50px]">
-            <img className="w-full h-full" src="/images/logo.png" alt="Logo" />
+            <img className="w-full h-full" src={logo} alt="Logo" />
           </Link>
         </div>
         {/* Navigation items */}

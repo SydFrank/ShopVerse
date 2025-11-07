@@ -142,7 +142,6 @@ export const get_active_sellers = createAsyncThunk(
  * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload.
  * @returns {Object} Response data or error.
  */
-
 export const get_deactive_sellers = createAsyncThunk(
   "seller/get_deactive_sellers",
   // This thunk asynchronously fetches seller data from the backend.
@@ -164,6 +163,63 @@ export const get_deactive_sellers = createAsyncThunk(
   }
 );
 // End of get_deactive_sellers async thunk
+
+/** * Async Thunk: Create Stripe Connect Account
+ * ------------------------
+ * Sends a request to the backend to create a Stripe Connect account.
+ * Uses axios (via `api`) to send the request.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ *
+ * @returns {Object} Redirects to Stripe onboarding URL or logs error.
+ */
+export const create_stripe_connect_account = createAsyncThunk(
+  "seller/create_stripe_connect_account",
+  // This thunk asynchronously fetches seller data from the backend.
+  async () => {
+    try {
+      const {
+        data: { url },
+      } = await api.get("/payment/create-stripe-connect-account", {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      // Redirect the user to the Stripe onboarding URL
+      window.location.href = url;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+// End of create_stripe_connect_account async thunk
+
+/** * Async Thunk: Activate Stripe Connect Account
+ * ------------------------
+ * Sends a request to the backend to activate a Stripe Connect account.
+ * Uses axios (via `api`) to send the request.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ * @param {string} activeCode - The activation code for the Stripe Connect account.
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error.
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload.
+ * @returns {Object} Response data or error.
+ */
+export const active_stripe_connect_account = createAsyncThunk(
+  "seller/active_stripe_connect_account",
+  // This thunk asynchronously fetches seller data from the backend.
+  async (activeCode, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.put(
+        `/payment/active-stripe-connect-account/${activeCode}`,
+        {},
+        {
+          withCredentials: true, // Include cookies for authentication/session
+        }
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of active_stripe_connect_account async thunk
 
 /**
  * The `seller` slice of the global Redux state.
@@ -192,6 +248,7 @@ const sellerSlice = createSlice({
      */
     messageClear: (state, _) => {
       state.errorMessage = "";
+      state.successMessage = "";
     },
   },
   extraReducers: (builder) => {
@@ -216,10 +273,26 @@ const sellerSlice = createSlice({
         state.sellers = payload.sellers;
         state.totalSeller = payload.totalSeller;
       })
+      // Handle the pending state of the get_deactive_sellers action
       .addCase(get_deactive_sellers.fulfilled, (state, { payload }) => {
         state.sellers = payload.sellers;
         state.totalSeller = payload.totalSeller;
-      });
+      })
+      // Handle the different states of the active_stripe_connect_account action
+      .addCase(active_stripe_connect_account.pending, (state, { payload }) => {
+        state.loader = true;
+      })
+      .addCase(active_stripe_connect_account.rejected, (state, { payload }) => {
+        state.loader = false;
+        state.errorMessage = payload.message;
+      })
+      .addCase(
+        active_stripe_connect_account.fulfilled,
+        (state, { payload }) => {
+          state.loader = false;
+          state.successMessage = payload.message;
+        }
+      );
   },
 });
 

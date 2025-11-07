@@ -19,6 +19,7 @@ const Register = lazy(() => import("../../views/auth/Register"));
 const AdminLogin = lazy(() => import("../../views/auth/adminLogin"));
 const Home = lazy(() => import("../../views/Home"));
 const Unauthorized = lazy(() => import("../../views/Unauthorized"));
+const Success = lazy(() => import("../../views/Success"));
 
 const publicRoutes = [
   {
@@ -40,6 +41,10 @@ const publicRoutes = [
   {
     path: "/unauthorized", //  URL path for the unauthorized page
     element: <Unauthorized />, // React component render when this route is matched
+  },
+  {
+    path: "/success?", //  URL path for the success page
+    element: <Success />, // React component render when this route is matched
   },
 ];
 
