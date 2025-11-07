@@ -53,7 +53,7 @@ const Payment = () => {
               {/* Stripe payment component */}
               {paymentMethod === "stripe" && (
                 <div>
-                  <Stripe />
+                  <Stripe order={orderId} price={price} />
                 </div>
               )}
 
