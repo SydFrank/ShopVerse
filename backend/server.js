@@ -212,6 +212,7 @@ app.use("/api", require("./routes/home/customerAuthRoutes"));
 app.use("/api", require("./routes/home/cartRoutes"));
 app.use("/api", require("./routes/order/orderRoutes"));
 app.use("/api", require("./routes/chatRoutes"));
+app.use("/api", require("./routes/paymentRoutes"));
 
 // Define a GET route handler for the root path '/'
 // Sends a simple response message to the client to verify that the server is running
