@@ -35,5 +35,7 @@ router.put(
   orderControllers.seller_order_status_update
 );
 
+router.post("/order/create-payment", orderControllers.payment_create);
+
 // Export the router to be used in the main server application
 module.exports = router;

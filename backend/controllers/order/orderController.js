@@ -8,6 +8,7 @@ const { responseReturn } = require("../../utils/response");
 const customerOrder = require("../../models/customerOrder");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // Define the orderControllers class to handle order-related operations
 class orderControllers {
@@ -532,6 +533,40 @@ class orderControllers {
     }
   };
   // End of seller_order_status_update method
+
+  /**
+   * Handles creating a Stripe payment intent for order payment processing.
+   * This method creates a payment intent with Stripe that allows customers
+   * to pay for their orders using various payment methods. The payment intent
+   * includes the total amount and currency, and returns a client secret that
+   * the frontend can use to complete the payment process securely.
+   *
+   * @param {Object} req - Express request object, expects body:
+   *   - price: total amount to be charged (number, in dollars)
+   * @param {Object} res - Express response object
+   */
+  payment_create = async (req, res) => {
+    // Extract the price from request body
+    const price = req.body?.price;
+
+    try {
+      // Create a payment intent with Stripe
+      const payment = await stripe.paymentIntents.create({
+        amount: Math.round(Number(price) * 100), // Convert dollars to cents (Stripe requires amounts in smallest currency unit)
+        currency: "aud", // Set currency to Australian Dollars
+        automatic_payment_methods: { enabled: true }, // Enable automatic payment method selection (cards, digital wallets, etc.)
+      });
+
+      // Return the client secret to the frontend for secure payment completion
+      responseReturn(res, 200, {
+        clientSecret: payment.client_secret, // Client secret needed for frontend payment confirmation
+      });
+    } catch (error) {
+      // Log error message for debugging purposes
+      console.log("Payment creation error:", error.message);
+    }
+  };
+  // End of payment_create method
 }
 
 // Export instance of orderControllers for use in routes
