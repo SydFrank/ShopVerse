@@ -14,53 +14,88 @@ const Payment = () => {
   const [paymentMethod, setPaymentMethod] = useState("stripe");
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col bg-slate-50">
       <Header />
-      <section className="bg-[#eeeeee]">
-        <div className="w-[85%] max-lg:w-[90%] max-md:w-[90%] max-sm:w-[90%] mx-auto py-16">
-          <div className="flex flex-wrap max-md:flex-col-reverse">
+      <section className="flex-1">
+        <div className="w-[85%] max-xl:w-[90%] mx-auto py-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Payment Method Selection */}
-            <div className="w-7/12 max-md:w-full ">
-              <div className="pr-2 max-md:pr-0">
-                {/* Payment method tabs */}
-                <div className="flex flex-wrap">
-                  <div
-                    onClick={() => setPaymentMethod("stripe")}
-                    className={`w-[20%] border-r cursor-pointer  py-4 px-6 ${
-                      paymentMethod === "stripe" ? "bg-white" : "bg-slate-100"
-                    }`}
-                  >
-                    <div className="flex flex-col gap-[3px] justify-center items-center">
-                      <img src="/images/payment/stripe.png" alt="Payment" />
-                    </div>
-                    <span className="text-slate-600 ">Stripe</span>
-                  </div>
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200">
+                <div className="p-5 border-b border-slate-100">
+                  <h3 className="text-slate-800 font-semibold">
+                    Choose payment method
+                  </h3>
+                </div>
+                <div className="p-5">
+                  {/* Payment method tabs */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      onClick={() => setPaymentMethod("stripe")}
+                      className={`rounded-lg border px-4 py-3 flex items-center gap-3 transition ${
+                        paymentMethod === "stripe"
+                          ? "border-emerald-500 ring-2 ring-emerald-100 bg-emerald-50"
+                          : "border-slate-200 hover:border-slate-300 bg-white"
+                      }`}
+                    >
+                      <div className="w-7 h-7 rounded-md overflow-hidden bg-slate-100 grid place-content-center">
+                        <img
+                          src="/images/payment/stripe.png"
+                          alt="Payment"
+                          className="w-7 h-7 object-contain"
+                        />
+                      </div>
+                      <span
+                        className={
+                          paymentMethod === "stripe"
+                            ? "text-emerald-700 text-sm font-medium"
+                            : "text-slate-700 text-sm font-medium"
+                        }
+                      >
+                        Stripe
+                      </span>
+                    </button>
 
-                  <div
-                    onClick={() => setPaymentMethod("cod")}
-                    className={`w-[20%] border-r cursor-pointer  py-4 px-6 ${
-                      paymentMethod === "cod" ? "bg-white" : "bg-slate-100"
-                    }`}
-                  >
-                    <div className="flex flex-col gap-[3px] justify-center items-center">
-                      <img src="/images/payment/cod.jpg" alt="Payment" />
-                    </div>
-                    <span className="text-slate-600">COD</span>
+                    <button
+                      onClick={() => setPaymentMethod("cod")}
+                      className={`rounded-lg border px-4 py-3 flex items-center gap-3 transition ${
+                        paymentMethod === "cod"
+                          ? "border-emerald-500 ring-2 ring-emerald-100 bg-emerald-50"
+                          : "border-slate-200 hover:border-slate-300 bg-white"
+                      }`}
+                    >
+                      <div className="w-7 h-7 rounded-md overflow-hidden bg-slate-100 grid place-content-center">
+                        <img
+                          src="/images/payment/cod.jpg"
+                          alt="Payment"
+                          className="w-7 h-7 object-cover"
+                        />
+                      </div>
+                      <span
+                        className={
+                          paymentMethod === "cod"
+                            ? "text-emerald-700 text-sm font-medium"
+                            : "text-slate-700 text-sm font-medium"
+                        }
+                      >
+                        COD
+                      </span>
+                    </button>
                   </div>
                 </div>
               </div>
 
               {/* Stripe payment component */}
               {paymentMethod === "stripe" && (
-                <div>
-                  <Stripe order={orderId} price={price} />
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                  <Stripe orderId={orderId} price={price} />
                 </div>
               )}
 
               {/* Cash on delivery option */}
               {paymentMethod === "cod" && (
-                <div className="w-full px-4 py-8 bg-white shadow-sm">
-                  <button className="px-10 py-[6px] rounded-sm hover:shadow-green-500/20 hover:shadow-lg bg-[#059473] text-white ">
+                <div className="w-full bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                  <button className="w-full sm:w-auto px-6 py-2.5 rounded-md hover:shadow-emerald-700/20 hover:shadow-md bg-emerald-600 text-white font-medium">
                     Pay Now
                   </button>
                 </div>
@@ -68,19 +103,27 @@ const Payment = () => {
             </div>
 
             {/* Order Summary */}
-            <div className="w-5/12 max-md:w-full ">
-              <div className="pl-2 max-md:pl-0 max-md:mb-0 ">
-                <div className="bg-white shadow p-5 text-slate-600 flex flex-col gap-3 ">
-                  <h2 className="font-bold text-lg ">Order Summary</h2>
+            <div className="lg:col-span-1">
+              <div className="lg:sticky lg:top-6">
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 text-slate-700 space-y-4">
+                  <h2 className="font-semibold text-lg text-slate-800">
+                    Order Summary
+                  </h2>
                   {/* Order details */}
-                  <div className="flex justify-between items-center">
-                    <span>{items} Items and Shipping Fee Included</span>
-                    <span>${price}</span>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-slate-600">
+                      {items} Items and Shipping Fee Included
+                    </span>
+                    <span className="font-medium">${price}</span>
                   </div>
                   {/* Total amount */}
-                  <div className="flex justify-between items-center font-semibold">
-                    <span>Total Amount</span>
-                    <span className="text-lg text-green-600">${price}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-slate-800">
+                      Total Amount
+                    </span>
+                    <span className="text-xl font-semibold text-emerald-600">
+                      ${price}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -88,7 +131,6 @@ const Payment = () => {
           </div>
         </div>
       </section>
-
       <Footer />
     </div>
   );
