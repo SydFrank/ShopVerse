@@ -110,12 +110,12 @@ const Payment = () => {
                     Order Summary
                   </h2>
                   {/* Order details */}
-                  <div className="flex justify-between items-center text-sm">
+                  {/* <div className="flex justify-between items-center text-sm">
                     <span className="text-slate-600">
                       {items} Items and Shipping Fee Included
                     </span>
                     <span className="font-medium">${price}</span>
-                  </div>
+                  </div> */}
                   {/* Total amount */}
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-slate-800">

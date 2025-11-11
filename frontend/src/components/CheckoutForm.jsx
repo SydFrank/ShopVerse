@@ -6,6 +6,7 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
+import api from "../api/api";
 
 const CheckoutForm = ({ orderId }) => {
   // Store orderId in local storage

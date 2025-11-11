@@ -21,6 +21,7 @@ import ChangePassword from "./components/dashboard/ChangePassword";
 import Wishlist from "./components/dashboard/Wishlist";
 import OrderDetails from "./components/dashboard/OrderDetails";
 import Chat from "./components/dashboard/Chat";
+import ConfirmOrder from "./pages/ConfIrmOrder";
 
 function App() {
   // Redux dispatch hook for triggering actions
@@ -43,6 +44,7 @@ function App() {
         <Route path="/products/search?" element={<SearchProducts />} />
         <Route path="/product/details/:slug" element={<Details />} />
         <Route path="/payment" element={<Payment />} />
+        <Route path="/order/confirm?" element={<ConfirmOrder />} />
 
         <Route path="/dashboard" element={<ProtectUser />}>
           <Route path="" element={<Dashboard />}>
