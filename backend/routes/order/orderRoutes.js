@@ -37,5 +37,6 @@ router.put(
 
 router.post("/order/create-payment", orderControllers.payment_create);
 
+router.get("/order/confirm/:orderId", orderControllers.order_confirm);
 // Export the router to be used in the main server application
 module.exports = router;

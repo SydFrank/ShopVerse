@@ -6,6 +6,9 @@ const cartModel = require("../../models/cartModel");
 // Import custom response utility for consistent API responses
 const { responseReturn } = require("../../utils/response");
 const customerOrder = require("../../models/customerOrder");
+const myShopWallet = require("../../models/myShopWallet");
+const sellerWallet = require("../../models/sellerWallet");
+
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
@@ -567,6 +570,78 @@ class orderControllers {
     }
   };
   // End of payment_create method
+
+  /**
+   * Handles confirming order payment and updating order status.
+   * This method is called after successful payment to update both customer and seller
+   * order statuses from "unpaid" to "paid", and creates wallet entries for revenue tracking.
+   * It also records financial transactions for both the platform and individual sellers.
+   *
+   * @param {Object} req - Express request object, expects params:
+   *   - orderId: ID of the order to confirm payment for (string)
+   * @param {Object} res - Express response object
+   */
+  order_confirm = async (req, res) => {
+    // Extract order ID from request parameters
+    const { orderId } = req.params;
+
+    try {
+      // Update customer order payment status to "paid"
+      await customerOrder.findByIdAndUpdate(orderId, {
+        payment_status: "paid",
+      });
+
+      // Update all related seller orders to "paid" and set delivery status to "pending"
+      // This allows sellers to start processing the order
+      await authOrderModel.updateMany(
+        { orderId: new ObjectId(orderId) }, // Find all seller orders for this customer order
+        {
+          payment_status: "paid", // Mark payment as received
+          delivery_status: "pending", // Set delivery status to pending (ready to process)
+        }
+      );
+
+      // Fetch the confirmed customer order for financial tracking
+      const cuOrder = await customerOrder.findById(orderId);
+
+      // Fetch all seller orders associated with this customer order
+      const auOrder = await authOrderModel.find({
+        orderId: new ObjectId(orderId),
+      });
+
+      // Get current date and format it for financial record keeping
+      const time = moment(Date.now()).format("l"); // Format: MM/DD/YYYY
+
+      // Split the date to extract month and year for financial categorization
+      const splitTime = time.split("/");
+      // splitTime[0] = month, splitTime[1] = day, splitTime[2] = year
+
+      // Create platform wallet entry for total order revenue tracking
+      // This records the total amount received by the platform
+      await myShopWallet.create({
+        amount: cuOrder.price, // Total order amount (including all sellers + fees)
+        month: splitTime[0], // Month for financial reporting
+        year: splitTime[2], // Year for financial reporting
+      });
+
+      // Create individual seller wallet entries for each seller in this order
+      // This tracks how much each seller earned from their products
+      for (let i = 0; i < auOrder.length; i++) {
+        await sellerWallet.create({
+          sellerId: auOrder[i].sellerId.toString(), // Convert ObjectId to string
+          amount: auOrder[i].price, // Amount earned by this specific seller
+          month: splitTime[0], // Month for financial reporting
+          year: splitTime[2], // Year for financial reporting
+        });
+      }
+
+      // Return success response confirming payment and order processing
+      responseReturn(res, 200, { message: "success" });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  // End of order_confirm method
 }
 
 // Export instance of orderControllers for use in routes
