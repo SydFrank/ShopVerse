@@ -265,6 +265,26 @@ class paymentController {
     }
   };
   // End of withdrawal_request method
+
+  /**
+   * Handles retrieving all pending payment withdrawal requests.
+   * This method fetches and returns all withdrawal requests that are currently pending.
+   * Used for admin or payment processing to review and manage withdrawal requests.
+   *
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   */
+  get_payment_request = async (req, res) => {
+    try {
+      const requests = await withdrawRequest.find({ status: "pending" });
+      responseReturn(res, 200, { requests });
+    } catch (error) {
+      responseReturn(res, 500, {
+        message: "Internal Server Error",
+      });
+    }
+  };
+  // End of get_payment_request method
 }
 
 module.exports = new paymentController();

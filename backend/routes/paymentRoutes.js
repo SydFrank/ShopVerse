@@ -26,5 +26,11 @@ router.post(
   authMiddleware,
   paymentController.withdrawal_request
 );
+
+router.get(
+  "/payment/request",
+  authMiddleware,
+  paymentController.get_payment_request
+);
 // Export the router to be used in the main server application
 module.exports = router;
