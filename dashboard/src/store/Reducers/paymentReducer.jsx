@@ -61,6 +61,32 @@ export const send_withdrawal_request = createAsyncThunk(
 );
 // End of send_withdrawal_request async thunk
 
+/**
+ * Async Thunk: Get Payment Requests
+ * --------------------------------
+ * Fetches all payment withdrawal requests made by sellers from the backend.
+ * This is typically used by admin users to review and manage withdrawal requests.
+ *
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error
+ * * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload
+ * @returns {Object} Response data containing the list of payment requests, or error
+ */
+export const get_payment_request = createAsyncThunk(
+  "seller/get_payment_request",
+  async (_, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.get("/payment/request", {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      // On success, dispatch the fulfilled action with the server's response data
+      return fulfillWithValue(data);
+    } catch (error) {
+      // On error, dispatch the rejected action with the backend error message
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // Payment Reducer Slice
 const paymentReducer = createSlice({
   name: "payment",
@@ -120,6 +146,10 @@ const paymentReducer = createSlice({
         state.availableAmount =
           state.availableAmount - payload.withdrawal.amount;
         state.pendingAmount = state.pendingAmount + payload.withdrawal.amount;
+      })
+      // Handle fulfilled state for get_payment_request
+      .addCase(get_payment_request.fulfilled, (state, { payload }) => {
+        state.pendingWithdrawals = payload.requests;
       });
   },
 });
