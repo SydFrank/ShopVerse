@@ -1,8 +1,13 @@
-import React, { forwardRef, useEffect } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FixedSizeList as List } from "react-window";
-import { get_payment_request } from "../../store/Reducers/paymentReducer";
+import {
+  get_payment_request,
+  confirm_payment_request,
+  messageClear,
+} from "../../store/Reducers/paymentReducer";
 import moment from "moment";
+import toast from "react-hot-toast";
 
 /**
  * Handles the wheel event on the list's outer container.
@@ -31,14 +36,34 @@ const PaymentRequest = () => {
   const dispatch = useDispatch();
 
   // Extract payment details from Redux state
-  const { successMessage, errorMessage, pendingWithdrawals } = useSelector(
-    (state) => state.payment
-  );
+  const { loader, successMessage, errorMessage, pendingWithdrawals } =
+    useSelector((state) => state.payment);
+
+  // Local state for tracking selected payment ID for confirmation
+  const [paymentId, setPaymentId] = useState("");
 
   // Fetch payment requests on component mount
   useEffect(() => {
     dispatch(get_payment_request());
   }, []);
+
+  // Function to confirm a payment request
+  const confirm_request = (id) => {
+    setPaymentId(id);
+    dispatch(confirm_payment_request(id));
+  };
+
+  // Show success or error messages as toasts
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(messageClear());
+    }
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(messageClear());
+    }
+  }, [successMessage, errorMessage]);
 
   /**
    * Renders a single row in the virtualized list.
@@ -61,8 +86,14 @@ const PaymentRequest = () => {
           {moment(pendingWithdrawals[index]?.createdAt).format("LL")}
         </div>
         <div className="w-[25%] p-2 whitespace-nowrap">
-          <button className="bg-indigo-500 shadow-lg hover:shadow-indigo-500/50 px-3 py-[2px] cursor-pointer text-white rounded-sm text-sm">
-            Confirm
+          <button
+            disabled={loader}
+            onClick={() => confirm_request(pendingWithdrawals[index]?._id)}
+            className="bg-indigo-500 shadow-lg hover:shadow-indigo-500/50 px-3 py-[2px] cursor-pointer text-white rounded-sm text-sm"
+          >
+            {loader && paymentId === pendingWithdrawals[index]?._id
+              ? "loading..."
+              : "Confirm"}
           </button>
         </div>
       </div>

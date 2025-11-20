@@ -102,6 +102,30 @@ const Payments = () => {
     );
   };
 
+  /**
+   * Renders a single row in the virtualized list for successful withdrawals.
+   * Displays withdrawal details such as number, amount, status, and date.
+   * @param {Object} param0 - The props object containing index and style.
+   */
+  const Rows = ({ index, style }) => {
+    return (
+      <div style={style} className="flex text-sm text-white font-medium ">
+        <div className="w-[25%] p-2 whitespace-nowrap">{index + 1}</div>
+        <div className="w-[25%] p-2 whitespace-nowrap">
+          ${successWithdrawals[index]?.amount}
+        </div>
+        <div className="w-[25%] p-2 whitespace-nowrap">
+          <span className="py-[1px] px-[5px] bg-slate-300 text-blue-500 rounded-md text-sm">
+            {successWithdrawals[index]?.status}
+          </span>
+        </div>
+        <div className="w-[25%] p-2 whitespace-nowrap">
+          {moment(successWithdrawals[index]?.createdAt).format("LL")}
+        </div>
+      </div>
+    );
+  };
+
   // Fetch seller payment details on component mount
   useEffect(() => {
     dispatch(get_seller_payment_details(userInfo._id));
@@ -228,10 +252,10 @@ const Payments = () => {
               className="List"
               height={350}
               itemSize={35}
-              itemCount={10}
+              itemCount={successWithdrawals.length}
               outerElementType={outerElementType}
             >
-              {Row}
+              {Rows}
             </List>
           </div>
         </div>
