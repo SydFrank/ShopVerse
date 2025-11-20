@@ -8,6 +8,8 @@ const { v4: uuidv4 } = require("uuid");
 const { responseReturn } = require("../../utils/response");
 // Stripe library initialization with secret key
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 class paymentController {
   /**
@@ -285,6 +287,55 @@ class paymentController {
     }
   };
   // End of get_payment_request method
+
+  /**
+   * Handles confirming a withdrawal payment request and processing the transfer.
+   * This method processes a pending withdrawal request by transferring funds from
+   * the platform's Stripe account to the seller's connected Stripe account.
+   * Upon successful transfer, it updates the withdrawal request status to "success".
+   *
+   * @param {Object} req - Express request object, expects body:
+   *   - paymentId: ID of the withdrawal request to confirm (string)
+   * @param {Object} res - Express response object
+   */
+  payment_request_confirm = async (req, res) => {
+    // Extract payment ID from request body
+    const { paymentId } = req.body;
+
+    try {
+      // Find the withdrawal request record by its ID
+      const payment = await withdrawRequest.findById(paymentId);
+
+      // Get the seller's Stripe account ID from the stripeModel
+      // This is needed to transfer funds to the correct Stripe Connect account
+      const { stripeId } = await stripeModel.findOne({
+        sellerId: new ObjectId(payment.sellerId), // Convert seller ID to ObjectId for query
+      });
+
+      // Create a transfer in Stripe to send funds to the seller's account
+      await stripe.transfers.create({
+        amount: payment.amount * 100, // Convert to cents (Stripe requires smallest currency unit)
+        currency: "aud", // Australian Dollars
+        destination: stripeId, // Seller's Stripe Connect account ID
+      });
+
+      // Update the withdrawal request status to "success" after successful transfer
+      await withdrawRequest.findByIdAndUpdate(paymentId, {
+        status: "success",
+      });
+
+      // Return success response with payment details and confirmation message
+      responseReturn(res, 200, {
+        payment, // Updated payment record
+        message: "Request Confirmed", // Confirmation message
+      });
+    } catch (error) {
+      responseReturn(res, 500, {
+        message: "Internal Server Error",
+      });
+    }
+  };
+  // End of payment_request_confirm method
 }
 
 module.exports = new paymentController();
