@@ -18,6 +18,7 @@ import sellerReducer from "./Reducers/sellerReducer";
 import chatReducer from "./Reducers/chatReducer";
 import orderReducer from "./Reducers/orderReducer";
 import paymentReducer from "./Reducers/paymentReducer";
+import dashboardReducer from "./Reducers/dashboardReducer";
 
 /**
  * Combines all feature slice reducers into a single root reducer object.
@@ -35,6 +36,7 @@ const rootReducer = {
   chat: chatReducer,
   order: orderReducer,
   payment: paymentReducer,
+  dashboard: dashboardReducer,
 };
 // const rootReducer = combineReducers({
 //   auth: authReducer,
