@@ -26,6 +26,31 @@ export const get_admin_dashboard_data = createAsyncThunk(
 );
 // End of get_admin_dashboard_data async thunk
 
+/**
+ * Async Thunk: Get Seller Dashboard Data
+ * ----------------------------------------
+ * Fetches key metrics and recent activity data for the seller dashboard from the backend.
+ * This includes total sales, orders, products, pending orders, and recent orders/messages.
+ *
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error
+ * * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload
+ * @returns {Object} Response data containing dashboard metrics, or error
+ */
+export const get_seller_dashboard_data = createAsyncThunk(
+  "dashboard/get_seller_dashboard_data",
+  async (_, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.get("/seller/get-dashboard-data", {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of get_seller_dashboard_data async thunk
+
 const dashboardReducer = createSlice({
   name: "dashboard",
   initialState: {
@@ -48,17 +73,25 @@ const dashboardReducer = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(
-      get_admin_dashboard_data.fulfilled,
-      (state, { payload }) => {
+    builder
+      // Handle fulfilled state for fetching admin dashboard data
+      .addCase(get_admin_dashboard_data.fulfilled, (state, { payload }) => {
         state.totalSale = payload.totalSale;
         state.totalOrder = payload.totalOrder;
         state.totalProduct = payload.totalProduct;
         state.totalSeller = payload.totalSeller;
         state.recentOrder = payload.recentOrders;
         state.recentMessage = payload.messages;
-      }
-    );
+      })
+      // Handle fulfilled state for fetching seller dashboard data
+      .addCase(get_seller_dashboard_data.fulfilled, (state, { payload }) => {
+        state.totalSale = payload.totalSale;
+        state.totalOrder = payload.totalOrder;
+        state.totalProduct = payload.totalProduct;
+        state.totalPendingOrder = payload.totalPendingOrder;
+        state.recentOrder = payload.recentOrders;
+        state.recentMessage = payload.messages;
+      });
   },
 });
 
