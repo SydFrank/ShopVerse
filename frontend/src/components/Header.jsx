@@ -1,5 +1,5 @@
 // Import React library
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 // Import Material Design icons
 import { MdEmail } from "react-icons/md"; // Email icon
 import { MdOutlineSmartphone } from "react-icons/md"; // Phone icon
@@ -16,13 +16,20 @@ import { FaHeart } from "react-icons/fa";
 import { FaShoppingCart } from "react-icons/fa";
 import { FaPhoneAlt } from "react-icons/fa";
 // Redux imports for state management
-import { useSelector } from "react-redux"; // Redux hooks for dispatching actions and selecting state
+import { useDispatch, useSelector } from "react-redux"; // Redux hooks for dispatching actions and selecting state
+import {
+  get_cart_products,
+  get_wishlist_products,
+} from "../store/reducers/cartReducer";
 
 /**
  * Header Component - Website top navigation bar
  * Contains contact information, social media links, language selector and user login status
  */
 const Header = () => {
+  // Hook to dispatch Redux actions
+  const dispatch = useDispatch();
+  // Hook for programmatic navigation
   const navigate = useNavigate();
 
   // Select categories data from home reducer state
@@ -62,6 +69,14 @@ const Header = () => {
       navigate("/login");
     }
   };
+
+  // Fetch cart and wishlist products when userInfo changes (i.e., user logs in)
+  useEffect(() => {
+    if (userInfo) {
+      dispatch(get_cart_products(userInfo.id));
+      dispatch(get_wishlist_products(userInfo.id));
+    }
+  }, [userInfo]);
 
   return (
     // Main header container with full width and white background
@@ -245,7 +260,12 @@ const Header = () => {
                 <div className="flex max-lg:hidden justify-center items-center gap-5">
                   <div className="flex justify-center gap-5">
                     {/* Wishlist icon with count */}
-                    <div className="relative flex justify-center items-center cursor-pointer w-[35px] h-[35px] rounded-full bg-[#e2e2e2]">
+                    <div
+                      onClick={() =>
+                        navigate(userInfo ? "/dashboard/my-wishlist" : "/login")
+                      }
+                      className="relative flex justify-center items-center cursor-pointer w-[35px] h-[35px] rounded-full bg-[#e2e2e2]"
+                    >
                       <span className="text-xl text-green-500">
                         <FaHeart />
                       </span>
