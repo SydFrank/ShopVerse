@@ -168,14 +168,17 @@ const Login = () => {
 
               {/* Social media login buttons */}
               {/* Facebook login button with branded styling */}
-              <button className="w-full py-2 mb-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md flex justify-center items-center gap-2">
-                <FaFacebookF /> Login with Facebook
-              </button>
-
+              <a target="_blank" href="http://localhost:5174/login">
+                <div className="w-full py-2 mb-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md flex justify-center items-center gap-2">
+                  Login As a Seller
+                </div>
+              </a>
               {/* Google login button with branded styling */}
-              <button className="w-full py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md flex justify-center items-center gap-2">
-                <IoLogoGoogle /> Login with Google
-              </button>
+              <a target="_blank" href="http://localhost:5174/register">
+                <div className="w-full py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-md flex justify-center items-center gap-2">
+                  Register As a Seller
+                </div>
+              </a>
 
               {/* Registration redirect section for new users */}
               <p className="text-center text-slate-600 mt-4">

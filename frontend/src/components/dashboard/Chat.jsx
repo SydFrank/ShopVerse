@@ -170,7 +170,10 @@ const Chat = () => {
                             src="/images/user.png"
                             alt=""
                           />
-                          <div className="p-2 bg-purple-500 text-white rounded-md">
+                          <div
+                            className="max-w-[70%] p-2 bg-purple-500 text-white rounded-md 
+                     break-words whitespace-normal"
+                          >
                             <span>{m.message}</span>
                           </div>
                         </div>
@@ -187,7 +190,10 @@ const Chat = () => {
                             src="/images/admin.png"
                             alt=""
                           />
-                          <div className="p-2 bg-cyan-500 text-white rounded-md">
+                          <div
+                            className="max-w-[70%] p-2 bg-cyan-500 text-white rounded-md 
+                     break-words whitespace-normal"
+                          >
                             <span>{m.message}</span>
                           </div>
                         </div>
