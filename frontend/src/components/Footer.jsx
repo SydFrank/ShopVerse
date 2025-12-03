@@ -1,11 +1,14 @@
 // Import React library
 import React from "react";
 // Import Link component from React Router for navigation
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // Import social media icons from Font Awesome
 import { FaFacebookF } from "react-icons/fa"; // Facebook icon
 import { FaTwitter } from "react-icons/fa"; // Twitter icon
 import { FaLinkedinIn } from "react-icons/fa"; // LinkedIn icon
+import { useSelector } from "react-redux";
+import { FaHeart } from "react-icons/fa";
+import { FaShoppingCart } from "react-icons/fa";
 
 /**
  * Footer Component - Website footer section
@@ -15,6 +18,15 @@ import { FaLinkedinIn } from "react-icons/fa"; // LinkedIn icon
  * @returns {JSX.Element} Complete footer section with company info, links, and social media
  */
 const Footer = () => {
+  // Hook to navigate programmatically
+  const navigate = useNavigate();
+  // Access user information from Redux store
+  const { userInfo } = useSelector((state) => state.auth);
+  // Select cart product count from cart reducer state
+  const { cart_product_count, wishlist_count } = useSelector(
+    (state) => state.cart
+  );
+
   return (
     // Main footer container with light background
     <footer className="bg-[#f3f6fa]">
@@ -150,6 +162,53 @@ const Footer = () => {
       {/* Copyright section - Bottom of footer */}
       <div className="w-[90%] flex flex-wrap justify-center items-center text-slate-600 mx-auto py-5 text-center ">
         <span>Copyright &copy; 2025 All rights reserved</span>
+      </div>
+
+      <div
+        className="hidden fixed max-lg:block w-[55px] h-[120px] bottom-4 right-0.5
+     bg-white/80 backdrop-blur-md shadow-lg rounded-2xl p-2"
+      >
+        <div className="w-full h-full flex gap-3 flex-col justify-center items-center">
+          {/* Cart */}
+          <div
+            onClick={() => navigate(userInfo ? "/cart" : "/login")}
+            className="relative flex justify-center items-center cursor-pointer 
+        w-[38px] h-[38px] rounded-full bg-gray-100 hover:bg-gray-200 transition"
+          >
+            <span className="text-xl text-gray-700">
+              <FaShoppingCart />
+            </span>
+            {cart_product_count !== 0 && (
+              <div
+                className="w-[20px] h-[20px] absolute bg-green-600 rounded-full text-white 
+          flex justify-center items-center -top-1 -right-1 text-xs font-semibold"
+              >
+                {cart_product_count}
+              </div>
+            )}
+          </div>
+
+          {/* Wish List */}
+          <div
+            onClick={() =>
+              navigate(userInfo ? "/dashboard/my-wishlist" : "/login")
+            }
+            className="relative flex justify-center items-center cursor-pointer
+        w-[38px] h-[38px] rounded-full bg-gray-100 hover:bg-gray-200 transition"
+          >
+            <span className="text-xl text-gray-700">
+              <FaHeart />
+            </span>
+            {wishlist_count !== 0 && (
+              <div
+                className="w-[20px] h-[20px] absolute bg-red-500 rounded-full text-white 
+          flex justify-center items-center -top-1 -right-1 text-xs font-semibold"
+              >
+                {wishlist_count}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </footer>
   );
