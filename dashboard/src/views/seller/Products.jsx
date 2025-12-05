@@ -5,6 +5,7 @@ import Pagination from "../Pagination";
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { get_products } from "../../store/Reducers/productReducer";
+import { LuImageMinus } from "react-icons/lu";
 /**
  * Products component displays a paginated table of products with static demo data.
  * Includes search and page size controls, and action icons for each product row.
@@ -169,6 +170,14 @@ const Products = () => {
                       >
                         <FaEdit />
                       </Link>
+
+                      <Link
+                        to={`/seller/dashboard/add-banner/${curVal._id}`}
+                        className="p-[6px] bg-sky-500 rounded hover:shadow-lg hover:shadow-yellow-500/50"
+                      >
+                        <LuImageMinus />
+                      </Link>
+
                       <Link className="p-[6px] bg-green-500 rounded hover:shadow-lg hover:shadow-green-500/50">
                         <FaEye />
                       </Link>
@@ -183,15 +192,6 @@ const Products = () => {
           </table>
         </div>
         {/* Pagination footer */}
-        {/* <div className="w-full flex justify-end mt-4 bottom-4 right-4">
-          <Pagination
-            pageNumber={currentPage}
-            setPageNumber={setCurrentPage}
-            totalItem={50}
-            parPage={parPage}
-            showItem={3}
-          />
-        </div> */}
         {totalProduct <= parPage ? (
           ""
         ) : (
