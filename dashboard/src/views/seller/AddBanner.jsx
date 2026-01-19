@@ -5,12 +5,17 @@ import { overrideStyle } from "../../utils/utils"; // Custom spinner
 import { PropagateLoader } from "react-spinners"; // Spinner component for indicating loading state
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { add_banner, messageClear } from "../../store/Reducers/bannerReducer";
+import {
+  add_banner,
+  get_banner,
+  messageClear,
+  update_banner,
+} from "../../store/Reducers/bannerReducer";
 import toast from "react-hot-toast";
 
 const AddBanner = () => {
   // Extract banner-related state from Redux
-  const { successMessage, errorMessage, loader } = useSelector(
+  const { successMessage, errorMessage, loader, banner } = useSelector(
     (state) => state.banner
   );
   // Extract productId from URL parameters
@@ -43,6 +48,19 @@ const AddBanner = () => {
     dispatch(add_banner(formData)); // Dispatch the add_banner action with the form data
   };
 
+  // Handler for form submission to update banner
+  const update = (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("mainban", image);
+    dispatch(
+      update_banner({
+        info: formData,
+        bannerId: banner._id,
+      })
+    );
+  };
+
   // Show success or error messages as toasts
   useEffect(() => {
     if (successMessage) {
@@ -55,49 +73,108 @@ const AddBanner = () => {
     }
   }, [successMessage, errorMessage]);
 
+  // Fetch existing banner data when component mounts or productId changes
+  useEffect(() => {
+    dispatch(get_banner(productId));
+  }, [productId]);
+
   return (
     <div className="px-2 lg:px-7 pt-5">
       <h1 className="text-[20px] font-bold mb-3">Add Banner</h1>
       <div className="w-full p-4 bg-[#6a5fdf] rounded-md">
-        <form onSubmit={add}>
-          <div className="mb-4 ">
-            <label
-              htmlFor="image"
-              className="flex justify-center items-center flex-col h-[180px] cursor-pointer border border-dashed hover:border-red-500 w-full text-white"
-            >
-              <span className="text-4xl ">
-                <FaRegImage />
-              </span>
-              <span>Select Banner Image</span>
-            </label>
-            <input
-              required
-              onChange={imageHandle}
-              type="file"
-              id="image"
-              className="hidden"
-            />
+        {!banner && (
+          <div>
+            {" "}
+            <form onSubmit={add}>
+              <div className="mb-4 ">
+                <label
+                  htmlFor="image"
+                  className="flex justify-center items-center flex-col h-[180px] cursor-pointer border border-dashed hover:border-red-500 w-full text-white"
+                >
+                  <span className="text-4xl ">
+                    <FaRegImage />
+                  </span>
+                  <span>Select Banner Image</span>
+                </label>
+                <input
+                  required
+                  onChange={imageHandle}
+                  type="file"
+                  id="image"
+                  className="hidden"
+                />
+              </div>
+
+              {imageShow && (
+                <div className="mb-4">
+                  <img src={imageShow} className="w-full h-[300px]" />
+                </div>
+              )}
+
+              <button
+                disabled={loader}
+                className="bg-red-500 w-[280px] hover:shadow-red-300/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3 flex items-center justify-center gap-2"
+              >
+                {loader ? (
+                  // Show loading spinner during API request
+                  <PropagateLoader color="white" cssOverride={overrideStyle} />
+                ) : (
+                  // Display lock icon and text if not loading
+                  <>Add Banner</>
+                )}
+              </button>
+            </form>
           </div>
+        )}
 
-          {imageShow && (
-            <div className="mb-4">
-              <img src={imageShow} className="w-full h-[300px]" />
-            </div>
-          )}
+        {banner && (
+          <div>
+            {
+              <div className="mb-4">
+                <img src={banner.banner} className="w-full h-[300px]" />
+              </div>
+            }
+            <form onSubmit={update}>
+              <div className="mb-4 ">
+                <label
+                  htmlFor="image"
+                  className="flex justify-center items-center flex-col h-[180px] cursor-pointer border border-dashed hover:border-red-500 w-full text-white"
+                >
+                  <span className="text-4xl ">
+                    <FaRegImage />
+                  </span>
+                  <span>Select Banner Image</span>
+                </label>
+                <input
+                  required
+                  onChange={imageHandle}
+                  type="file"
+                  id="image"
+                  className="hidden"
+                />
+              </div>
 
-          <button
-            disabled={loader}
-            className="bg-red-500 w-[280px] hover:shadow-red-300/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3 flex items-center justify-center gap-2"
-          >
-            {loader ? (
-              // Show loading spinner during API request
-              <PropagateLoader color="white" cssOverride={overrideStyle} />
-            ) : (
-              // Display lock icon and text if not loading
-              <>Add Banner</>
-            )}
-          </button>
-        </form>
+              {imageShow && (
+                <div className="mb-4">
+                  <img src={imageShow} className="w-full h-[300px]" />
+                </div>
+              )}
+
+              <button
+                disabled={loader}
+                className="bg-red-500 w-[280px] hover:shadow-red-300/50 hover:shadow-lg text-white rounded-md px-7 py-2 mb-3 flex items-center justify-center gap-2"
+              >
+                {loader ? (
+                  // Show loading spinner during API request
+                  <PropagateLoader color="white" cssOverride={overrideStyle} />
+                ) : (
+                  // Display lock icon and text if not loading
+                  <>Update Banner</>
+                )}
+              </button>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );
