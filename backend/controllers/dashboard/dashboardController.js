@@ -326,6 +326,30 @@ class dashboardController {
     });
   };
   // End of update_banner method
+
+  /**
+   * Retrieves all promotional banners from the database.
+   * This method fetches all banner records to provide a complete list of banners.
+   * Used for banner management and display purposes.
+   *
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   */
+  get_banners = async (req, res) => {
+    try {
+      const banners = await bannerModel.aggregate([
+        {
+          $sample: {
+            size: 5,
+          },
+        },
+      ]);
+      responseReturn(res, 200, { banners });
+    } catch (error) {
+      responseReturn(res, 500, { error: error.message });
+    }
+  };
+  // End of get_banners method
 }
 
 module.exports = new dashboardController();

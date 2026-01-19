@@ -28,5 +28,8 @@ router.put(
   authMiddleware,
   dashboardController.update_banner,
 );
+
+router.get("/banners", dashboardController.get_banners);
+
 // Export the router to be used in the main server application
 module.exports = router;
