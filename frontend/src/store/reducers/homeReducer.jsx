@@ -199,6 +199,27 @@ export const get_reviews = createAsyncThunk(
 // End of get_reviews async thunk
 
 /**
+ * Async thunk to fetch homepage banner images
+ * Used to display promotional banners in a carousel on the homepage
+ * @async
+ * @function get_banners
+ * @returns {Promise<Object>} Promise resolving to banner images data
+ * @throws {Object} API error response
+ */
+export const get_banners = createAsyncThunk(
+  "review/get_banners",
+  async (_, { fulfillWithValue }) => {
+    try {
+      const { data } = await api.get(`/banners`);
+      return fulfillWithValue(data);
+    } catch (error) {
+      console.log(error.response);
+    }
+  }
+);
+// End of get_banners async thunk
+
+/**
  * Home Redux Slice Configuration
  *
  * @typedef {Object} HomeState
@@ -239,6 +260,7 @@ export const homeReducer = createSlice({
     totalReview: 0,
     rating_review: [],
     reviews: [],
+    banners: [],
   },
 
   reducers: {
@@ -287,6 +309,10 @@ export const homeReducer = createSlice({
         state.reviews = payload.reviews;
         state.totalReview = payload.totalReview;
         state.rating_review = payload.rating_review;
+      })
+      // Fetch Homepage Banners
+      .addCase(get_banners.fulfilled, (state, { payload }) => {
+        state.banners = payload.banners;
       });
   },
 });
