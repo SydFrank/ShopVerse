@@ -225,6 +225,33 @@ class categoryController {
     });
   };
   // End of update_Category method
+
+  /**
+   * Handles deleting a category by its ID.
+   * Expects the category ID to be provided as a URL parameter.
+   * Deletes the category from the database and returns a success message.
+   *
+   * @param {Object} req - Express request object, expects:
+   *  - params.id: ID of the category to delete (string)
+   * @param {Object} res - Express response object
+   *
+   */
+  delete_Category = async (req, res) => {
+    try {
+      const categoryId = req.params.id;
+      const deleteCategory = await categoryModel.findByIdAndDelete(categoryId);
+
+      if (!deleteCategory) {
+        console.log(`Category with ID ${categoryId} not found.`);
+        return res.status(404).json({ message: "Category not found" });
+      }
+      res.status(200).json({ message: "Category deleted successfully" });
+    } catch (error) {
+      console.log(`Error delete category with ID ${categoryId}:`, error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
+  // End of delete_Category method
 }
 
 // Export instance of categoryController for use in routes

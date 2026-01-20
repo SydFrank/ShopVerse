@@ -16,5 +16,8 @@ router.put(
   authMiddleware,
   categoryController.update_Category,
 );
+
+router.delete("/category-delete/:id", categoryController.delete_Category);
+
 // Export the router to be used in the main server application
 module.exports = router;
