@@ -146,6 +146,85 @@ class categoryController {
     }
   };
   // End of get_Category method
+
+  /**
+   * Handles updating an existing category.
+   * Expects a multipart/form-data request with 'name' and optional 'image' fields.
+   * If an image is provided, uploads it to Cloudinary and updates the category record.
+   * If no image is provided, only updates the name and slug fields.
+   * Used in admin dashboard for category management functionality.
+   *
+   * @param {Object} req - Express request object, expects:
+   *   - params.id: ID of the category to update (string)
+   *   - body/fields: multipart form data containing 'name' and optional 'image' fields
+   * @param {Object} res - Express response object
+   */
+  update_Category = async (req, res) => {
+    // Create a new formidable form instance to parse incoming form data
+    const form = formidable();
+    // Parse the incoming form data (fields and files)
+    form.parse(req, async (err, fields, files) => {
+      // If an error occurs during parsing, return a 404 error response
+      if (err) {
+        responseReturn(res, 404, { error: "something went wrong" });
+      } else {
+        // Extract the 'name' field from the parsed data
+        let { name } = fields;
+        // Extract the 'image' file from the parsed files
+        let { image } = files;
+        // Extract the 'id' parameter from the request URL
+        const { id } = req.params;
+        // Trim whitespace from the category name
+        name = name.trim();
+        // Generate a slug by replacing spaces with hyphens in the name
+        const slug = name.split(" ").join("-");
+
+        try {
+          // Initialize result variable for potential image upload
+          let result = null;
+          // Only upload new image if one was provided in the request
+          if (image) {
+            // Configure Cloudinary with credentials from environment variables
+            cloudinary.config({
+              cloud_name: process.env.cloud_name,
+              api_key: process.env.api_key,
+              api_secret: process.env.api_secret,
+              secure: true,
+            });
+            // Upload the new image file to Cloudinary under the 'categorys' folder
+            result = await cloudinary.uploader.upload(image.filepath, {
+              folder: "categorys",
+            });
+          }
+          // Create update data object with name and slug (always updated)
+          const updateData = {
+            name,
+            slug,
+          };
+          // Only add image URL to update data if new image was uploaded
+          if (result) {
+            updateData.image = result.url;
+          }
+
+          // Update category in database with new data and return updated document
+          const category = await categoryModel.findByIdAndUpdate(
+            id,
+            updateData,
+            { new: true }, // Return the updated document instead of the original
+          );
+          // Return success response with updated category data
+          responseReturn(res, 200, {
+            category, // Updated category object with all details
+            message: "Category Updated Successfully", // Success confirmation message
+          });
+        } catch (error) {
+          // Handle any errors during image upload or database operation
+          responseReturn(res, 500, { error: "Internal Server Error" });
+        }
+      }
+    });
+  };
+  // End of update_Category method
 }
 
 // Export instance of categoryController for use in routes
