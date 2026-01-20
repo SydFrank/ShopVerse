@@ -8,6 +8,7 @@ import { PropagateLoader } from "react-spinners"; // Spinner component for indic
 import { overrideStyle } from "../../utils/utils"; // Custom spinner
 // style override
 import {
+  updateCategory,
   categoryAdd,
   messageClear,
   get_category,
@@ -58,6 +59,10 @@ const Category = () => {
 
   // State: holds the selected image for the category
   const [imageShow, setImageShow] = useState("");
+  // State: determines if the form is in edit mode
+  const [isEdit, setIsEdit] = useState(false);
+  // State: holds the ID of the category being edited
+  const [editId, setEditId] = useState(null);
 
   /**
    * State holds the form data for adding a new category
@@ -86,10 +91,21 @@ const Category = () => {
     }
   };
 
-  const add_category = (e) => {
+  // Function to handle form submission for adding or updating a category
+  const addOrUpdateCategory = (e) => {
     e.preventDefault(); // Prevent the default form submission behavior
     // console.log(state);
-    dispatch(categoryAdd(state)); // Dispatch the categoryAdd action with the current state
+    if (isEdit) {
+      // Update category logic to be implemented
+      dispatch(
+        updateCategory({
+          id: editId,
+          ...state,
+        })
+      );
+    } else {
+      dispatch(categoryAdd(state)); // Dispatch the categoryAdd action with the current state
+    }
   };
 
   // useEffect to handle category add response messages
@@ -110,6 +126,8 @@ const Category = () => {
       });
       // Reset image preview
       setImageShow("");
+      setIsEdit(false);
+      setEditId(null);
     }
     if (errorMessage) {
       // Show error toast notification
@@ -117,7 +135,7 @@ const Category = () => {
       // Clear success/error messages from Redux state
       dispatch(messageClear());
     }
-  }, [successMessage, errorMessage]);
+  }, [successMessage, errorMessage, dispatch]);
 
   // useEffect to fetch categories whenever search value, items per page, or current page changes
   useEffect(() => {
@@ -130,6 +148,18 @@ const Category = () => {
     // Dispatch Redux action to fetch categories based on current filters
     dispatch(get_category(obj));
   }, [searchValue, parPage, currentPage]);
+
+  // Function to handle editing a category (to be implemented)
+  const handleEdit = (category) => {
+    setState({
+      name: category.name,
+      image: category.image,
+    });
+    setImageShow(category.image);
+    setEditId(category._id);
+    setIsEdit(true);
+    setShow(true);
+  };
 
   return (
     <div className="px-2 lg:px-7 pt-5">
@@ -204,7 +234,10 @@ const Category = () => {
                         className="py-1 px-4 font-medium whitespace-nowrap"
                       >
                         <div className="flex justify-start items-center gap-4">
-                          <Link className="p-[6px] bg-yellow-500 rounded hover:shadow-lg hover:shadow-yellow-500/50">
+                          <Link
+                            className="p-[6px] bg-yellow-500 rounded hover:shadow-lg hover:shadow-yellow-500/50 "
+                            onClick={() => handleEdit(curVal)}
+                          >
                             <FaEdit />
                           </Link>
                           <Link className="p-[6px] bg-red-500 rounded hover:shadow-lg hover:shadow-red-500/50">
@@ -240,13 +273,13 @@ const Category = () => {
             <div className="bg-[#6a5fdf] h-screen lg:h-auto px-3 py-2 lg:rounded-md text-[#d0d2d6]">
               <div className="flex justify-between items-center mb-4">
                 <h1 className="text-[#d0d2d6] font-semibold text-xl mb-4 w-full text-center">
-                  Add Category
+                  {isEdit ? "Edit Category" : "Add Category"}
                 </h1>
                 <div onClick={() => setShow(false)} className="block lg:hidden">
                   <IoMdCloseCircle />
                 </div>
               </div>
-              <form onSubmit={add_category}>
+              <form onSubmit={addOrUpdateCategory}>
                 <div className="flex flex-col w-full gap-1 mb-3">
                   <label htmlFor="name">Category Name</label>
                   <input
@@ -298,7 +331,7 @@ const Category = () => {
                         />
                       ) : (
                         // Display lock icon and text if not loading
-                        <>Add Category</>
+                        <>{isEdit ? "Update Category" : "Add Category"}</>
                       )}
                     </button>
                   </div>

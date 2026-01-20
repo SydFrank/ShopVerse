@@ -29,7 +29,7 @@ export const categoryAdd = createAsyncThunk(
       const { data } = await api.post("/category-add", formData, {
         withCredentials: true,
       });
-      console.log(data);
+      // console.log(data);
       // On success, dispatch the fulfilled action with the server's response data.
       return fulfillWithValue(data);
     } catch (error) {
@@ -84,6 +84,38 @@ export const get_category = createAsyncThunk(
 //End of get_category async thunk
 
 /**
+ * Async Thunk: Update Category
+ * ------------------------
+ * Sends a request to the backend to update an existing category.
+ * Uses axios (via `api`) to put updated category data.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ * @param {Object} info - Category payload (e.g. { id, name, image }).
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error.
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload.
+ * @returns {Object} Response data or error.
+ */
+export const updateCategory = createAsyncThunk(
+  "category/updateCategory",
+  async ({ id, name, image }, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("name", name);
+      if (image) {
+        formData.append("image", image);
+      }
+      const { data } = await api.put(`/category-update/${id}`, formData, {
+        withCredentials: true,
+      });
+      // console.log(data);
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+// End of updateCategory async thunk
+
+/**
  * The `auth` slice of the global Redux state.
  *
  * - `name`: Unique name for the slice.
@@ -130,6 +162,21 @@ const categorySlice = createSlice({
         state.totalCategory = payload.totalCategory;
         state.successMessage = payload.message;
         state.categorys = payload.categorys; // Update categories with fetched data
+      })
+      // Handles update category async flow
+      .addCase(updateCategory.rejected, (state, { payload }) => {
+        state.loader = false;
+        state.errorMessage = payload.error; // Store backend error
+      })
+      .addCase(updateCategory.fulfilled, (state, { payload }) => {
+        state.loader = false;
+        state.successMessage = payload.message;
+        const index = state.categorys.findIndex(
+          (cat) => cat._id === payload.category._id
+        );
+        if (index !== -1) {
+          state.categorys[index] = payload.category;
+        }
       });
   },
 });
