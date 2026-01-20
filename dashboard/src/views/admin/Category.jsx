@@ -8,6 +8,7 @@ import { PropagateLoader } from "react-spinners"; // Spinner component for indic
 import { overrideStyle } from "../../utils/utils"; // Custom spinner
 // style override
 import {
+  deleteCategory,
   updateCategory,
   categoryAdd,
   messageClear,
@@ -161,6 +162,15 @@ const Category = () => {
     setShow(true);
   };
 
+  // Function to handle deleting a category
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure to delete this category?")) {
+      // Dispatch delete action here
+      console.log("Category deleted: ", id);
+      dispatch(deleteCategory(id));
+    }
+  };
+
   return (
     <div className="px-2 lg:px-7 pt-5">
       {/* Mobile header bar with Category title and Add button */}
@@ -240,7 +250,10 @@ const Category = () => {
                           >
                             <FaEdit />
                           </Link>
-                          <Link className="p-[6px] bg-red-500 rounded hover:shadow-lg hover:shadow-red-500/50">
+                          <Link
+                            className="p-[6px] bg-red-500 rounded hover:shadow-lg hover:shadow-red-500/50"
+                            onClick={() => handleDelete(curVal._id)}
+                          >
                             <FaTrash />
                           </Link>
                         </div>

@@ -116,6 +116,29 @@ export const updateCategory = createAsyncThunk(
 // End of updateCategory async thunk
 
 /**
+ * Async Thunk: Delete Category
+ * ------------------------
+ * Sends a request to the backend to delete an existing category.
+ * Uses axios (via `api`) to delete category data.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ * @param {String} id - ID of the category to be deleted.
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error.
+ * @returns {Object} Response data or error.
+ */
+export const deleteCategory = createAsyncThunk(
+  "category/deleteCategory",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await api.delete(`/category-delete/${id}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data.message);
+    }
+  }
+);
+// End of deleteCategory async thunk
+
+/**
  * The `auth` slice of the global Redux state.
  *
  * - `name`: Unique name for the slice.
@@ -177,6 +200,17 @@ const categorySlice = createSlice({
         if (index !== -1) {
           state.categorys[index] = payload.category;
         }
+      })
+      // Handles delete category async flow
+      .addCase(deleteCategory.rejected, (state, action) => {
+        state.loader = false;
+        state.errorMessage = action.payload.error; // Store backend error
+      })
+      .addCase(deleteCategory.fulfilled, (state, action) => {
+        state.categorys = state.categorys.filter(
+          (category) => category._id !== action.meta.arg
+        );
+        state.successMessage = action.payload.message;
       });
   },
 });
