@@ -174,7 +174,7 @@ const AddProduct = () => {
   useEffect(() => {
     if (successMessage) {
       // Show success toast notification
-      toast.success(successMessage);
+      // toast.success(successMessage);
       // Clear success/error messages from Redux state
       dispatch(messageClear());
       // Reset form fields
