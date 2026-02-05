@@ -236,6 +236,7 @@ class productController {
       category,
       productId,
     } = req.body;
+    0;
 
     // Trim whitespace from the product name
     name = name.trim();

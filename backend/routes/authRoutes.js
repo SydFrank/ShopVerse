@@ -13,15 +13,21 @@ router.post("/seller-login", authControllers.seller_login);
 router.post(
   "/profile-image-upload",
   authMiddleware,
-  authControllers.profile_image_upload
+  authControllers.profile_image_upload,
 );
 router.post(
   "/profile-info-add",
   authMiddleware,
-  authControllers.profile_info_add
+  authControllers.profile_info_add,
 );
 
 router.get("/logout", authMiddleware, authControllers.logout);
+
+router.post(
+  "/change-password",
+  authMiddleware,
+  authControllers.change_password,
+);
 
 // Export the router to be used in the main server application
 module.exports = router;
