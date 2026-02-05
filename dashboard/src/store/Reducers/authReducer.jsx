@@ -29,7 +29,7 @@ export const admin_login = createAsyncThunk(
       // console.log(error.response.data);
       return rejectWithValue(error.response.data); // Return backend error message
     }
-  }
+  },
 );
 // End of admin_login async thunk
 
@@ -61,7 +61,7 @@ export const seller_login = createAsyncThunk(
       // console.log(error.response.data);
       return rejectWithValue(error.response.data); // Return backend error message
     }
-  }
+  },
 );
 // End of seller_login async thunk
 
@@ -93,7 +93,7 @@ export const seller_register = createAsyncThunk(
       // console.log(error.response.data);
       return rejectWithValue(error.response.data); // Return backend error message
     }
-  }
+  },
 );
 // End of seller_register async thunk
 
@@ -126,7 +126,7 @@ export const get_user_info = createAsyncThunk(
       // console.log(error.response.data);
       return rejectWithValue(error.response.data); // Return backend error message
     }
-  }
+  },
 );
 // End of get_user_info async thunks
 
@@ -154,7 +154,7 @@ export const profile_image_upload = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data); // Return backend error message
     }
-  }
+  },
 );
 // End of profile_image_upload async thunks
 
@@ -183,7 +183,7 @@ export const profile_info_add = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data); // Return backend error message
     }
-  }
+  },
 );
 // End of profile_info_add async thunks
 
@@ -229,24 +229,44 @@ const returnRole = (token) => {
  */
 export const logout = createAsyncThunk(
   "auth/logout",
-  async ({ navigate, role }, { rejectWithValue, fulfillWithValue }) => {
+  async (_, { rejectWithValue, fulfillWithValue }) => {
     try {
       const { data } = await api.get("/logout", {
         withCredentials: true, // Include cookies for authentication/session
       });
       localStorage.removeItem("accessToken");
-      if (role === "admin") {
-        navigate("/admin/login");
-      } else {
-        navigate("/login");
-      }
       return fulfillWithValue(data);
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
-// End of logout async thunk
+
+/**
+ * Async Thunk: Change Password
+ * ------------------------
+ * Changes the user's password by sending the old and new passwords to the backend.
+ * Uses axios (via `api`) to post the password change request.
+ * Automatically generates pending, fulfilled, and rejected action types.
+ * @param {Object} info - Password change data (e.g. { old_password, new_password }).
+ * @param {Function} rejectWithValue - Dispatches a rejected action with custom error.
+ * @param {Function} fulfillWithValue - Dispatches a fulfilled action with custom payload.
+ * @returns {Object} Response data or error.
+ */
+export const change_password = createAsyncThunk(
+  "auth/change_password",
+  async (info, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.post("/change-password", info, {
+        withCredentials: true, // Include cookies for authentication/session
+      });
+      return fulfillWithValue(data.message); // Dispatch success
+    } catch (error) {
+      return rejectWithValue(error.response.data.message); // Return backend error message
+    }
+  },
+);
+// End of change_password async thunk
 
 /**
  * The `auth` slice of the global Redux state.
@@ -343,6 +363,28 @@ const authSlice = createSlice({
         state.loader = false;
         state.userInfo = payload.userInfo; // Store user info from backend
         state.successMessage = payload.message;
+      })
+      // Handles change password async flow
+      .addCase(change_password.pending, (state) => {
+        state.loader = true;
+        state.errorMessage = null;
+      })
+      .addCase(change_password.rejected, (state, action) => {
+        state.loader = false;
+        state.errorMessage = action.payload; // Store backend error message
+      })
+      .addCase(change_password.fulfilled, (state, action) => {
+        state.loader = false;
+        state.successMessage = action.payload;
+      })
+      // Handles logout async flow
+      .addCase(logout.fulfilled, (state) => {
+        state.userInfo = "";
+        state.role = "";
+        state.token = null;
+        state.successMessage = "";
+        state.errorMessage = "";
+        state.loader = false;
       });
   },
 });

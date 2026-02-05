@@ -29,7 +29,7 @@ const Login = () => {
 
   // Destructure authentication-related state from Redux
   const { loader, errorMessage, successMessage } = useSelector(
-    (state) => state.auth
+    (state) => state.auth,
   );
 
   /**
@@ -67,7 +67,7 @@ const Login = () => {
    */
   useEffect(() => {
     if (successMessage) {
-      toast.success(successMessage);
+      // toast.success(successMessage);
       dispatch(messageClear());
       navigate("/");
     }

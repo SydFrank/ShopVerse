@@ -42,6 +42,7 @@ const Sidebar = ({ showSidebar, setShowSidebar }) => {
   const { pathname } = useLocation();
   // State to hold all navigation items
   const [allNav, setAllNav] = useState([]);
+  const currentRole = role;
 
   // Fetch navigation items for the admin role on initial render
   useEffect(() => {
@@ -90,9 +91,28 @@ const Sidebar = ({ showSidebar, setShowSidebar }) => {
                 </Link>
               </li>
             ))}
-            <li>
+            {/* <li>
               <button
                 onClick={() => dispatch(logout({ navigate, role }))}
+                className="text-[#030811] font-bold duration-200
+                  px-[12px] py-[9px] round-sm flex justify-start items-center gap-[12px] hover:pl-4 transition-all w-full mb-1 cursor-pointer"
+              >
+                <span>
+                  <RiLogoutBoxLine />
+                </span>
+                <span>Logout</span>
+              </button>
+            </li> */}
+            <li>
+              <button
+                onClick={() => {
+                  dispatch(logout())
+                    .unwrap()
+                    .then(() => {
+                      if (currentRole === "admin") navigate("/admin/login");
+                      else navigate("/login");
+                    });
+                }}
                 className="text-[#030811] font-bold duration-200
                   px-[12px] py-[9px] round-sm flex justify-start items-center gap-[12px] hover:pl-4 transition-all w-full mb-1 cursor-pointer"
               >

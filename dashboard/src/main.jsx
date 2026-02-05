@@ -38,5 +38,5 @@ createRoot(document.getElementById("root")).render(
         />
       </Suspense>
     </Provider>
-  </BrowserRouter>
+  </BrowserRouter>,
 );

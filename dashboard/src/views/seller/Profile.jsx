@@ -6,6 +6,7 @@ import {
   profile_image_upload,
   messageClear,
   profile_info_add,
+  change_password,
 } from "../../store/Reducers/authReducer"; // Redux actions for profile
 import toast from "react-hot-toast"; // For displaying toast messages
 import { overrideStyle } from "../../utils/utils"; // Custom spinner style
@@ -44,8 +45,25 @@ const Profile = () => {
 
   // Get user info and status from Redux state
   const { userInfo, loader, successMessage, errorMessage } = useSelector(
-    (state) => state.auth
+    (state) => state.auth,
   );
+
+  /**
+   * useEffect to handle response messages for profile actions.
+   * - Shows a success toast if an action is successful.
+   * - Shows an error toast if there is an error.
+   * - Clears messages from Redux after displaying.
+   */
+  // useEffect(() => {
+  //   // if (successMessage && successMessage !== "Login success") {
+  //   //   toast.success(successMessage);
+  //   //   dispatch(messageClear());
+  //   // }
+  //   if (successMessage) {
+  //     toast.success(successMessage);
+  //     dispatch(messageClear());
+  //   }
+  // }, [successMessage]);
 
   /**
    * Handles profile image upload.
@@ -72,23 +90,6 @@ const Profile = () => {
   };
 
   /**
-   * useEffect to handle response messages for profile actions.
-   * - Shows a success toast if an action is successful.
-   * - Shows an error toast if there is an error.
-   * - Clears messages from Redux after displaying.
-   */
-  useEffect(() => {
-    if (successMessage && successMessage !== "Login success") {
-      toast.success(successMessage);
-      dispatch(messageClear());
-    }
-    if (errorMessage) {
-      toast.error(errorMessage);
-      dispatch(messageClear());
-    }
-  }, [successMessage, errorMessage]);
-
-  /**
    * Handles shop information form submission.
    * - Prevents default form submission.
    * - Dispatches profile_info_add action with the current state.
@@ -97,6 +98,39 @@ const Profile = () => {
     e.preventDefault();
     dispatch(profile_info_add(state));
   };
+
+  // Change Password
+  const [passwordData, setPasswordData] = useState({
+    email: "", // Email input for password change
+    old_password: "", // Old password input
+    new_password: "", // New password input
+  });
+
+  // Input handler for password change form
+  const pinputHandle = (e) => {
+    setPasswordData({
+      ...passwordData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  // Handle password change form submission
+  const handlePasswordChange = (e) => {
+    e.preventDefault();
+    dispatch(change_password(passwordData));
+  };
+
+  // useEffect to handle response messages for password change action.
+  useEffect(() => {
+    // if (successMessage) {
+    //   toast.success(successMessage);
+    //   dispatch(messageClear());
+    // }
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(messageClear());
+    }
+  }, [errorMessage, dispatch]);
 
   return (
     <div className="px-2 lg:px-7 py-5 ">
@@ -301,7 +335,7 @@ const Profile = () => {
               <h1 className="text-[#d0d2d6] text-lg mb-3 font-semibold">
                 Change Password
               </h1>
-              <form>
+              <form onSubmit={handlePasswordChange}>
                 <div className="flex flex-col w-full gap-2 mb-2">
                   <label htmlFor="email">Email</label>
                   <input
@@ -310,6 +344,8 @@ const Profile = () => {
                     name="email"
                     id="email"
                     placeholder="Email"
+                    value={passwordData.email}
+                    onChange={pinputHandle}
                   />
                 </div>
                 <div className="flex flex-col w-full gap-2 mb-2">
@@ -318,8 +354,10 @@ const Profile = () => {
                     className="px-4 py-2 focus:border-indigo-500 outline-none bg-[#ffffff] border border-slate-700 rounded-md text-[#000000]"
                     type="password"
                     name="old_password"
-                    id="old_password"
+                    id="o_password"
                     placeholder="Old Password"
+                    value={passwordData.old_password}
+                    onChange={pinputHandle}
                   />
                 </div>
                 <div className="flex flex-col w-full gap-2 mb-2">
@@ -328,13 +366,18 @@ const Profile = () => {
                     className="px-4 py-2 focus:border-indigo-500 outline-none bg-[#ffffff] border border-slate-700 rounded-md text-[#000000]"
                     type="password"
                     name="new_password"
-                    id="new_password"
+                    id="n_password"
                     placeholder="New Password"
+                    value={passwordData.new_password}
+                    onChange={pinputHandle}
                   />
                 </div>
 
-                <button className="bg-red-500 hover:shadow-red-500/40 hover:shadow-md text-white rounded-md px-7 py-2 my-2">
-                  Save Changes
+                <button
+                  disabled={loader}
+                  className="bg-red-500 hover:shadow-red-500/40 hover:shadow-md text-white rounded-md px-7 py-2 my-2"
+                >
+                  {loader ? "loading..." : "Save Changes"}
                 </button>
               </form>
             </div>
