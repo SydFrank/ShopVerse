@@ -53,7 +53,18 @@ const local = "http://localhost:5000";
 // Production server URL - update this with actual production domain
 // Example: "https://api.shopverse.com" or "https://your-domain.com"
 // eslint-disable-next-line no-unused-vars
-const production = "";
+// Note: Currently set to localhost for testing, should be updated for production
+const production = "http://localhost:6000";
+
+// Variable to hold the selected API base URL based on the environment
+let api_url = "";
+let mode = "pro";
+// Determine the API base URL based on the current environment
+if (mode === "pro") {
+  api_url = production;
+} else {
+  api_url = local;
+}
 
 /**
  * Configured Axios Instance
@@ -73,7 +84,7 @@ const production = "";
 const api = axios.create({
   // Base URL for all API requests - dynamically constructed from environment variables
   // Currently uses local development server, switch to production for deployment
-  baseURL: `${local}/api`,
+  baseURL: `${api_url}/api`,
 
   // Additional configuration options can be added here:
   // timeout: 10000, // Request timeout in milliseconds
