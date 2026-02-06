@@ -54,16 +54,16 @@ const Profile = () => {
    * - Shows an error toast if there is an error.
    * - Clears messages from Redux after displaying.
    */
-  // useEffect(() => {
-  //   // if (successMessage && successMessage !== "Login success") {
-  //   //   toast.success(successMessage);
-  //   //   dispatch(messageClear());
-  //   // }
-  //   if (successMessage) {
-  //     toast.success(successMessage);
-  //     dispatch(messageClear());
-  //   }
-  // }, [successMessage]);
+  useEffect(() => {
+    if (successMessage && successMessage !== "Login success") {
+      toast.success(successMessage);
+      dispatch(messageClear());
+    }
+    // if (successMessage) {
+    //   toast.success(successMessage);
+    //   dispatch(messageClear());
+    // }
+  }, [successMessage]);
 
   /**
    * Handles profile image upload.
@@ -130,7 +130,7 @@ const Profile = () => {
       toast.error(errorMessage);
       dispatch(messageClear());
     }
-  }, [errorMessage, dispatch]);
+  }, [successMessage, errorMessage, dispatch]);
 
   return (
     <div className="px-2 lg:px-7 py-5 ">
