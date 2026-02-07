@@ -21,7 +21,7 @@ import ChangePassword from "./components/dashboard/ChangePassword";
 import Wishlist from "./components/dashboard/Wishlist";
 import OrderDetails from "./components/dashboard/OrderDetails";
 import Chat from "./components/dashboard/Chat";
-import ConfirmOrder from "./pages/ConfIrmOrder";
+import ConfirmOrder from "./pages/ConfirmOrder";
 
 function App() {
   // Redux dispatch hook for triggering actions
