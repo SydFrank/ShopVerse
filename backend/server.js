@@ -26,30 +26,64 @@ require("dotenv").config();
  * Enable Cross-Origin Resource Sharing (CORS) for the specified frontend origin
  * Allow credentials such as cookies and authorization headers to be included in requests
  */
+// app.use(
+//   cors({
+//     origin:
+//       process.env.MODE === "pro"
+//         ? [
+//             process.env.client_customer_production_url,
+//             process.env.client_admin_production_url,
+//           ]
+//         : ["http://localhost:5173", "http://localhost:5174"], // Frontend development server origin
+//     credentials: true, // Required for sending cookies across domains
+//   }),
+// );
+
+// // Initialize a Socket.IO server instance, allowing connections from any origin
+// const io = socket(server, {
+//   cors: {
+//     origin:
+//       process.env.MODE === "pro"
+//         ? [
+//             process.env.client_customer_production_url,
+//             process.env.client_admin_production_url,
+//           ]
+//         : ["http://localhost:5173", "http://localhost:5174"], // Allow connections from any origin
+//     credentials: true, // Allow credentials to be sent
+//   },
+// });
+
+const allowedOrigins =
+  process.env.mode === "pro"
+    ? [
+        process.env.client_customer_production_url,
+        process.env.client_admin_production_url,
+      ]
+    : ["http://localhost:5173", "http://localhost:5174"];
+
 app.use(
   cors({
-    origin:
-      process.env.MODE === "pro"
-        ? [
-            process.env.client_customer_production_url,
-            process.env.client_admin_production_url,
-          ]
-        : ["http://localhost:5173", "http://localhost:5174"], // Frontend development server origin
-    credentials: true, // Required for sending cookies across domains
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
   }),
 );
 
-// Initialize a Socket.IO server instance, allowing connections from any origin
 const io = socket(server, {
   cors: {
-    origin:
-      process.env.MODE === "pro"
-        ? [
-            process.env.client_customer_production_url,
-            process.env.client_admin_production_url,
-          ]
-        : ["http://localhost:5173", "http://localhost:5174"], // Allow connections from any origin
-    credentials: true, // Allow credentials to be sent
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
   },
 });
 
