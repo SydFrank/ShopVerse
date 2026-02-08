@@ -1,7 +1,7 @@
 import { lazy } from "react";
 
 // Lazy load admin dashboard and management views for performance optimization
-const AdminDashboard = lazy(() => import("../../views/admin/adminDashboard"));
+const AdminDashboard = lazy(() => import("../../views/admin/AdminDashboard"));
 const Orders = lazy(() => import("../../views/admin/Orders"));
 const Category = lazy(() => import("../../views/admin/Category"));
 const Seller = lazy(() => import("../../views/admin/Seller"));
