@@ -30,7 +30,10 @@ app.use(
   cors({
     origin:
       process.env.MODE === "pro"
-        ? [process.env.client_customer_production_url]
+        ? [
+            process.env.client_customer_production_url,
+            process.env.client_admin_production_url,
+          ]
         : ["http://localhost:5173", "http://localhost:5174"], // Frontend development server origin
     credentials: true, // Required for sending cookies across domains
   }),
@@ -41,7 +44,10 @@ const io = socket(server, {
   cors: {
     origin:
       process.env.MODE === "pro"
-        ? [process.env.client_customer_production_url]
+        ? [
+            process.env.client_customer_production_url,
+            process.env.client_admin_production_url,
+          ]
         : ["http://localhost:5173", "http://localhost:5174"], // Allow connections from any origin
     credentials: true, // Allow credentials to be sent
   },
