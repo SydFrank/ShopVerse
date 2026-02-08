@@ -1,19 +1,48 @@
 /**
- * Creates an Axios instance to encapsulate API requests.
+ * API Configuration - Centralized HTTP Client for ShopVerse
  *
- * Configuration details:
- * - baseURL: The base URL for all requests, allowing centralized management of the API endpoint.
- *   Here, it is set to the local development server at "http://localhost:5173/api".
+ * This file configures and exports a centralized Axios instance for making HTTP requests
+ * to the ShopVerse backend API. It provides a consistent base configuration for all
+ * API calls throughout the application, including the base URL, default headers,
+ * and any necessary interceptors for request/response handling.
+ *
+ * Key Features:
+ * - Centralized API configuration for consistent HTTP requests
+ * - Base URL configuration for backend server communication
+ * - Reusable Axios instance for all API calls in the application
+ * - Extensible configuration for adding interceptors, headers, and middleware
+ * - Environment-specific configuration support for development and production
  *
  * Usage:
- * - Use this instance to send HTTP requests throughout the project, avoiding repetition of full URLs.
- * - Allows easy extension for adding interceptors, timeout settings, and other configurations in the future.
+ * - Import this configured API instance in service files or components
+ * - Use standard Axios methods: api.get(), api.post(), api.put(), api.delete()
+ * - Base URL is automatically prepended to all requests
+ *
+ * @module APIClient
  */
 
-import axios from "axios";
+// Axios import for HTTP client functionality
+import axios from "axios"; // Popular HTTP client library for making API requests
+
+// Local development server URL for testing and development
+const local = "http://localhost:5000";
+
+// Production server URL - update this with actual production domain
+// Example: "https://api.shopverse.com" or "https://your-domain.com"
+
+const production = "https://backend-shopverse.onrender.com";
+
+let api_url = "";
+let mode = "pro";
+if (mode === "pro") {
+  api_url = production;
+} else {
+  api_url = local;
+}
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: `${api_url}/api`,
+  withCredentials: true, // Include cookies in requests for authentication
 });
 
 export default api;
