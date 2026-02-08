@@ -13,7 +13,10 @@ import {
 import toast from "react-hot-toast";
 import io from "socket.io-client";
 // const SOCKET_URL = "http://localhost:5000";
-const socket = io("http://localhost:5000");
+// const socket = io("http://localhost:5000");
+const socket = io("https://shopverse-backend-platform.onrender.com", {
+  withCredentials: true,
+});
 
 const Chat = () => {
   // Reference for scrolling to the latest message within chat container
@@ -26,7 +29,7 @@ const Chat = () => {
   const { userInfo } = useSelector((state) => state.auth);
   // Accessing chat-related state from Redux store
   const { fb_messages, currentFd, my_friends, successMessage } = useSelector(
-    (state) => state.chat
+    (state) => state.chat,
   );
 
   // Local state for managing input text
@@ -47,7 +50,7 @@ const Chat = () => {
       add_friend({
         sellerId: sellerId || "",
         userId: userInfo.id,
-      })
+      }),
     );
   }, [sellerId]);
 
@@ -60,7 +63,7 @@ const Chat = () => {
           text,
           sellerId,
           name: userInfo.name,
-        })
+        }),
       );
       setText("");
     }
