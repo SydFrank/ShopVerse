@@ -4,15 +4,17 @@ const mongoose = require("mongoose");
 // An asynchronous function to establish a connection to the MongoDB database
 const dbConnect = async () => {
   try {
-    // Attempt to connect to the MongoDB database using the URL from environment variables
-    await mongoose.connect(
-      process.env.DB_URL,
-      // Use the new URL string parser instead of the deprecated one
-      {
-        useNewUrlParser: true,
-      }
-    );
-    console.log("Database connected....");
+    if (process.env.MODE === "pro") {
+      await mongoose.connect(process.env.DB_PRO_URL, {
+        useNewUrlParser: true, // Use the new URL parser to avoid deprecation warnings
+      });
+      console.log("Production database connected successfully");
+    } else {
+      await mongoose.connect(process.env.DB_LOCAL_URL, {
+        useNewUrlParser: true, // Use the new URL parser to avoid deprecation warnings
+      });
+      console.log("Local database connected successfully");
+    }
   } catch (error) {
     console.log(error.message);
   }

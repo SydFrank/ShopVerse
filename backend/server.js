@@ -28,17 +28,23 @@ require("dotenv").config();
  */
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174"], // Frontend development server origin
+    origin:
+      process.env.MODE === "pro"
+        ? [process.env.client_customer_production_url]
+        : ["http://localhost:5173", "http://localhost:5174"], // Frontend development server origin
     credentials: true, // Required for sending cookies across domains
-  })
+  }),
 );
 
 // Initialize a Socket.IO server instance, allowing connections from any origin
 const io = socket(server, {
   cors: {
-    origin: "*", // Allow connections from any origin
+    origin:
+      process.env.MODE === "pro"
+        ? [process.env.client_customer_production_url]
+        : ["http://localhost:5173", "http://localhost:5174"], // Allow connections from any origin
+    credentials: true, // Allow credentials to be sent
   },
-  credentials: true, // Allow credentials to be sent
 });
 
 // Array to store all connected customers with their socket information
