@@ -376,16 +376,16 @@ const authSlice = createSlice({
       .addCase(change_password.fulfilled, (state, action) => {
         state.loader = false;
         state.successMessage = action.payload;
-      })
-      // Handles logout async flow
-      .addCase(logout.fulfilled, (state) => {
-        state.userInfo = "";
-        state.role = "";
-        state.token = null;
-        state.successMessage = "";
-        state.errorMessage = "";
-        state.loader = false;
       });
+    // Handles logout async flow
+    // .addCase(logout.fulfilled, (state) => {
+    //   state.userInfo = "";
+    //   state.role = "";
+    //   state.token = null;
+    //   state.successMessage = "";
+    //   state.errorMessage = "";
+    //   state.loader = false;
+    // });
   },
 });
 
