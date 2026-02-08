@@ -54,7 +54,7 @@ const local = "http://localhost:5000";
 // Example: "https://api.shopverse.com" or "https://your-domain.com"
 // eslint-disable-next-line no-unused-vars
 // Note: Currently set to localhost for testing, should be updated for production
-const production = "https://shopverse-backend-lastest.onrender.com";
+const production = "https://shopverse-y7gh.onrender.com";
 
 // Variable to hold the selected API base URL based on the environment
 let api_url = "";
