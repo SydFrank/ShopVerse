@@ -1,4 +1,4 @@
-import io from "socket.io-client";
+// import io from "socket.io-client";
 
 // Styles for loading spinner
 export const overrideStyle = {
@@ -9,9 +9,11 @@ export const overrideStyle = {
   alignItems: "center",
 };
 
-// Initialize socket connection
-// export const socket = io("http://localhost:5000");
+import { io } from "socket.io-client";
 
-export const socket = io("https://shopverse-platform-latest.onrender.com", {
+const socket = io("https://backend-shopverse-version-1.onrender.com", {
   withCredentials: true,
+  transports: ["websocket", "polling"],
 });
+
+export default socket;

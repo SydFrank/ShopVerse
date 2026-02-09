@@ -30,19 +30,35 @@ const local = "http://localhost:5000";
 // Production server URL - update this with actual production domain
 // Example: "https://api.shopverse.com" or "https://your-domain.com"
 
-const production = "https://shopverse-platform-latest.onrender.com";
-
+const production = "https://backend-shopverse-version-1.onrender.com";
+// Variable to hold the selected API base URL based on the environment
 let api_url = "";
 let mode = "pro";
+// Determine the API base URL based on the current environment
 if (mode === "pro") {
   api_url = production;
 } else {
   api_url = local;
 }
 
+/**
+ * Configured Axios Instance
+ *
+ * Creates a pre-configured Axios instance with base settings for the ShopVerse API.
+ * This instance can be used throughout the application for consistent API communication.
+ *
+ * Configuration:
+ * - baseURL: Dynamically set based on environment (currently using local)
+ * - Future enhancements: Can include default headers, timeout, interceptors
+ *
+ * Environment Switching:
+ * - Development: Uses local variable (localhost:5000)
+ * - Production: Should use production variable when deployed
+ * - Consider using process.env.NODE_ENV for automatic environment detection
+ */
 const api = axios.create({
   baseURL: `${api_url}/api`,
-  withCredentials: true, // Include cookies in requests for authentication
+  withCredentials: true, // Include cookies for authentication/session management
 });
 
 export default api;
