@@ -66,44 +66,17 @@ const SellerToCustomer = () => {
   // Local state for managing received messages
   const [receiverMessage, setReceiverMessage] = useState("");
 
-  // update 1
-  useEffect(() => {
-    const onConnect = () => console.log("seller socket connected:", socket.id);
-    const onError = (e) =>
-      console.log("seller socket connect_error:", e?.message || e);
-
-    socket.on("connect", onConnect);
-    socket.on("connect_error", onError);
-
-    return () => {
-      socket.off("connect", onConnect);
-      socket.off("connect_error", onError);
-    };
-  }, []);
-
-  // update 2
-  useEffect(() => {
-    if (!userInfo?._id) return;
-    socket.emit("add_seller", userInfo._id, userInfo);
-  }, [userInfo?._id]);
-
   // Fetch customers on component mount
   useEffect(() => {
     dispatch(get_customers(userInfo._id));
   }, []);
 
   // Fetch customer messages when customerId changes
-  // useEffect(() => {
-  //   if (customerId) {
-  //     dispatch(get_customer_message(customerId));
-  //   }
-  // }, [customerId]);
-
-  // update 3
   useEffect(() => {
-    if (!userInfo?._id) return;
-    dispatch(get_customers(userInfo._id));
-  }, [userInfo?._id, dispatch]);
+    if (customerId) {
+      dispatch(get_customer_message(customerId));
+    }
+  }, [customerId]);
 
   // Function to handle sending messages
   const send = (e) => {
