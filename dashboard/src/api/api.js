@@ -30,7 +30,7 @@ const local = "http://localhost:5000";
 // Production server URL - update this with actual production domain
 // Example: "https://api.shopverse.com" or "https://your-domain.com"
 
-const production = "https://backend-shopverse-version-1.onrender.com";
+const production = "https://backend-shopverse-version-2.onrender.com";
 // Variable to hold the selected API base URL based on the environment
 let api_url = "";
 let mode = "pro";
