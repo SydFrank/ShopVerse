@@ -44,10 +44,17 @@ class authControllers {
           });
 
           // Set token in cookie, valid for 7 days
+          // res.cookie("accessToken", token, {
+          //   expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          //   httpOnly: true,
+          //   secure: process.env.NODE_ENV === "production",
+          // });
+
           res.cookie("accessToken", token, {
-            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: true,
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
           });
 
           // Send success response
@@ -162,8 +169,14 @@ class authControllers {
           });
 
           // Set token in cookie, valid for 7 days
+          // res.cookie("accessToken", token, {
+          //   expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          // });
           res.cookie("accessToken", token, {
-            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
           });
 
           // Send success response
