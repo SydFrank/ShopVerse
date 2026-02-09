@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 // An asynchronous function to establish a connection to the MongoDB database
 const dbConnect = async () => {
   try {
-    if (process.env.MODE === "pro") {
+    if (process.env.mode === "pro") {
       await mongoose.connect(process.env.DB_PRO_URL, {
         useNewUrlParser: true, // Use the new URL parser to avoid deprecation warnings
       });
