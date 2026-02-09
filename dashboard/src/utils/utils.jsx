@@ -1,5 +1,3 @@
-// import io from "socket.io-client";
-
 // Styles for loading spinner
 export const overrideStyle = {
   display: "flex",
@@ -9,12 +7,13 @@ export const overrideStyle = {
   alignItems: "center",
 };
 
-import { io } from "socket.io-client";
-
-export const socket = io(
-  "https://backend-shopverse-version-5-updated.onrender.com",
-  {
-    withCredentials: true,
-    transports: ["websocket", "polling"],
-  },
-);
+// import { io } from "socket.io-client";
+import io from "socket.io-client";
+// export const socket = io(
+//   "https://backend-shopverse-version-5-updated.onrender.com",
+//   {
+//     withCredentials: true,
+//     transports: ["websocket", "polling"],
+//   },
+// );
+export const socket = io("http://localhost:5000");
