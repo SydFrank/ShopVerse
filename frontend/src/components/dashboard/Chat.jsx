@@ -14,7 +14,6 @@ import toast from "react-hot-toast";
 // import io from "socket.io-client";
 import { io } from "socket.io-client";
 
-// const SOCKET_URL = "http://localhost:5000";
 // const socket = io("http://localhost:5000");
 
 const socket = io("https://backend-shopverse-version-4-update.onrender.com", {
