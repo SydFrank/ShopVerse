@@ -16,7 +16,7 @@ import io from "socket.io-client";
 
 // const socket = io("http://localhost:5000");
 
-const socket = io("https://backend-shopverse-version-5-updated.onrender.com", {
+const socket = io("https://backend-shopverse-version-6-updated.onrender.com", {
   withCredentials: true,
   transports: ["websocket", "polling"],
 });
