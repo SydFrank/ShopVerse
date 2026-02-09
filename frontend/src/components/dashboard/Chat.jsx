@@ -11,12 +11,11 @@ import {
   updateMessage,
 } from "../../store/reducers/chatReducer";
 import toast from "react-hot-toast";
-import io from "socket.io-client";
+// import io from "socket.io-client";
+import { io } from "socket.io-client";
+
 // const SOCKET_URL = "http://localhost:5000";
 const socket = io("http://localhost:5000");
-// const socket = io("https://shopverse-backend-platform.onrender.com", {
-//   withCredentials: true,
-// });
 
 const Chat = () => {
   // Reference for scrolling to the latest message within chat container
