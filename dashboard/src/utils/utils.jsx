@@ -10,4 +10,8 @@ export const overrideStyle = {
 };
 
 // Initialize socket connection
-export const socket = io("http://localhost:5000");
+// export const socket = io("http://localhost:5000");
+
+export const socket = io("https://shopverse-platform-latest.onrender.com", {
+  withCredentials: true,
+});
