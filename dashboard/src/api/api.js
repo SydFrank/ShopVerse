@@ -28,7 +28,7 @@ import axios from "axios"; // Popular HTTP client library for making API request
 const local = "http://localhost:5000";
 
 // Production server URL - update this with actual production domain
-const production = "https://backend-shopverse-version-4-update.onrender.com";
+const production = "https://backend-shopverse-version-5-updated.onrender.com";
 // Variable to hold the selected API base URL based on the environment
 let api_url = "";
 let mode = "pro";
