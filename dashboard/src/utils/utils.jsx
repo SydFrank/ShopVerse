@@ -11,7 +11,7 @@ export const overrideStyle = {
 
 import { io } from "socket.io-client";
 
-export const socket = io("https://backend-shopverse-version-2.onrender.com", {
+export const socket = io("https://backend-shopverse-version-3.onrender.com", {
   withCredentials: true,
   transports: ["websocket", "polling"],
 });
