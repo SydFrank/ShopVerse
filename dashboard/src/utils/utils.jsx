@@ -9,11 +9,14 @@ export const overrideStyle = {
 
 import { io } from "socket.io-client";
 // import io from "socket.io-client";
+// export const socket = io(
+//   "https://backend-shopverse-version-7-updated.onrender.com",
+//   {
+//     withCredentials: true,
+//     transports: ["websocket", "polling"],
+//   },
+// );
+// export const socket = io("http://localhost:5000");
 export const socket = io(
   "https://backend-shopverse-version-7-updated.onrender.com",
-  {
-    withCredentials: true,
-    transports: ["websocket", "polling"],
-  },
 );
-// export const socket = io("http://localhost:5000");

@@ -101,24 +101,11 @@ const SellerToCustomer = () => {
   }, [successMessage]);
 
   // Effect to listen for incoming messages from the socket server
-  // useEffect(() => {
-  //   // Listen for 'customer_message' event from the socket server
-  //   socket.on("customer_message", (msg) => {
-  //     setReceiverMessage(msg);
-  //   });
-  // }, []);
-
-  // update 4
   useEffect(() => {
-    const onCustomerMsg = (msg) => {
+    // Listen for 'customer_message' event from the socket server
+    socket.on("customer_message", (msg) => {
       setReceiverMessage(msg);
-    };
-
-    socket.on("customer_message", onCustomerMsg);
-
-    return () => {
-      socket.off("customer_message", onCustomerMsg);
-    };
+    });
   }, []);
 
   // Effect to update messages when a new receiver message is received
