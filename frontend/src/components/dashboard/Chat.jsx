@@ -14,12 +14,12 @@ import toast from "react-hot-toast";
 import io from "socket.io-client";
 // import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000");
+// const socket = io("http://localhost:5000");
 
-// const socket = io("https://backend-shopverse-version-5-updated.onrender.com", {
-//   withCredentials: true,
-//   transports: ["websocket", "polling"],
-// });
+const socket = io("https://backend-shopverse-version-5-updated.onrender.com", {
+  withCredentials: true,
+  transports: ["websocket", "polling"],
+});
 
 const Chat = () => {
   // Reference for scrolling to the latest message within chat container
@@ -42,10 +42,30 @@ const Chat = () => {
   // Local state for managing active seller
   const [activeSeller, setActiveSeller] = useState([]);
 
-  // Effect to add user to socket server on component mount
+  // update 1
   useEffect(() => {
-    socket.emit("add_user", userInfo.id, userInfo);
+    const onConnect = () => console.log("socket connected:", socket.id);
+    const onError = (e) => console.log("socket connect_error:", e.message);
+
+    socket.on("connect", onConnect);
+    socket.on("connect_error", onError);
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("connect_error", onError);
+    };
   }, []);
+
+  // Effect to add user to socket server on component mount
+  // useEffect(() => {
+  //   socket.emit("add_user", userInfo.id, userInfo);
+  // }, []);
+
+  // update 2
+  useEffect(() => {
+    if (!userInfo?.id) return;
+    socket.emit("add_user", userInfo.id, userInfo);
+  }, [userInfo?.id]);
 
   // Effect to add a friend when sellerId changes
   useEffect(() => {
@@ -73,15 +93,32 @@ const Chat = () => {
   };
 
   // Effect to listen for incoming messages from the socket server
+  // useEffect(() => {
+  //   // Listen for 'seller_message' event from the socket server
+  //   socket.on("seller_message", (msg) => {
+  //     setReceiverMessage(msg);
+  //   });
+  //   // Clean up the event listener on component unmount
+  //   socket.on("activeSeller", (sellers) => {
+  //     setActiveSeller(sellers);
+  //   });
+  // }, []);
+
+  // update 3
   useEffect(() => {
-    // Listen for 'seller_message' event from the socket server
-    socket.on("seller_message", (msg) => {
-      setReceiverMessage(msg);
-    });
-    // Clean up the event listener on component unmount
-    socket.on("activeSeller", (sellers) => {
+    const onSellerMsg = (msg) => setReceiverMessage(msg);
+    const onActiveSeller = (sellers) => {
+      console.log("activeSeller:", sellers); // 你想看对象有没有来，就看这个
       setActiveSeller(sellers);
-    });
+    };
+
+    socket.on("seller_message", onSellerMsg);
+    socket.on("activeSeller", onActiveSeller);
+
+    return () => {
+      socket.off("seller_message", onSellerMsg);
+      socket.off("activeSeller", onActiveSeller);
+    };
   }, []);
 
   // Effect to emit sent message to socket server when successMessage changes
