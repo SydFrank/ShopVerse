@@ -10,7 +10,7 @@ export const overrideStyle = {
 import { io } from "socket.io-client";
 // import io from "socket.io-client";
 export const socket = io(
-  "https://backend-shopverse-version-6-updated.onrender.com",
+  "https://backend-shopverse-version-7-updated.onrender.com",
   {
     withCredentials: true,
     transports: ["websocket", "polling"],
